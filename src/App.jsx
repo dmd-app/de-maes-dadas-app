@@ -134,7 +134,7 @@ const ContentCarousel = ({ title, items }) => (
           </div>
           <div className="p-4 bg-white flex flex-col flex-grow">
             <h4 className="font-display font-bold text-lg text-black mb-2 leading-tight">{item.title}</h4>
-            <p className="text-sm font-sans text-gray-600 line-clamp-3 leading-relaxed">{item.desc}</p>
+            <p className="text-sm font-sans text-black line-clamp-3 leading-relaxed">{item.desc}</p>
           </div>
         </div>
       ))}
