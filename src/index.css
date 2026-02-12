@@ -2,20 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --color-terracotta: #E07A5F;
-  --color-beige: #F4F1DE;
-  --color-green: #3D405B;
-  --color-soft-green: #81B29A;
-  --color-cream: #F2CC8F;
-}
-
+/* O Tailwind agora controla tudo via classes no App.jsx */
 body {
-  background-color: var(--color-beige);
-  color: var(--color-green);
-  font-family: 'Lato', sans-serif;
+  @apply bg-dmd-bg text-dmd-black font-sans;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', serif;
+  @apply font-display;
 }
