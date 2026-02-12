@@ -123,8 +123,8 @@ const ContentCarousel = ({ title, items }) => (
     
     <div className="flex overflow-x-auto px-6 gap-4 pb-4 snap-x hide-scrollbar">
       {items.map((item, idx) => (
-        <div key={idx} className={`min-w-[280px] snap-center bg-white rounded-xl border-2 border-black shadow-md overflow-hidden flex-shrink-0 hover:shadow-xl transition-shadow`}>
-          <div className={`h-40 relative bg-gradient-to-br ${item.color}`}>
+        <div key={idx} className={`min-w-[280px] h-80 snap-center bg-white rounded-xl border-2 border-black shadow-md overflow-hidden flex-shrink-0 hover:shadow-xl transition-shadow flex flex-col`}>
+          <div className={`h-40 relative bg-gradient-to-br ${item.color} flex-shrink-0`}>
             <div className="absolute inset-0 bg-black/5"></div>
             <div className="absolute bottom-0 left-0 p-4 w-full">
               <span className="text-black text-xs font-sans font-bold uppercase tracking-wider bg-white border-2 border-black px-2 py-1 rounded shadow-sm">
@@ -132,9 +132,9 @@ const ContentCarousel = ({ title, items }) => (
               </span>
             </div>
           </div>
-          <div className="p-4 bg-white">
-            <h4 className="font-display font-bold text-lg text-black mb-1 leading-tight">{item.title}</h4>
-            <p className="text-sm font-sans text-gray-600 line-clamp-2">{item.desc}</p>
+          <div className="p-4 bg-white flex flex-col flex-grow">
+            <h4 className="font-display font-bold text-lg text-black mb-2 leading-tight">{item.title}</h4>
+            <p className="text-sm font-sans text-gray-600 line-clamp-3 leading-relaxed">{item.desc}</p>
           </div>
         </div>
       ))}
@@ -189,9 +189,6 @@ const App = () => {
       <ContentCarousel title="Encontre Sua Tribo" items={tribos} />
       
       {/* Footer Navigation */}
-      <div className="fixed bottom-16 left-0 right-0 text-center text-[10px] font-bold text-red-500 bg-yellow-200 z-50">
-        VERSÃO 2.0 - PELE NOVA (TESTE)
-      </div>
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-black px-6 py-3 flex justify-between items-center text-xs font-bold text-gray-400 max-w-md mx-auto z-50">
         <button className="flex flex-col items-center gap-1 text-dmd-blue transform scale-105">
           <div className="p-1 bg-dmd-bg border-2 border-black rounded-full shadow-sm">
