@@ -7,15 +7,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        'dmd-terracotta': '#E07A5F',
-        'dmd-beige': '#F4F1DE',
-        'dmd-green': '#3D405B',
-        'dmd-soft-green': '#81B29A',
-        'dmd-cream': '#F2CC8F',
+        'dmd-bg': '#F6F3EE',
+        'dmd-blue': '#2B4DBC',
+        'dmd-yellow': '#C78A1D',
+        'dmd-pink': '#FFBAF7',
+        'dmd-lime': '#DCFFA2',
+        'dmd-black': '#000000',
       },
       fontFamily: {
-        serif: ['Playfair Display', 'serif'],
-        sans: ['Lato', 'sans-serif'],
+        display: ['"Bricolage Grotesque"', 'sans-serif'],
+        sans: ['Poppins', 'sans-serif'],
       },
     },
   },
