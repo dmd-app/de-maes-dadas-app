@@ -189,6 +189,9 @@ const App = () => {
       <ContentCarousel title="Encontre Sua Tribo" items={tribos} />
       
       {/* Footer Navigation */}
+      <div className="fixed bottom-16 left-0 right-0 text-center text-[10px] font-bold text-red-500 bg-yellow-200 z-50">
+        VERSÃO 2.0 - PELE NOVA (TESTE)
+      </div>
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-black px-6 py-3 flex justify-between items-center text-xs font-bold text-gray-400 max-w-md mx-auto z-50">
         <button className="flex flex-col items-center gap-1 text-dmd-blue transform scale-105">
           <div className="p-1 bg-dmd-bg border-2 border-black rounded-full shadow-sm">
