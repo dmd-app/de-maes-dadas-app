@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        'pop-pink': '#F0C4D5',      // Fundo Principal
+        'pop-pink': '#FCCA59',      // Fundo Principal
         'pop-burgundy': '#7A1C38',  // Cor do Logo/Botão Forte
         'pop-blue': '#0A3F6B',      // Azul Escuro
         'pop-green': '#144D38',     // Verde Escuro
