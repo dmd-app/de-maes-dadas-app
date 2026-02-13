@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  @apply bg-pop-pink font-sans;
+  @apply bg-soft-bg font-sans;
 }
 
 h1, h2, h3, h4, h5, h6 {

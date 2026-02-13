@@ -30,7 +30,7 @@ const MoodCup = () => {
   };
 
   return (
-    <section className="px-6 py-2">
+    <section className="px-6 py-2 bg-soft-bg">
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col items-center">
         <h2 className="text-gray-700 font-sans mb-6">Como está seu copo hoje?</h2>
         
@@ -79,7 +79,7 @@ const ActionGrid = () => {
 
   return (
     <>
-      <section className="px-6 py-4 grid grid-cols-2 gap-4">
+      <section className="px-6 py-4 grid grid-cols-2 gap-4 bg-soft-bg">
         <button 
           onClick={() => setIsPanicOpen(true)}
           className="col-span-2 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white p-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all"
@@ -145,7 +145,7 @@ const ActionGrid = () => {
 };
 
 const ContentSection = ({ title, items, badgeColor }) => (
-  <section className="py-6">
+  <section className="py-6 bg-soft-bg">
     <div className="px-6 mb-4 flex justify-between items-center">
       <h3 className="text-lg font-sans font-bold text-gray-800">{title}</h3>
       <a href="#" className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</a>
@@ -155,13 +155,13 @@ const ContentSection = ({ title, items, badgeColor }) => (
       {items.map((item, idx) => (
         <div key={idx} className="min-w-[240px] snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col">
           {/* Card Image Area - imitating illustrations with gradients/patterns */}
-          <div className={`h-32 relative ${item.bgClass} flex items-center justify-center`}>
-             <span className={`absolute top-4 left-4 text-[10px] font-bold text-white px-3 py-1 rounded-full ${badgeColor}`}>
+          <div className={`h-32 relative ${item.bgClass} flex items-center justify-center overflow-hidden`}>
+             <span className={`absolute top-4 left-4 text-[10px] font-bold text-white px-3 py-1 rounded-full ${badgeColor} z-10`}>
                 {item.tag}
              </span>
              {/* Abstract Shapes (CSS) */}
-             <div className="w-16 h-16 rounded-full bg-white/20 blur-xl absolute top-2 right-2"></div>
-             <div className="w-20 h-20 rounded-full bg-black/5 blur-xl absolute bottom-0 left-0"></div>
+             <div className="w-24 h-24 rounded-full bg-white/20 blur-2xl absolute -top-4 -right-4"></div>
+             <div className="w-32 h-32 rounded-full bg-black/5 blur-3xl absolute -bottom-10 -left-10"></div>
           </div>
           
           <div className="p-5">
@@ -222,13 +222,18 @@ const App = () => {
       {/* Footer Navigation - Clean White */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-8 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-md mx-auto z-50">
         <button className="flex flex-col items-center gap-1 text-[#FF66C4]">
-          <Heart size={24} fill="#FF66C4" />
+          <div className="p-1 bg-pink-50 rounded-lg">
+             <Heart size={24} fill="#FF66C4" />
+          </div>
+          <span>Início</span>
         </button>
         <button className="flex flex-col items-center gap-1 hover:text-[#FF66C4] transition-colors">
           <MessageCircle size={24} />
+          <span>Aldeia</span>
         </button>
         <button className="flex flex-col items-center gap-1 hover:text-[#FF66C4] transition-colors">
           <User size={24} />
+          <span>Perfil</span>
         </button>
       </nav>
     </div>
