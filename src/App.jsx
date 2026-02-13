@@ -36,11 +36,13 @@ const MoodCup = () => {
     "Transbordando amor e paciência!",
   ];
 
-  // Logic: 0 (Empty/Green) -> 10 (Full/Red)
+  // Logic: 0 (Vazio/Exausta/Azul) -> 5 (Equilibrada/Verde) -> 10 (Cheio/Raiva/Vermelho)
   const getCupColor = (val) => {
-    if (val < 4) return 'bg-soft-green'; 
-    if (val > 7) return 'bg-soft-orange';
-    return 'bg-[#A3E635]'; // Lime green for middle
+    if (val <= 2) return 'bg-cup-empty';
+    if (val <= 4) return 'bg-cup-low';
+    if (val <= 6) return 'bg-cup-balanced';
+    if (val <= 8) return 'bg-cup-high';
+    return 'bg-cup-full';
   };
 
   return (
@@ -71,7 +73,7 @@ const MoodCup = () => {
         {/* Slider */}
         <div className="w-full relative">
           {/* Gradient Track Background */}
-          <div className="h-2 w-full rounded-full bg-gradient-to-r from-soft-green via-yellow-400 to-soft-orange absolute top-2"></div>
+          <div className="h-2 w-full rounded-full bg-gradient-to-r from-cup-empty via-cup-balanced to-cup-full absolute top-2"></div>
           <input 
             type="range" 
             min="0" 
@@ -83,8 +85,9 @@ const MoodCup = () => {
         </div>
         
         <div className="w-full flex justify-between text-xs text-gray-400 mt-2 font-medium">
-          <span>0 - Vazio</span>
-          <span>10 - Cheio</span>
+          <span className="text-cup-empty">0 - Exausta</span>
+          <span className="text-gray-400">5 - Equilibrada</span>
+          <span className="text-cup-full">10 - Raiva</span>
         </div>
       </div>
     </section>
