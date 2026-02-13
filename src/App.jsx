@@ -23,34 +23,46 @@ const MoodCup = () => {
   const [mood, setMood] = useState(5);
   
   const moodPhrases = [
-    "Socorro. Não tenho nada pra dar.",
-    "No vapor. Preciso de pausa urgente.",
-    "A reserva de paciência acabou.",
-    "Cansada, mas sobrevivendo.",
-    "No piloto automático.",
-    "Um dia de cada vez.",
-    "Respirando fundo. Está tudo bem.",
-    "Hoje o dia está fluindo.",
-    "Tenho energia para mim e para eles.",
-    "Me sentindo viva e presente.",
-    "Transbordando amor e paciência!",
+    "Respire. Você precisa ser cuidada agora.",
+    "Peça ajuda. Não carregue o mundo sozinha.",
+    "Uma pausa de 5 minutos pode salvar seu dia.",
+    "Você está fazendo o seu melhor.",
+    "Quase lá. Mantenha a calma.",
+    "Equilíbrio perfeito. Aproveite esse momento.",
+    "Atenção aos sinais do corpo.",
+    "Opa. A temperatura está subindo.",
+    "Saia de cena antes de explodir.",
+    "Luz vermelha! Pare tudo agora.",
+    "Sua raiva é válida. Proteja-se.",
   ];
+
+  const moodIcons = ["", "", "", "", "", "", "", "", "", "", ""];
 
   // Logic: 0 (Vazio/Exausta/Azul) -> 5 (Equilibrada/Verde) -> 10 (Cheio/Raiva/Vermelho)
   const getCupColor = (val) => {
-    if (val <= 2) return 'bg-cup-empty';
-    if (val <= 4) return 'bg-cup-low';
+    if (val <= 1) return 'bg-cup-empty';
+    if (val <= 2) return 'bg-cup-low';
+    if (val <= 4) return 'bg-cup-rising';
     if (val <= 6) return 'bg-cup-balanced';
+    if (val <= 7) return 'bg-cup-warm';
     if (val <= 8) return 'bg-cup-high';
     return 'bg-cup-full';
+  };
+
+  const getPhraseColor = (val) => {
+    if (val <= 2) return 'text-cup-empty';
+    if (val <= 4) return 'text-cup-rising';
+    if (val <= 6) return 'text-cup-balanced';
+    if (val <= 8) return 'text-cup-high';
+    return 'text-cup-full';
   };
 
   return (
     <section className="px-6 py-2 bg-soft-bg">
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col items-center">
         <h2 className="text-gray-700 font-sans mb-1">Como está seu copo hoje?</h2>
-        <p className="text-sm text-gray-400 font-sans italic mb-6 text-center transition-all duration-300">
-          {`"${moodPhrases[mood]}"`}
+        <p className={`text-sm font-sans italic mb-6 text-center transition-all duration-300 ${getPhraseColor(mood)}`}>
+          {`"${moodPhrases[mood]}" ${moodIcons[mood]}`}
         </p>
         
         {/* The Visual Cup */}
@@ -84,10 +96,10 @@ const MoodCup = () => {
           />
         </div>
         
-        <div className="w-full flex justify-between text-xs text-gray-400 mt-2 font-medium">
-          <span className="text-cup-empty">0 - Exausta</span>
-          <span className="text-gray-400">5 - Equilibrada</span>
-          <span className="text-cup-full">10 - Raiva</span>
+        <div className="w-full flex justify-between text-xs mt-2 font-medium">
+          <span className="text-cup-empty">Vazio</span>
+          <span className="text-cup-balanced">Equilíbrio</span>
+          <span className="text-cup-full">Cheio</span>
         </div>
       </div>
     </section>
