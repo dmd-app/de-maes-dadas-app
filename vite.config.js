@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
-    // Force new hash generation (Build v3)
+    // Force new hash generation (Build v4 - Final Polish)
     rollupOptions: {
       output: {
         entryFileNames: `assets/[name].${Date.now()}.js`,
