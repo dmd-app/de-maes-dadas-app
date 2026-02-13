@@ -7,14 +7,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        'pop-pink': '#F0C4D5',      // Fundo Principal
-        'pop-burgundy': '#7A1C38',  // Cor do Logo/Botão Forte
-        'pop-blue': '#0A3F6B',      // Azul Escuro
-        'pop-green': '#144D38',     // Verde Escuro
-        'pop-lime': '#C8E068',      // Verde Lima
-        'pop-orange': '#E67A48',    // Laranja
-        'pop-yellow': '#FDF0A6',    // Amarelo Claro
-        'pop-light': '#FDF3F6',     // Off-white rosado
+        'soft-bg': '#FFF5F9',       // Fundo Rosa Bebê
+        'soft-blue': '#1E3A8A',     // Azul do Logo
+        'soft-purple': '#A855F7',   // Roxo dos Botões
+        'soft-pink': '#EC4899',     // Rosa dos Detalhes
+        'soft-green': '#84CC16',    // Verde do Copo Cheio
+        'soft-orange': '#F97316',   // Laranja do Copo Vazio
+        'soft-gray': '#64748B',     // Texto Secundário
       },
       fontFamily: {
         display: ['"Bricolage Grotesque"', 'sans-serif'],
