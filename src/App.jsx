@@ -97,14 +97,12 @@ const PanicButton = () => {
 
 const ActionButtons = () => (
   <section className="px-6 py-4 grid grid-cols-2 gap-4 bg-pop-pink">
-    <button className="p-5 bg-pop-green rounded-full shadow-md flex flex-col items-center justify-center gap-1 hover:scale-105 transition-transform">
-      <Users size={24} className="text-pop-lime" />
-      <span className="font-sans font-bold text-sm text-pop-lime tracking-wide">Rodas de Conversa</span>
+    <button className="p-6 bg-pop-green rounded-full shadow-md flex flex-col items-center justify-center gap-1 hover:scale-105 transition-transform h-32">
+      <span className="font-sans font-bold text-lg text-pop-lime tracking-wide text-center leading-tight">Rodas de Conversa</span>
     </button>
     
-    <button className="p-5 bg-pop-orange rounded-full shadow-md flex flex-col items-center justify-center gap-1 hover:scale-105 transition-transform">
-      <BookOpen size={24} className="text-white" />
-      <span className="font-sans font-bold text-sm text-white tracking-wide">Biblioteca</span>
+    <button className="p-6 bg-pop-orange rounded-full shadow-md flex flex-col items-center justify-center gap-1 hover:scale-105 transition-transform h-32">
+      <span className="font-sans font-bold text-lg text-white tracking-wide text-center leading-tight">Biblioteca</span>
     </button>
   </section>
 );
