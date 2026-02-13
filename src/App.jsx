@@ -22,6 +22,20 @@ const Header = () => (
 const MoodCup = () => {
   const [mood, setMood] = useState(5);
   
+  const moodPhrases = [
+    "Socorro. Não tenho nada pra dar.",
+    "No vapor. Preciso de pausa urgente.",
+    "A reserva de paciência acabou.",
+    "Cansada, mas sobrevivendo.",
+    "No piloto automático.",
+    "Um dia de cada vez.",
+    "Respirando fundo. Está tudo bem.",
+    "Hoje o dia está fluindo.",
+    "Tenho energia para mim e para eles.",
+    "Me sentindo viva e presente.",
+    "Transbordando amor e paciência!",
+  ];
+
   // Logic: 0 (Empty/Green) -> 10 (Full/Red)
   const getCupColor = (val) => {
     if (val < 4) return 'bg-soft-green'; 
@@ -32,7 +46,10 @@ const MoodCup = () => {
   return (
     <section className="px-6 py-2 bg-soft-bg">
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col items-center">
-        <h2 className="text-gray-700 font-sans mb-6">Como está seu copo hoje?</h2>
+        <h2 className="text-gray-700 font-sans mb-1">Como está seu copo hoje?</h2>
+        <p className="text-sm text-gray-400 font-sans italic mb-6 text-center transition-all duration-300">
+          {`"${moodPhrases[mood]}"`}
+        </p>
         
         {/* The Visual Cup */}
         <div className="relative w-32 h-44 border-x-4 border-b-4 border-gray-200 rounded-b-2xl mb-6 overflow-hidden">
