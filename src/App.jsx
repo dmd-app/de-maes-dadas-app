@@ -22,10 +22,10 @@ const Header = () => (
 const MoodCup = () => {
   const [mood, setMood] = useState(5);
   
-  // Logic: 0 (Empty/Sad/Orange) -> 10 (Full/Happy/Green)
+  // Logic: 0 (Empty/Green) -> 10 (Full/Red)
   const getCupColor = (val) => {
-    if (val < 4) return 'bg-soft-orange'; 
-    if (val > 7) return 'bg-soft-green';
+    if (val < 4) return 'bg-soft-green'; 
+    if (val > 7) return 'bg-soft-orange';
     return 'bg-[#A3E635]'; // Lime green for middle
   };
 
@@ -54,7 +54,7 @@ const MoodCup = () => {
         {/* Slider */}
         <div className="w-full relative">
           {/* Gradient Track Background */}
-          <div className="h-2 w-full rounded-full bg-gradient-to-r from-soft-orange via-yellow-400 to-soft-green absolute top-2"></div>
+          <div className="h-2 w-full rounded-full bg-gradient-to-r from-soft-green via-yellow-400 to-soft-orange absolute top-2"></div>
           <input 
             type="range" 
             min="0" 
