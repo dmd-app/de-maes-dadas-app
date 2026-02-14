@@ -60,15 +60,16 @@ const MoodCup = () => {
   return (
     <section className="px-6 py-2 bg-soft-bg">
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col">
-        <h2 className="text-gray-700 font-sans mb-1 text-left">Como est&#225; seu copo hoje?</h2>
-        <p className={`text-sm font-sans italic mb-4 text-left transition-all duration-300 ${getPhraseColor(mood)}`}>
-          {`"${moodPhrases[mood]}" ${moodIcons[mood]}`}
-        </p>
+        <h2 className="text-gray-700 font-sans mb-4 text-left">Como est&#225; seu copo hoje?</h2>
 
         {/* Mood Number */}
-        <div className={`text-3xl font-bold mb-4 text-center transition-colors duration-300 ${getPhraseColor(mood)}`}>
+        <div className={`text-3xl font-bold text-center transition-colors duration-300 ${getPhraseColor(mood)}`}>
           {mood}<span className="text-lg text-gray-300 font-normal">/10</span>
         </div>
+
+        <p className={`text-sm font-sans italic mb-4 mt-1 text-center transition-all duration-300 ${getPhraseColor(mood)}`}>
+          {`"${moodPhrases[mood]}" ${moodIcons[mood]}`}
+        </p>
 
         {/* Slider with 7-stop gradient */}
         <div className="w-full relative">
