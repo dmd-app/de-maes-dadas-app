@@ -61,45 +61,37 @@ const MoodCup = () => {
     <section className="px-6 py-2 bg-soft-bg">
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col">
         <h2 className="text-gray-700 font-sans mb-1 text-left">Como est&#225; seu copo hoje?</h2>
-        <p className={`text-sm font-sans italic mb-6 text-left transition-all duration-300 ${getPhraseColor(mood)}`}>
+        <p className={`text-sm font-sans italic mb-4 text-left transition-all duration-300 ${getPhraseColor(mood)}`}>
           {`"${moodPhrases[mood]}" ${moodIcons[mood]}`}
         </p>
-        
-        {/* The Visual Cup */}
-        <div className="relative w-32 h-44 border-x-4 border-b-4 border-gray-200 rounded-b-2xl mb-6 overflow-hidden mx-auto">
-          {/* Liquid */}
-          <div 
-            className={`absolute bottom-0 left-0 w-full transition-all duration-500 ease-out ${getCupColor(mood)}`}
-            style={{ height: `${mood * 10}%` }}
-          >
-            {/* Surface Line */}
-            <div className="w-full h-1 bg-white/30 absolute top-0"></div>
-          </div>
-        </div>
 
-        {/* The Badge */}
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold mb-4 transition-colors mx-auto ${getCupColor(mood)}`}>
+        {/* Mood Number */}
+        <div className={`text-3xl font-bold mb-4 text-center transition-colors duration-300 ${getPhraseColor(mood)}`}>
           {mood}
         </div>
 
-        {/* Slider */}
+        {/* Slider with 7-stop gradient */}
         <div className="w-full relative">
-          {/* Gradient Track Background */}
-          <div className="h-2 w-full rounded-full bg-gradient-to-r from-cup-empty via-cup-balanced to-cup-full absolute top-2"></div>
+          <div 
+            className="h-3 w-full rounded-full absolute top-[6px]"
+            style={{
+              background: 'linear-gradient(to right, #3B82F6 0%, #06B6D4 16%, #34D399 33%, #22C55E 50%, #FBBF24 66%, #F97316 83%, #EF4444 100%)'
+            }}
+          ></div>
           <input 
             type="range" 
             min="0" 
             max="10" 
             value={mood} 
             onChange={(e) => setMood(parseInt(e.target.value))}
-            className="w-full h-2 bg-transparent rounded-lg appearance-none cursor-pointer relative z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-soft-pink [&::-webkit-slider-thumb]:shadow-md"
+            className="w-full h-3 bg-transparent rounded-lg appearance-none cursor-pointer relative z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-7 [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-gray-300 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing"
           />
         </div>
         
-        <div className="w-full flex justify-between text-xs mt-2 font-medium">
-          <span className="text-cup-empty">Vazio</span>
-          <span className="text-cup-balanced">Equilíbrio</span>
-          <span className="text-cup-full">Cheio</span>
+        <div className="w-full flex justify-between text-xs mt-3 font-medium">
+          <span className="text-cup-empty font-semibold">0 - Vazio</span>
+          <span className="text-cup-balanced font-semibold">5 - Equilíbrio</span>
+          <span className="text-cup-full font-semibold">10 - Cheio</span>
         </div>
       </div>
     </section>
