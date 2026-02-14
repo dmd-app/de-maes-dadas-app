@@ -239,7 +239,7 @@ const App = () => {
       <Header />
       <MoodCup />
       <ActionGrid />
-      <ContentSection title="Trilhas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" />
+      <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" />
       <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" />
       
       {/* Footer Navigation - Floating */}
