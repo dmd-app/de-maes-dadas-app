@@ -207,7 +207,8 @@ const App = () => {
       title: "O Luto da Identidade",
       desc: "Quem era você antes de ser mãe? Vamos reencontrar essa mulher.",
       tag: "DIVÃ",
-      bgClass: "bg-gradient-to-br from-pink-200 to-red-100" 
+      bgClass: "bg-gradient-to-br from-pink-200 to-red-100",
+      image: "/images/luto-identidade.jpeg"
     },
     {
       title: "A Luz Vermelha da Raiva",
