@@ -169,14 +169,19 @@ const ContentSection = ({ title, items, badgeColor }) => (
     <div className="flex overflow-x-auto px-6 gap-4 pb-8 snap-x hide-scrollbar">
       {items.map((item, idx) => (
         <div key={idx} className="min-w-[240px] snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col">
-          {/* Card Image Area - imitating illustrations with gradients/patterns */}
+          {/* Card Image Area */}
           <div className={`h-32 relative ${item.bgClass} flex items-center justify-center overflow-hidden`}>
              <span className={`absolute top-4 left-4 text-[10px] font-bold px-3 py-1 rounded-full ${badgeColor} z-10`}>
                 {item.tag}
              </span>
-             {/* Abstract Shapes (CSS) */}
-             <div className="w-24 h-24 rounded-full bg-white/20 blur-2xl absolute -top-4 -right-4"></div>
-             <div className="w-32 h-32 rounded-full bg-black/5 blur-3xl absolute -bottom-10 -left-10"></div>
+             {item.image ? (
+               <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+             ) : (
+               <>
+                 <div className="w-24 h-24 rounded-full bg-white/20 blur-2xl absolute -top-4 -right-4"></div>
+                 <div className="w-32 h-32 rounded-full bg-black/5 blur-3xl absolute -bottom-10 -left-10"></div>
+               </>
+             )}
           </div>
           
           <div className="p-5">
@@ -195,7 +200,8 @@ const App = () => {
       title: "Quem Cuida de Quem Cuida?",
       desc: "A política do cuidado e a solidão da mulher moderna.",
       tag: "ALDEIA",
-      bgClass: "bg-[#EAD6C6]" // Beige/Earth tone
+      bgClass: "bg-[#EAD6C6]",
+      image: "/images/quem-cuida.jpeg"
     },
     {
       title: "O Luto da Identidade",
