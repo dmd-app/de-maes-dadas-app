@@ -59,14 +59,14 @@ const MoodCup = () => {
 
   return (
     <section className="px-6 py-2 bg-soft-bg">
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col items-center">
-        <h2 className="text-gray-700 font-sans mb-1">Como está seu copo hoje?</h2>
-        <p className={`text-sm font-sans italic mb-6 text-center transition-all duration-300 ${getPhraseColor(mood)}`}>
+      <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col">
+        <h2 className="text-gray-700 font-sans mb-1 text-left">Como est&#225; seu copo hoje?</h2>
+        <p className={`text-sm font-sans italic mb-6 text-left transition-all duration-300 ${getPhraseColor(mood)}`}>
           {`"${moodPhrases[mood]}" ${moodIcons[mood]}`}
         </p>
         
         {/* The Visual Cup */}
-        <div className="relative w-32 h-44 border-x-4 border-b-4 border-gray-200 rounded-b-2xl mb-6 overflow-hidden">
+        <div className="relative w-32 h-44 border-x-4 border-b-4 border-gray-200 rounded-b-2xl mb-6 overflow-hidden mx-auto">
           {/* Liquid */}
           <div 
             className={`absolute bottom-0 left-0 w-full transition-all duration-500 ease-out ${getCupColor(mood)}`}
@@ -78,7 +78,7 @@ const MoodCup = () => {
         </div>
 
         {/* The Badge */}
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold mb-4 transition-colors ${getCupColor(mood)}`}>
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold mb-4 transition-colors mx-auto ${getCupColor(mood)}`}>
           {mood}
         </div>
 
