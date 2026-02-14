@@ -107,69 +107,55 @@ const ActionGrid = () => {
   const [isPanicOpen, setIsPanicOpen] = useState(false);
 
   return (
-    <>
-      <section className="px-6 py-4 grid grid-cols-2 gap-4 bg-soft-bg">
-        <button 
-          onClick={() => setIsPanicOpen(true)}
-          className="col-span-2 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white p-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all"
-        >
-          <Heart fill="white" size={20} />
-          <span className="font-bold tracking-wide">ABRIR O CORAÇÃO</span>
-        </button>
+    <section className="px-6 py-4 grid grid-cols-2 gap-4 bg-soft-bg">
+      <button 
+        onClick={() => setIsPanicOpen(!isPanicOpen)}
+        className="col-span-2 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white p-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all"
+      >
+        <Heart fill="white" size={20} />
+        <span className="font-bold tracking-wide">ABRIR O CORAÇÃO</span>
+      </button>
 
-        <button className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
-          <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
-            <MessageCircle size={24} />
-          </div>
-          <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de Conversa</span>
-        </button>
-        
-        <button className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
-          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
-            <BookOpen size={24} />
-          </div>
-          <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca (O Espelho)</span>
-        </button>
-      </section>
-
-      {/* Panic Modal Overlay */}
-      {isPanicOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4 animate-fade-in backdrop-blur-sm">
-          <div className="bg-white w-full max-w-sm rounded-[2rem] overflow-hidden shadow-2xl">
-            {/* Header Gradient */}
-            <div className="bg-gradient-to-r from-[#FF66C4] to-[#B946FF] p-6 text-center relative">
-              <h3 className="text-white font-bold text-lg uppercase tracking-wider">Abrir o Coração</h3>
-              <button onClick={() => setIsPanicOpen(false)} className="absolute top-6 right-6 text-white/80 hover:text-white">
-                <X size={20} />
-              </button>
-            </div>
-            
-            <div className="p-8 flex flex-col items-center">
-              <Heart size={48} className="text-[#FF66C4] mb-4 fill-[#FF66C4]" />
-              <h4 className="text-gray-800 font-bold mb-1">O que está pesando aí dentro?</h4>
-              <p className="text-gray-400 text-sm mb-6">Desabafe...</p>
-              
-              <textarea 
-                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF66C4] focus:outline-none text-gray-700 resize-none h-32 mb-6"
-                placeholder="Escreva aqui seus sentimentos..."
-              ></textarea>
-              
-              <div className="flex gap-3 w-full">
-                <button 
-                  onClick={() => setIsPanicOpen(false)}
-                  className="flex-1 py-3 text-gray-500 font-medium rounded-full border border-gray-200 hover:bg-gray-50"
-                >
-                  Cancelar
-                </button>
-                <button className="flex-1 py-3 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-full shadow-md">
-                  Enviar para a Aldeia
-                </button>
-              </div>
-            </div>
+      {/* Inline expand below button */}
+      <div className={`col-span-2 overflow-hidden transition-all duration-300 ease-in-out ${isPanicOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
+          <Heart size={36} className="text-[#FF66C4] mb-3 fill-[#FF66C4]" />
+          <h4 className="text-gray-800 font-bold mb-1">O que está pesando aí dentro?</h4>
+          <p className="text-gray-400 text-sm mb-4">Desabafe...</p>
+          
+          <textarea 
+            className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF66C4] focus:outline-none text-gray-700 resize-none h-28 mb-4 text-sm"
+            placeholder="Escreva aqui seus sentimentos..."
+          ></textarea>
+          
+          <div className="flex gap-3 w-full">
+            <button 
+              onClick={() => setIsPanicOpen(false)}
+              className="flex-1 py-3 text-gray-500 font-medium rounded-full border border-gray-200 hover:bg-gray-50 text-sm"
+            >
+              Cancelar
+            </button>
+            <button className="flex-1 py-3 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-full shadow-md text-sm">
+              Enviar para a Aldeia
+            </button>
           </div>
         </div>
-      )}
-    </>
+      </div>
+
+      <button className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
+        <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
+          <MessageCircle size={24} />
+        </div>
+        <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de Conversa</span>
+      </button>
+      
+      <button className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
+        <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
+          <BookOpen size={24} />
+        </div>
+        <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca (O Espelho)</span>
+      </button>
+    </section>
   );
 };
 
