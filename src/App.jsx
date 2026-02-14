@@ -250,11 +250,11 @@ const App = () => {
       
       {/* Footer Navigation - Floating */}
       <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-        <button className="flex flex-col items-center gap-1 text-[#FF66C4]">
-          <div className="p-1 bg-pink-50 rounded-lg">
-             <Heart size={24} fill="#FF66C4" />
+        <button className="flex flex-col items-center gap-1 text-gray-800">
+          <div className="p-1 bg-gray-100 rounded-lg">
+             <Heart size={24} fill="#374151" stroke="#374151" />
           </div>
-          <span>Inicio</span>
+          <span className="font-semibold">Inicio</span>
         </button>
         <button className="flex flex-col items-center gap-1 hover:text-[#FF66C4] transition-colors">
           <MessageCircle size={24} />
