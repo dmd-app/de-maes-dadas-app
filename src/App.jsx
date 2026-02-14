@@ -153,7 +153,7 @@ const ActionGrid = () => {
         <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
           <BookOpen size={24} />
         </div>
-        <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca (O Espelho)</span>
+        <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca<br />(O Espelho)</span>
       </button>
     </section>
   );
