@@ -67,7 +67,7 @@ const MoodCup = () => {
 
         {/* Mood Number */}
         <div className={`text-3xl font-bold mb-4 text-center transition-colors duration-300 ${getPhraseColor(mood)}`}>
-          {mood}
+          {mood}<span className="text-lg text-gray-300 font-normal">/10</span>
         </div>
 
         {/* Slider with 7-stop gradient */}
@@ -89,9 +89,8 @@ const MoodCup = () => {
         </div>
         
         <div className="w-full flex justify-between text-xs mt-3 font-medium">
-          <span className="text-cup-empty font-semibold">0 - Vazio</span>
-          <span className="text-cup-balanced font-semibold">5 - Equilíbrio</span>
-          <span className="text-cup-full font-semibold">10 - Cheio</span>
+          <span className="text-cup-empty font-semibold">Vazio</span>
+          <span className="text-cup-full font-semibold">Cheio</span>
         </div>
       </div>
     </section>
