@@ -144,7 +144,7 @@ const ActionGrid = () => {
 
       <button className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
         <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
-          <MessageCircle size={24} />
+          <Users size={24} />
         </div>
         <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de Conversa</span>
       </button>
