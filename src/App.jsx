@@ -60,7 +60,12 @@ const MoodCup = () => {
   return (
     <section className="px-6 py-2 bg-soft-bg">
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col">
-        <h2 className="text-gray-700 font-sans mb-4 text-left">Como est&#225; seu copo hoje?</h2>
+        <h2 className="text-gray-700 font-sans mb-1 text-left">Como est&#225; seu copo hoje?</h2>
+        <p className={`text-xs font-sans mb-4 text-left transition-all duration-300 ${getPhraseColor(mood)}`}>
+          {mood <= 3 && 'Copo Vazio (Exausta)'}
+          {mood >= 4 && mood <= 7 && 'Equilibrada (Por enquanto)'}
+          {mood >= 8 && 'Transbordando (Raiva)'}
+        </p>
 
         {/* Mood Number */}
         <div className={`text-3xl font-bold text-center transition-colors duration-300 ${getPhraseColor(mood)}`}>
