@@ -270,7 +270,10 @@ const App = () => {
       {/* Os Guardioes do Cuidado */}
       <section className="py-6 bg-soft-bg">
         <div className="px-6 mb-2">
-          <h3 className="text-lg font-sans font-bold text-gray-800">Os Guardi&#245;es do Cuidado</h3>
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-sans font-bold text-gray-800">Os Guardi&#245;es do Cuidado</h3>
+            <a href="#" className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</a>
+          </div>
           <p className="text-xs text-gray-400 leading-relaxed mt-1">
             Encontros com saberes que sustentam a vida. N&#227;o s&#227;o gurus. S&#227;o pessoas que caminham com o corpo, a escuta e a experi&#234;ncia.
           </p>
