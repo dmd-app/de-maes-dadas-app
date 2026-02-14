@@ -159,7 +159,7 @@ const ActionGrid = () => {
   );
 };
 
-const ContentSection = ({ title, items, badgeColor, cardWidth = "calc(50vw - 2.5rem)" }) => (
+const ContentSection = ({ title, items, badgeColor }) => (
   <section className="py-6 bg-soft-bg">
     <div className="px-6 mb-4 flex justify-between items-center">
       <h3 className="text-lg font-sans font-bold text-gray-800">{title}</h3>
@@ -168,7 +168,7 @@ const ContentSection = ({ title, items, badgeColor, cardWidth = "calc(50vw - 2.5
     
     <div className="flex overflow-x-auto px-6 gap-4 pb-8 snap-x hide-scrollbar">
       {items.map((item, idx) => (
-        <div key={idx} style={{ minWidth: cardWidth, maxWidth: cardWidth }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col">
+        <div key={idx} className="min-w-[180px] max-w-[180px] snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col">
           {/* Card Image Area */}
           <div className={`h-32 relative ${item.bgClass} flex items-center justify-center overflow-hidden`}>
              <span className={`absolute top-4 left-4 text-[10px] font-bold px-3 py-1 rounded-full ${badgeColor} z-10`}>
