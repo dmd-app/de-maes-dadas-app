@@ -7,7 +7,7 @@ import './index.css';
 const Header = () => (
   <header className="p-6 pb-2 flex justify-between items-start bg-soft-bg">
     <div>
-      <h1 className="text-3xl font-display font-bold text-soft-blue tracking-tight">DeMãesDadas</h1>
+      <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
       <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
       <div className="mt-6">
         <p className="text-lg text-soft-blue font-sans">Bem-vinda, Mamãe 💗</p>
@@ -22,52 +22,81 @@ const Header = () => (
 const MoodCup = () => {
   const [mood, setMood] = useState(5);
   
-  // Logic: 0 (Empty/Green) -> 10 (Full/Red)
+  const moodPhrases = [
+    "Respire. Você precisa ser cuidada agora.",
+    "Peça ajuda. Não carregue o mundo sozinha.",
+    "Uma pausa de 5 minutos pode salvar seu dia.",
+    "Você está fazendo o seu melhor.",
+    "Quase lá. Mantenha a calma.",
+    "Equilíbrio perfeito. Aproveite esse momento.",
+    "Atenção aos sinais do corpo.",
+    "Opa. A temperatura está subindo.",
+    "Saia de cena antes de explodir.",
+    "Luz vermelha! Pare tudo agora.",
+    "Sua raiva é válida. Proteja-se.",
+  ];
+
+  const moodIcons = ["", "", "", "", "", "", "", "", "", "", ""];
+
+  // Logic: 0 (Vazio/Exausta/Azul) -> 5 (Equilibrada/Verde) -> 10 (Cheio/Raiva/Vermelho)
   const getCupColor = (val) => {
-    if (val < 4) return 'bg-soft-green'; 
-    if (val > 7) return 'bg-soft-orange';
-    return 'bg-[#A3E635]'; // Lime green for middle
+    if (val <= 1) return 'bg-cup-empty';
+    if (val <= 2) return 'bg-cup-low';
+    if (val <= 4) return 'bg-cup-rising';
+    if (val <= 6) return 'bg-cup-balanced';
+    if (val <= 7) return 'bg-cup-warm';
+    if (val <= 8) return 'bg-cup-high';
+    return 'bg-cup-full';
+  };
+
+  const getPhraseColor = (val) => {
+    if (val <= 2) return 'text-cup-empty';
+    if (val <= 4) return 'text-cup-rising';
+    if (val <= 6) return 'text-cup-balanced';
+    if (val <= 8) return 'text-cup-high';
+    return 'text-cup-full';
   };
 
   return (
     <section className="px-6 py-2 bg-soft-bg">
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col items-center">
-        <h2 className="text-gray-700 font-sans mb-6">Como está seu copo hoje?</h2>
-        
-        {/* The Visual Cup */}
-        <div className="relative w-32 h-44 border-x-4 border-b-4 border-gray-200 rounded-b-2xl mb-6 overflow-hidden">
-          {/* Liquid */}
-          <div 
-            className={`absolute bottom-0 left-0 w-full transition-all duration-500 ease-out ${getCupColor(mood)}`}
-            style={{ height: `${mood * 10}%` }}
-          >
-            {/* Surface Line */}
-            <div className="w-full h-1 bg-white/30 absolute top-0"></div>
-          </div>
+      <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col">
+        <h2 className="text-gray-700 font-sans mb-1 text-left">Como est&#225; seu copo hoje?</h2>
+        <p className={`text-xs font-sans mb-4 text-left transition-all duration-300 ${getPhraseColor(mood)}`}>
+          {mood <= 3 && 'Copo Vazio (Exausta)'}
+          {mood >= 4 && mood <= 7 && 'Equilibrada (Por enquanto)'}
+          {mood >= 8 && 'Transbordando (Raiva)'}
+        </p>
+
+        {/* Mood Number */}
+        <div className={`text-3xl font-bold text-center transition-colors duration-300 ${getPhraseColor(mood)}`}>
+          {mood}<span className="text-lg text-gray-300 font-normal">/10</span>
         </div>
 
-        {/* The Badge */}
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold mb-4 transition-colors ${getCupColor(mood)}`}>
-          {mood}
-        </div>
+        <p className={`text-sm font-sans italic mb-4 mt-1 text-center transition-all duration-300 ${getPhraseColor(mood)}`}>
+          {`"${moodPhrases[mood]}" ${moodIcons[mood]}`}
+        </p>
 
-        {/* Slider */}
+        {/* Slider with 7-stop gradient */}
         <div className="w-full relative">
-          {/* Gradient Track Background */}
-          <div className="h-2 w-full rounded-full bg-gradient-to-r from-soft-green via-yellow-400 to-soft-orange absolute top-2"></div>
+          <div 
+            className="h-3 w-full rounded-full absolute top-[6px]"
+            style={{
+              background: 'linear-gradient(to right, #3B82F6 0%, #06B6D4 16%, #34D399 33%, #22C55E 50%, #FBBF24 66%, #F97316 83%, #EF4444 100%)'
+            }}
+          ></div>
           <input 
             type="range" 
             min="0" 
             max="10" 
             value={mood} 
             onChange={(e) => setMood(parseInt(e.target.value))}
-            className="w-full h-2 bg-transparent rounded-lg appearance-none cursor-pointer relative z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-soft-pink [&::-webkit-slider-thumb]:shadow-md"
+            className="w-full h-3 bg-transparent rounded-lg appearance-none cursor-pointer relative z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-7 [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-gray-300 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing"
           />
         </div>
         
-        <div className="w-full flex justify-between text-xs text-gray-400 mt-2 font-medium">
-          <span>0 - Vazio</span>
-          <span>10 - Cheio</span>
+        <div className="w-full flex justify-between text-xs mt-3 font-medium">
+          <span className="text-cup-empty font-semibold">Vazio</span>
+          <span className="text-cup-full font-semibold">Cheio</span>
         </div>
       </div>
     </section>
@@ -78,69 +107,55 @@ const ActionGrid = () => {
   const [isPanicOpen, setIsPanicOpen] = useState(false);
 
   return (
-    <>
-      <section className="px-6 py-4 grid grid-cols-2 gap-4 bg-soft-bg">
-        <button 
-          onClick={() => setIsPanicOpen(true)}
-          className="col-span-2 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white p-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all"
-        >
-          <Heart fill="white" size={20} />
-          <span className="font-bold tracking-wide">ABRIR O CORAÇÃO</span>
-        </button>
+    <section className="px-6 py-4 grid grid-cols-2 gap-4 bg-soft-bg">
+      <button 
+        onClick={() => setIsPanicOpen(!isPanicOpen)}
+        className="col-span-2 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white p-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all"
+      >
+        <Heart fill="white" size={20} />
+        <span className="font-bold tracking-wide">ABRIR O CORAÇÃO</span>
+      </button>
 
-        <button className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
-          <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
-            <MessageCircle size={24} />
-          </div>
-          <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de Conversa</span>
-        </button>
-        
-        <button className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
-          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
-            <BookOpen size={24} />
-          </div>
-          <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca (O Espelho)</span>
-        </button>
-      </section>
-
-      {/* Panic Modal Overlay */}
-      {isPanicOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4 animate-fade-in backdrop-blur-sm">
-          <div className="bg-white w-full max-w-sm rounded-[2rem] overflow-hidden shadow-2xl">
-            {/* Header Gradient */}
-            <div className="bg-gradient-to-r from-[#FF66C4] to-[#B946FF] p-6 text-center relative">
-              <h3 className="text-white font-bold text-lg uppercase tracking-wider">Abrir o Coração</h3>
-              <button onClick={() => setIsPanicOpen(false)} className="absolute top-6 right-6 text-white/80 hover:text-white">
-                <X size={20} />
-              </button>
-            </div>
-            
-            <div className="p-8 flex flex-col items-center">
-              <Heart size={48} className="text-[#FF66C4] mb-4 fill-[#FF66C4]" />
-              <h4 className="text-gray-800 font-bold mb-1">O que está pesando aí dentro?</h4>
-              <p className="text-gray-400 text-sm mb-6">Desabafe...</p>
-              
-              <textarea 
-                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF66C4] focus:outline-none text-gray-700 resize-none h-32 mb-6"
-                placeholder="Escreva aqui seus sentimentos..."
-              ></textarea>
-              
-              <div className="flex gap-3 w-full">
-                <button 
-                  onClick={() => setIsPanicOpen(false)}
-                  className="flex-1 py-3 text-gray-500 font-medium rounded-full border border-gray-200 hover:bg-gray-50"
-                >
-                  Cancelar
-                </button>
-                <button className="flex-1 py-3 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-full shadow-md">
-                  Enviar para a Aldeia
-                </button>
-              </div>
-            </div>
+      {/* Inline expand below button */}
+      <div className={`col-span-2 overflow-hidden transition-all duration-300 ease-in-out ${isPanicOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
+          <Heart size={36} className="text-[#FF66C4] mb-3 fill-[#FF66C4]" />
+          <h4 className="text-gray-800 font-bold mb-1">O que está pesando aí dentro?</h4>
+          <p className="text-gray-400 text-sm mb-4">Desabafe...</p>
+          
+          <textarea 
+            className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF66C4] focus:outline-none text-gray-700 resize-none h-28 mb-4 text-sm"
+            placeholder="Escreva aqui seus sentimentos..."
+          ></textarea>
+          
+          <div className="flex gap-3 w-full">
+            <button 
+              onClick={() => setIsPanicOpen(false)}
+              className="flex-1 py-3 text-gray-500 font-medium rounded-full border border-gray-200 hover:bg-gray-50 text-sm"
+            >
+              Cancelar
+            </button>
+            <button className="flex-1 py-3 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-full shadow-md text-sm">
+              Enviar para a Aldeia
+            </button>
           </div>
         </div>
-      )}
-    </>
+      </div>
+
+      <button className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
+        <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
+          <Users size={24} />
+        </div>
+        <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de Conversa</span>
+      </button>
+      
+      <button className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
+        <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
+          <BookOpen size={24} />
+        </div>
+        <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca (O Espelho)</span>
+      </button>
+    </section>
   );
 };
 
@@ -154,14 +169,19 @@ const ContentSection = ({ title, items, badgeColor }) => (
     <div className="flex overflow-x-auto px-6 gap-4 pb-8 snap-x hide-scrollbar">
       {items.map((item, idx) => (
         <div key={idx} className="min-w-[240px] snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col">
-          {/* Card Image Area - imitating illustrations with gradients/patterns */}
+          {/* Card Image Area */}
           <div className={`h-32 relative ${item.bgClass} flex items-center justify-center overflow-hidden`}>
-             <span className={`absolute top-4 left-4 text-[10px] font-bold text-white px-3 py-1 rounded-full ${badgeColor} z-10`}>
+             <span className={`absolute top-4 left-4 text-[10px] font-bold px-3 py-1 rounded-full ${badgeColor} z-10`}>
                 {item.tag}
              </span>
-             {/* Abstract Shapes (CSS) */}
-             <div className="w-24 h-24 rounded-full bg-white/20 blur-2xl absolute -top-4 -right-4"></div>
-             <div className="w-32 h-32 rounded-full bg-black/5 blur-3xl absolute -bottom-10 -left-10"></div>
+             {item.image ? (
+               <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+             ) : (
+               <>
+                 <div className="w-24 h-24 rounded-full bg-white/20 blur-2xl absolute -top-4 -right-4"></div>
+                 <div className="w-32 h-32 rounded-full bg-black/5 blur-3xl absolute -bottom-10 -left-10"></div>
+               </>
+             )}
           </div>
           
           <div className="p-5">
@@ -180,19 +200,22 @@ const App = () => {
       title: "Quem Cuida de Quem Cuida?",
       desc: "A política do cuidado e a solidão da mulher moderna.",
       tag: "ALDEIA",
-      bgClass: "bg-[#EAD6C6]" // Beige/Earth tone
+      bgClass: "bg-[#EAD6C6]",
+      image: "/images/quem-cuida.jpeg"
     },
     {
       title: "O Luto da Identidade",
       desc: "Quem era você antes de ser mãe? Vamos reencontrar essa mulher.",
       tag: "DIVÃ",
-      bgClass: "bg-gradient-to-br from-pink-200 to-red-100" 
+      bgClass: "bg-gradient-to-br from-pink-200 to-red-100",
+      image: "/images/luto-identidade.jpeg"
     },
     {
       title: "A Luz Vermelha da Raiva",
       desc: "Entenda por que você explode e como lidar com a culpa.",
       tag: "PSICOLOGIA",
-      bgClass: "bg-gradient-to-br from-yellow-200 to-orange-100"
+      bgClass: "bg-gradient-to-br from-yellow-200 to-orange-100",
+      image: "/images/luz-vermelha-raiva.jpeg"
     }
   ];
 
@@ -216,16 +239,14 @@ const App = () => {
       <Header />
       <MoodCup />
       <ActionGrid />
-      <ContentSection title="Trilhas da Cura" items={trilhas} badgeColor="bg-[#FF66C4]" />
+      <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" />
       <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" />
       
-      {/* Footer Navigation - Clean White */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-8 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-md mx-auto z-50">
-        <button className="flex flex-col items-center gap-1 text-[#FF66C4]">
-          <div className="p-1 bg-pink-50 rounded-lg">
-             <Heart size={24} fill="#FF66C4" />
-          </div>
-          <span>Início</span>
+      {/* Footer Navigation - Floating */}
+      <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+        <button className="flex flex-col items-center gap-1 text-gray-800">
+          <Heart size={24} fill="#374151" stroke="#374151" />
+          <span className="font-semibold">Inicio</span>
         </button>
         <button className="flex flex-col items-center gap-1 hover:text-[#FF66C4] transition-colors">
           <MessageCircle size={24} />
