@@ -219,6 +219,33 @@ const App = () => {
     }
   ];
 
+  const guardioes = [
+    {
+      title: "Encontros Mensais ao Vivo",
+      desc: "Conversas com quem caminha com o corpo, a escuta e a experiência.",
+      tag: "AO VIVO",
+      bgClass: "bg-gradient-to-br from-teal-200 to-emerald-300"
+    },
+    {
+      title: "Conversas Abertas",
+      desc: "Rodas de saberes que sustentam a vida. Sem gurus, com presença.",
+      tag: "ABERTO",
+      bgClass: "bg-gradient-to-br from-amber-200 to-orange-200"
+    },
+    {
+      title: "Corpo, Emoção e Sono",
+      desc: "Temas que atravessam a maternidade real, sem filtro.",
+      tag: "TEMA",
+      bgClass: "bg-gradient-to-br from-sky-200 to-blue-300"
+    },
+    {
+      title: "Espiritualidade e Cuidado",
+      desc: "O sagrado no cotidiano de quem cuida.",
+      tag: "TEMA",
+      bgClass: "bg-gradient-to-br from-purple-200 to-violet-300"
+    }
+  ];
+
   const tribos = [
     {
       title: "Mães Solo",
@@ -240,6 +267,33 @@ const App = () => {
       <MoodCup />
       <ActionGrid />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" />
+      {/* Os Guardioes do Cuidado */}
+      <section className="py-6 bg-soft-bg">
+        <div className="px-6 mb-2">
+          <h3 className="text-lg font-sans font-bold text-gray-800">Os Guardi&#245;es do Cuidado</h3>
+          <p className="text-xs text-gray-400 leading-relaxed mt-1">
+            Encontros com saberes que sustentam a vida. N&#227;o s&#227;o gurus. S&#227;o pessoas que caminham com o corpo, a escuta e a experi&#234;ncia.
+          </p>
+        </div>
+        <div className="flex overflow-x-auto px-6 gap-4 pb-8 pt-2 snap-x hide-scrollbar">
+          {guardioes.map((item, idx) => (
+            <div key={idx} style={{ minWidth: "180px", maxWidth: "180px" }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col">
+              <div className={`h-32 relative ${item.bgClass} flex items-center justify-center overflow-hidden`}>
+                <span className="absolute top-4 left-4 text-[10px] font-bold px-3 py-1 rounded-full bg-white/90 text-emerald-700 z-10">
+                  {item.tag}
+                </span>
+                <div className="w-24 h-24 rounded-full bg-white/20 blur-2xl absolute -top-4 -right-4"></div>
+                <div className="w-32 h-32 rounded-full bg-black/5 blur-3xl absolute -bottom-10 -left-10"></div>
+              </div>
+              <div className="p-5">
+                <h4 className="font-sans font-bold text-gray-800 mb-2">{item.title}</h4>
+                <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" cardWidth="280px" />
       
       {/* Footer Navigation - Floating */}
