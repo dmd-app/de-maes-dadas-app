@@ -214,7 +214,8 @@ const App = () => {
       title: "A Luz Vermelha da Raiva",
       desc: "Entenda por que você explode e como lidar com a culpa.",
       tag: "PSICOLOGIA",
-      bgClass: "bg-gradient-to-br from-yellow-200 to-orange-100"
+      bgClass: "bg-gradient-to-br from-yellow-200 to-orange-100",
+      image: "/images/luz-vermelha-raiva.jpeg"
     }
   ];
 
