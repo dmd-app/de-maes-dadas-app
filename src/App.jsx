@@ -7,7 +7,7 @@ import './index.css';
 const Header = () => (
   <header className="p-6 pb-2 flex justify-between items-start bg-soft-bg">
     <div>
-      <h1 className="text-3xl font-display font-bold text-soft-blue tracking-tight">DeMãesDadas</h1>
+      <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
       <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
       <div className="mt-6">
         <p className="text-lg text-soft-blue font-sans">Bem-vinda, Mamãe 💗</p>
