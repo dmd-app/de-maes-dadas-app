@@ -159,7 +159,7 @@ const ActionGrid = () => {
   );
 };
 
-const ContentSection = ({ title, items, badgeColor, cardWidth = "calc(50vw - 2.5rem)" }) => (
+const ContentSection = ({ title, items, badgeColor, cardWidth = "180px" }) => (
   <section className="py-6 bg-soft-bg">
     <div className="px-6 mb-4 flex justify-between items-center">
       <h3 className="text-lg font-sans font-bold text-gray-800">{title}</h3>
@@ -240,7 +240,7 @@ const App = () => {
       <MoodCup />
       <ActionGrid />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" />
-      <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" cardWidth="calc(60vw - 2.5rem)" />
+      <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" cardWidth="280px" />
       
       {/* Footer Navigation - Floating */}
       <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
