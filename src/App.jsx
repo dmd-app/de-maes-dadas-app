@@ -895,10 +895,44 @@ const AldeiaPage = ({ onNavigate, posts }) => {
 };
 
 // --- POST DETAIL PAGE ---
-const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onReplyComment, onLikeReply }) => {
+const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onReplyComment, onLikeReply, onEditPost }) => {
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDesc, setEditDesc] = useState('');
+  const [editCategory, setEditCategory] = useState('');
+  const [showVersions, setShowVersions] = useState(false);
+
+  const isMyPost = post.author === "Eu";
+
+  const categoryOptions = [
+    { name: "Desabafo", color: "bg-[#FF66C4] text-white" },
+    { name: "Sono", color: "bg-indigo-400 text-white" },
+    { name: "Maternidade Solo", color: "bg-soft-blue text-white" },
+    { name: "Volta ao Trabalho", color: "bg-emerald-500 text-white" },
+  ];
+
+  const openEdit = () => {
+    setEditTitle(post.title);
+    setEditDesc(post.desc);
+    setEditCategory(post.category);
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (editTitle.trim() && editDesc.trim()) {
+      const cat = categoryOptions.find(c => c.name === editCategory);
+      onEditPost({
+        title: editTitle.trim(),
+        desc: editDesc.trim(),
+        category: editCategory,
+        categoryColor: cat?.color || post.categoryColor,
+      });
+      setIsEditing(false);
+    }
+  };
 
   const handleSendComment = () => {
     if (newComment.trim()) {
@@ -922,7 +956,12 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
         <button onClick={onBack} className="text-gray-700">
           <ArrowLeft size={24} />
         </button>
-        <h1 className="text-xl font-bold text-gray-800 font-sans">Conversa</h1>
+        <h1 className="text-xl font-bold text-gray-800 font-sans flex-1">Conversa</h1>
+        {isMyPost && (
+          <button onClick={openEdit} className="text-gray-400 hover:text-soft-blue transition-colors">
+            <Edit3 size={20} />
+          </button>
+        )}
       </header>
 
       {/* Full Post */}
@@ -933,6 +972,14 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
               {post.category}
             </span>
             <span className="text-xs text-gray-400">{post.author}{" \u2022 "}{post.time}</span>
+            {post.versions && post.versions.length > 0 && (
+              <button
+                onClick={() => setShowVersions(!showVersions)}
+                className="text-[10px] text-gray-300 hover:text-gray-500 ml-auto transition-colors"
+              >
+                {"(editado)"}
+              </button>
+            )}
           </div>
 
           <h2 className="font-bold text-gray-800 text-lg mb-2 leading-snug">{post.title}</h2>
@@ -955,6 +1002,90 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
           </div>
         </div>
       </div>
+
+      {/* Version History */}
+      {showVersions && post.versions && post.versions.length > 0 && (
+        <div className="px-6 pb-4">
+          <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+            <h4 className="text-xs font-bold text-gray-500 mb-3">{"Hist\u00f3rico de edi\u00e7\u00f5es"}</h4>
+            <div className="flex flex-col gap-3">
+              {post.versions.map((v, i) => (
+                <div key={i} className="bg-white rounded-xl p-3 border border-gray-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${v.categoryColor}`}>
+                      {v.category}
+                    </span>
+                    <span className="text-[10px] text-gray-400">{v.editedAt}</span>
+                  </div>
+                  <p className="text-xs font-semibold text-gray-600">{v.title}</p>
+                  <p className="text-[11px] text-gray-400 mt-1 line-clamp-2">{v.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {isEditing && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-8" onClick={() => setIsEditing(false)}>
+          <div className="bg-white rounded-3xl w-full max-w-sm p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-gray-800">Editar conversa</h3>
+              <button onClick={() => setIsEditing(false)} className="text-gray-400">
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Category */}
+            <p className="text-[11px] font-semibold text-gray-600 mb-2">Categoria</p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {categoryOptions.map((cat) => (
+                <button
+                  key={cat.name}
+                  onClick={() => setEditCategory(cat.name)}
+                  className={`px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${
+                    editCategory === cat.name ? cat.color : 'bg-gray-100 text-gray-500'
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Title */}
+            <p className="text-[11px] font-semibold text-gray-600 mb-1.5">{"T\u00edtulo"}</p>
+            <input
+              type="text"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              className="w-full text-sm text-gray-700 placeholder-gray-400 outline-none px-3 py-2.5 bg-gray-50 rounded-xl border border-gray-200 mb-3 focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
+              placeholder={"T\u00edtulo da conversa"}
+            />
+
+            {/* Text */}
+            <p className="text-[11px] font-semibold text-gray-600 mb-1.5">Texto</p>
+            <textarea
+              value={editDesc}
+              onChange={(e) => setEditDesc(e.target.value)}
+              className="w-full min-h-[80px] text-sm text-gray-700 placeholder-gray-400 outline-none p-3 bg-gray-50 rounded-xl border border-gray-200 resize-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
+              placeholder={"O que voc\u00ea quer compartilhar?"}
+            />
+
+            <button
+              onClick={handleSaveEdit}
+              disabled={!editTitle.trim() || !editDesc.trim()}
+              className={`w-full mt-3 py-3 rounded-xl font-bold text-sm tracking-wide transition-all active:scale-[0.98] ${
+                editTitle.trim() && editDesc.trim()
+                  ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-300'
+              }`}
+            >
+              SALVAR
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Comment Input - Below post, above comments */}
       <div className="px-6 pb-4">
@@ -1254,6 +1385,31 @@ const App = () => {
     window.scrollTo(0, 0);
   };
 
+  const handleEditPost = ({ title, desc, category, categoryColor }) => {
+    if (selectedPostIdx === null) return;
+    const updated = [...rodasPosts];
+    const post = { ...updated[selectedPostIdx] };
+
+    // Save current version to history before overwriting
+    const previousVersion = {
+      title: post.title,
+      desc: post.desc,
+      category: post.category,
+      categoryColor: post.categoryColor,
+      editedAt: new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+    };
+    post.versions = [...(post.versions || []), previousVersion];
+
+    // Apply edits
+    post.title = title;
+    post.desc = desc;
+    post.category = category;
+    post.categoryColor = categoryColor;
+
+    updated[selectedPostIdx] = post;
+    setRodasPosts(updated);
+  };
+
   const handleLikePost = () => {
     if (selectedPostIdx === null) return;
     handleLikePostByIdx(selectedPostIdx);
@@ -1492,6 +1648,7 @@ const App = () => {
           onLikeComment={handleLikeComment}
           onReplyComment={handleReplyComment}
           onLikeReply={handleLikeReply}
+          onEditPost={handleEditPost}
         />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setCurrentPage('inicio'); setSelectedPostIdx(null); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
