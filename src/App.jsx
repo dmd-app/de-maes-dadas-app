@@ -1590,6 +1590,7 @@ const App = () => {
           setUserEmail(email);
           localStorage.setItem('dmd_user', JSON.stringify({ name: username, email }));
           setCurrentPage('inicio');
+          window.scrollTo(0, 0);
         }}
         onGoToSignup={() => setCurrentPage('signup')}
       />
@@ -1616,7 +1617,7 @@ const App = () => {
     return (
       <OnboardingPage
         userName={userName}
-        onComplete={() => setCurrentPage('inicio')}
+        onComplete={() => { setCurrentPage('inicio'); window.scrollTo(0, 0); }}
       />
     );
   }
