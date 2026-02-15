@@ -630,10 +630,21 @@ const initialRodasPosts = [
   },
 ];
 
-const rodasFilters = ["Destaques", "Recentes", "Maternidade Solo", "Sono", "Desabafo"];
-
 const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
-  const [activeFilter, setActiveFilter] = useState("Destaques");
+  const [activeFilter, setActiveFilter] = useState("Recentes");
+
+  // Build dynamic filters: Recentes, Destaques, then categories sorted by engagement
+  const getCategoriesSortedByEngagement = () => {
+    const catMap = {};
+    posts.forEach((p) => {
+      if (!catMap[p.category]) catMap[p.category] = 0;
+      catMap[p.category] += (p.likes || 0) + (p.commentsList?.length || 0);
+    });
+    return Object.entries(catMap)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name]) => name);
+  };
+  const rodasFilters = ["Recentes", "Destaques", ...getCategoriesSortedByEngagement()];
   const [isNewPostOpen, setIsNewPostOpen] = useState(false);
   const [newPostText, setNewPostText] = useState('');
   const [newPostCategory, setNewPostCategory] = useState("Desabafo");
