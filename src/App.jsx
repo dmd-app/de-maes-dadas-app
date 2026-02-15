@@ -1386,6 +1386,9 @@ const JournalPage = ({ onBack, entries, onAddEntry, editingEntryId, onUpdateEntr
     }
     return '';
   });
+  const [viewingEntry, setViewingEntry] = useState(null);
+  const [detailEditing, setDetailEditing] = useState(false);
+  const [detailEditText, setDetailEditText] = useState('');
 
   const monthNames = ["Janeiro", "Fevereiro", "Mar\u00e7o", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
   const dayNames = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "S\u00e1b"];
@@ -1550,7 +1553,12 @@ const JournalPage = ({ onBack, entries, onAddEntry, editingEntryId, onUpdateEntr
                       </div>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{entry.text}</p>
+                    <button onClick={() => { setViewingEntry(entry); setDetailEditing(false); setDetailEditText(entry.text); }} className="text-left w-full">
+                      <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{entry.text}</p>
+                      {entry.history && entry.history.length > 0 && (
+                        <span className="text-[10px] text-gray-300 mt-2 block">{"Editado " + entry.history.length + (entry.history.length === 1 ? " vez" : " vezes")}</span>
+                      )}
+                    </button>
                   )}
                 </div>
               );
@@ -1606,6 +1614,105 @@ const JournalPage = ({ onBack, entries, onAddEntry, editingEntryId, onUpdateEntr
           </div>
         </div>
       )}
+
+      {/* Full-page entry detail view */}
+      {viewingEntry && (() => {
+        const liveEntry = entries.find((e) => e.id === viewingEntry.id) || viewingEntry;
+        const entryDate = new Date(liveEntry.date);
+        return (
+          <div className="fixed inset-0 z-50 bg-soft-bg overflow-y-auto">
+            <div className="max-w-md mx-auto min-h-screen flex flex-col">
+              {/* Detail Header */}
+              <header className="p-6 pb-4 flex items-center gap-4 bg-soft-bg sticky top-0 z-10">
+                <button onClick={() => { setViewingEntry(null); setDetailEditing(false); }} className="text-gray-700">
+                  <ArrowLeft size={24} />
+                </button>
+                <div className="flex-1">
+                  <h1 className="text-lg font-bold text-gray-800">Entrada do Journal</h1>
+                  <p className="text-xs text-gray-400">
+                    {entryDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                    {" \u00e0s "}
+                    {entryDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+                {!detailEditing && (
+                  <button
+                    onClick={() => { setDetailEditing(true); setDetailEditText(liveEntry.text); }}
+                    className="p-2 rounded-xl bg-pink-50 text-[#FF66C4]"
+                  >
+                    <Edit3 size={18} />
+                  </button>
+                )}
+              </header>
+
+              {/* Detail Content */}
+              <div className="px-6 flex-1">
+                {detailEditing ? (
+                  <div className="bg-white rounded-2xl p-5 shadow-sm border border-[#FF66C4]">
+                    <textarea
+                      value={detailEditText}
+                      onChange={(e) => setDetailEditText(e.target.value)}
+                      className="w-full min-h-[200px] text-sm text-gray-700 outline-none p-3 bg-gray-50 rounded-xl border border-gray-200 resize-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
+                      autoFocus
+                    />
+                    <div className="flex gap-3 mt-4">
+                      <button
+                        onClick={() => setDetailEditing(false)}
+                        className="flex-1 py-3 text-gray-400 font-medium rounded-xl border border-gray-200 text-sm"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (detailEditText.trim()) {
+                            onUpdateEntry(liveEntry.id, detailEditText.trim());
+                            setDetailEditing(false);
+                            setViewingEntry({ ...liveEntry, text: detailEditText.trim() });
+                          }
+                        }}
+                        disabled={!detailEditText.trim()}
+                        className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] ${
+                          detailEditText.trim()
+                            ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-md'
+                            : 'bg-gray-100 text-gray-300'
+                        }`}
+                      >
+                        Salvar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{liveEntry.text}</p>
+                  </div>
+                )}
+
+                {/* Edit History */}
+                {liveEntry.history && liveEntry.history.length > 0 && !detailEditing && (
+                  <div className="mt-6">
+                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{"Vers\u00f5es anteriores"}</h4>
+                    <div className="flex flex-col gap-3">
+                      {[...liveEntry.history].reverse().map((h, idx) => {
+                        const editDate = new Date(h.editedAt);
+                        return (
+                          <div key={idx} className="bg-white/60 rounded-xl p-4 border border-gray-100">
+                            <span className="text-[10px] font-semibold text-gray-300 block mb-2">
+                              {editDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                              {" \u00e0s "}
+                              {editDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                            <p className="text-xs text-gray-400 leading-relaxed whitespace-pre-wrap">{h.text}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
@@ -1642,7 +1749,12 @@ const App = () => {
   };
 
   const handleUpdateJournalEntry = (id, newText) => {
-    setJournalEntries((prev) => prev.map((e) => e.id === id ? { ...e, text: newText } : e));
+    setJournalEntries((prev) => prev.map((e) => {
+      if (e.id !== id) return e;
+      const history = e.history || [];
+      history.push({ text: e.text, editedAt: new Date().toISOString() });
+      return { ...e, text: newText, history };
+    }));
     setEditingEntryId(null);
   };
 
