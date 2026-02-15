@@ -277,6 +277,30 @@ const rodasFilters = ["Destaques", "Recentes", "Maternidade Solo", "Sono", "Desa
 const RodasDeConversa = ({ onBack, posts, onOpenPost }) => {
   const [activeFilter, setActiveFilter] = useState("Destaques");
 
+  // Filter and sort posts, keeping original index
+  const getFilteredPosts = () => {
+    let indexed = posts.map((post, idx) => ({ ...post, originalIdx: idx }));
+
+    // Category filters
+    if (activeFilter !== "Destaques" && activeFilter !== "Recentes") {
+      indexed = indexed.filter((p) => p.category === activeFilter);
+    }
+
+    // Sort
+    if (activeFilter === "Destaques") {
+      indexed.sort((a, b) => {
+        const engA = (a.likes || 0) + (a.commentsList?.length || 0);
+        const engB = (b.likes || 0) + (b.commentsList?.length || 0);
+        return engB - engA;
+      });
+    }
+    // Recentes: newest first (keep original order, newest = first in array)
+
+    return indexed;
+  };
+
+  const filteredPosts = getFilteredPosts();
+
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       {/* Header */}
@@ -306,8 +330,14 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost }) => {
 
       {/* Posts */}
       <div className="px-6 flex flex-col gap-4 pt-2">
-        {posts.map((post, idx) => (
-          <div key={idx} onClick={() => onOpenPost && onOpenPost(idx)} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform">
+        {filteredPosts.length === 0 && (
+          <div className="bg-white rounded-2xl p-6 border border-gray-100 text-center">
+            <MessageCircle size={32} className="text-gray-200 mx-auto mb-2" />
+            <p className="text-sm text-gray-400">{"Nenhuma conversa nessa categoria ainda."}</p>
+          </div>
+        )}
+        {filteredPosts.map((post) => (
+          <div key={post.originalIdx} onClick={() => onOpenPost && onOpenPost(post.originalIdx)} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform">
             {/* Meta */}
             <div className="flex items-center gap-2 mb-3">
               <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
