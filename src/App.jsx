@@ -748,7 +748,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
       </div>
 
       {/* Floating New Post Button */}
-      <div className="sticky bottom-24 z-30 flex justify-end px-6 -mt-14 pointer-events-none">
+      <div className="sticky bottom-28 z-30 flex justify-end px-6 -mt-16 pointer-events-none">
         <button
           onClick={() => setIsNewPostOpen(true)}
           className="w-14 h-14 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-all pointer-events-auto"
@@ -759,23 +759,23 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
 
       {/* New Post Modal */}
       {isNewPostOpen && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-end justify-center" onClick={() => setIsNewPostOpen(false)}>
-          <div className="bg-white rounded-t-3xl w-full max-w-md p-6 pb-8" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="font-bold text-gray-800 text-lg">Iniciar conversa</h3>
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-8" onClick={() => setIsNewPostOpen(false)}>
+          <div className="bg-white rounded-3xl w-full max-w-sm p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-gray-800">Iniciar conversa</h3>
               <button onClick={() => setIsNewPostOpen(false)} className="text-gray-400">
-                <X size={22} />
+                <X size={20} />
               </button>
             </div>
 
             {/* Category selector */}
-            <p className="text-xs font-semibold text-gray-600 mb-2">Categoria</p>
-            <div className="flex gap-2 mb-4">
+            <p className="text-[11px] font-semibold text-gray-600 mb-2">Categoria</p>
+            <div className="flex gap-2 mb-3">
               {categoryOptions.map((cat) => (
                 <button
                   key={cat.name}
                   onClick={() => setNewPostCategory(cat.name)}
-                  className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${
                     newPostCategory === cat.name
                       ? cat.color
                       : 'bg-gray-100 text-gray-500'
@@ -791,13 +791,13 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
               value={newPostText}
               onChange={(e) => setNewPostText(e.target.value)}
               placeholder={"O que voc\u00ea quer compartilhar?"}
-              className="w-full min-h-[120px] text-base text-gray-700 placeholder-gray-400 outline-none p-4 bg-gray-50 rounded-2xl border border-gray-200 resize-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
+              className="w-full min-h-[100px] text-sm text-gray-700 placeholder-gray-400 outline-none p-3 bg-gray-50 rounded-xl border border-gray-200 resize-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
             />
 
             <button
               onClick={handleNewPost}
               disabled={!newPostText.trim()}
-              className={`w-full mt-4 py-4 rounded-2xl font-bold text-sm tracking-wide transition-all active:scale-[0.98] ${
+              className={`w-full mt-3 py-3 rounded-xl font-bold text-sm tracking-wide transition-all active:scale-[0.98] ${
                 newPostText.trim()
                   ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-lg'
                   : 'bg-gray-100 text-gray-300'
