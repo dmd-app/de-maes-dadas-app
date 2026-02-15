@@ -274,7 +274,7 @@ const initialRodasPosts = [
 
 const rodasFilters = ["Destaques", "Recentes", "Maternidade Solo", "Sono", "Desabafo"];
 
-const RodasDeConversa = ({ onBack, posts, onOpenPost, onLikePost }) => {
+const RodasDeConversa = ({ onBack, posts, onOpenPost }) => {
   const [activeFilter, setActiveFilter] = useState("Destaques");
 
   return (
@@ -320,30 +320,21 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onLikePost }) => {
             <h3 className="font-bold text-gray-800 mb-1 leading-snug">{post.title}</h3>
             <p className="text-sm text-gray-500 leading-relaxed mb-4">{post.desc}</p>
 
-            {/* Actions */}
+            {/* Actions - Static display */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <button
-                  onClick={(e) => { e.stopPropagation(); onLikePost && onLikePost(idx); }}
-                  className={`flex items-center gap-1.5 transition-colors ${post.liked ? 'text-[#FF66C4]' : 'text-gray-400 hover:text-[#FF66C4]'}`}
-                >
-                  <Heart size={18} fill={post.liked ? '#FF66C4' : 'none'} />
+                <span className="flex items-center gap-1.5 text-gray-400">
+                  <Heart size={18} />
                   <span className="text-sm font-medium">{post.likes}</span>
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); onOpenPost && onOpenPost(idx); }}
-                  className="flex items-center gap-1.5 text-gray-400 hover:text-soft-blue transition-colors"
-                >
+                </span>
+                <span className="flex items-center gap-1.5 text-gray-400">
                   <MessageCircle size={18} />
                   <span className="text-sm font-medium">{post.commentsList?.length || 0}</span>
-                </button>
+                </span>
               </div>
-              <button
-                onClick={(e) => e.stopPropagation()}
-                className="text-gray-300 hover:text-gray-500 transition-colors"
-              >
+              <span className="text-gray-300">
                 <Share2 size={18} />
-              </button>
+              </span>
             </div>
           </div>
         ))}
@@ -824,7 +815,7 @@ const App = () => {
   if (currentPage === 'rodas') {
     return (
       <>
-        <RodasDeConversa onBack={() => setCurrentPage('aldeia')} posts={rodasPosts} onOpenPost={handleOpenPost} onLikePost={handleLikePostByIdx} />
+        <RodasDeConversa onBack={() => setCurrentPage('aldeia')} posts={rodasPosts} onOpenPost={handleOpenPost} />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => setCurrentPage('inicio')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <Heart size={24} />
