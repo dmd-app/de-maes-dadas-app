@@ -58,7 +58,7 @@ const SignupPage = ({ onSignup, onGoToLogin }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
-              className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+              className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
           </div>
           {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email}</p>}
@@ -74,7 +74,7 @@ const SignupPage = ({ onSignup, onGoToLogin }) => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Como quer ser chamada?"
-              className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+              className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
           </div>
           {errors.username && <p className="text-xs text-red-400 mt-1">{errors.username}</p>}
@@ -90,7 +90,7 @@ const SignupPage = ({ onSignup, onGoToLogin }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={"M\u00ednimo 6 caracteres"}
-              className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+              className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
             <button onClick={() => setShowPassword(!showPassword)} className="text-gray-400">
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -186,7 +186,7 @@ const LoginPage = ({ onLogin, onGoToSignup }) => {
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               placeholder={"seu@email.com ou nome de usu\u00e1rio"}
-              className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+              className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
           </div>
           {errors.identifier && <p className="text-xs text-red-400 mt-1">{errors.identifier}</p>}
@@ -206,7 +206,7 @@ const LoginPage = ({ onLogin, onGoToSignup }) => {
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
               placeholder="Sua senha"
-              className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+              className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
             <button onClick={() => setShowPassword(!showPassword)} className="text-gray-400">
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
