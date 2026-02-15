@@ -1243,7 +1243,8 @@ const App = () => {
       commentsList: [],
     };
     setRodasPosts([newPost, ...rodasPosts]);
-    setCurrentPage('rodas');
+    setSelectedPostIdx(0);
+    setCurrentPage('postDetail');
     window.scrollTo(0, 0);
   };
 
