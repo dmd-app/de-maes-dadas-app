@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3 } from 'lucide-react';
 import './index.css';
 
-// --- LOGIN PAGE ---
-const LoginPage = ({ onLogin }) => {
+// --- SIGNUP PAGE (Criar Conta) ---
+const SignupPage = ({ onSignup, onGoToLogin }) => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -26,18 +26,17 @@ const LoginPage = ({ onLogin }) => {
     const newErrors = validate();
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
-      onLogin({ email, username });
+      onSignup({ email, username });
     }
   };
 
   return (
     <div className="min-h-screen bg-soft-bg max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
-      {/* Top decorative area */}
       <div className="relative overflow-hidden pt-16 pb-10 px-8">
         <div className="w-40 h-40 rounded-full bg-[#FF66C4]/10 blur-3xl absolute -top-10 -right-10"></div>
         <div className="w-32 h-32 rounded-full bg-soft-blue/10 blur-3xl absolute -bottom-5 -left-10"></div>
         <div className="relative z-10">
-          <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-10 mb-2" />
+          <img src="/images/logo-horizontal-azul.png" alt="DeMaesDadas" className="h-10 mb-2" />
           <p className="text-sm text-soft-pink font-medium">Aldeia Digital</p>
           <h1 className="text-2xl font-bold text-gray-800 mt-6 leading-tight text-balance">
             {"Entre para a sua aldeia"}
@@ -48,7 +47,6 @@ const LoginPage = ({ onLogin }) => {
         </div>
       </div>
 
-      {/* Form */}
       <div className="flex-1 px-8 pb-10 flex flex-col gap-4">
         {/* Email */}
         <div>
@@ -91,7 +89,7 @@ const LoginPage = ({ onLogin }) => {
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Mínimo 6 caracteres"
+              placeholder={"M\u00ednimo 6 caracteres"}
               className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
             <button onClick={() => setShowPassword(!showPassword)} className="text-gray-400">
@@ -118,7 +116,6 @@ const LoginPage = ({ onLogin }) => {
         </div>
         {errors.terms && <p className="text-xs text-red-400 -mt-2">{errors.terms}</p>}
 
-        {/* Submit Button */}
         <button
           onClick={handleSubmit}
           className="w-full mt-4 py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide"
@@ -128,7 +125,106 @@ const LoginPage = ({ onLogin }) => {
 
         <p className="text-center text-xs text-gray-400 mt-2">
           {"J\u00e1 tem conta? "}
-          <button onClick={handleSubmit} className="text-soft-blue font-semibold underline">Entrar</button>
+          <button onClick={onGoToLogin} className="text-soft-blue font-semibold underline">Entrar</button>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// --- LOGIN PAGE (Entrar) ---
+const LoginPage = ({ onLogin, onGoToSignup }) => {
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+    if (!identifier.trim()) newErrors.identifier = 'Email ou nome de usu\u00e1rio obrigat\u00f3rio';
+    if (!password.trim()) newErrors.password = 'Senha obrigat\u00f3ria';
+    return newErrors;
+  };
+
+  const handleSubmit = () => {
+    const newErrors = validate();
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length === 0) {
+      const isEmail = identifier.includes('@');
+      onLogin({
+        email: isEmail ? identifier : '',
+        username: isEmail ? identifier.split('@')[0] : identifier,
+      });
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-soft-bg max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
+      <div className="relative overflow-hidden pt-16 pb-10 px-8">
+        <div className="w-40 h-40 rounded-full bg-[#FF66C4]/10 blur-3xl absolute -top-10 -right-10"></div>
+        <div className="w-32 h-32 rounded-full bg-soft-blue/10 blur-3xl absolute -bottom-5 -left-10"></div>
+        <div className="relative z-10">
+          <img src="/images/logo-horizontal-azul.png" alt="DeMaesDadas" className="h-10 mb-2" />
+          <p className="text-sm text-soft-pink font-medium">Aldeia Digital</p>
+          <h1 className="text-2xl font-bold text-gray-800 mt-6 leading-tight text-balance">
+            {"Bem-vinda de volta"}
+          </h1>
+          <p className="text-sm text-gray-400 mt-2">
+            {"Entre na sua aldeia"}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex-1 px-8 pb-10 flex flex-col gap-4">
+        {/* Email or Username */}
+        <div>
+          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">{"Email ou nome de usu\u00e1rio"}</label>
+          <div className={`flex items-center gap-3 bg-white rounded-xl border ${errors.identifier ? 'border-red-300' : 'border-gray-200'} px-4 py-3 focus-within:ring-2 focus-within:ring-soft-blue/30 transition-all`}>
+            <Mail size={18} className="text-gray-400 flex-shrink-0" />
+            <input
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="seu@email.com ou nome de usu\u00e1rio"
+              className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+            />
+          </div>
+          {errors.identifier && <p className="text-xs text-red-400 mt-1">{errors.identifier}</p>}
+        </div>
+
+        {/* Password */}
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-xs font-semibold text-gray-600">Senha</label>
+            <button className="text-xs text-[#FF66C4] font-semibold">Esqueci minha senha</button>
+          </div>
+          <div className={`flex items-center gap-3 bg-white rounded-xl border ${errors.password ? 'border-red-300' : 'border-gray-200'} px-4 py-3 focus-within:ring-2 focus-within:ring-soft-blue/30 transition-all`}>
+            <Lock size={18} className="text-gray-400 flex-shrink-0" />
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+              placeholder="Sua senha"
+              className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+            />
+            <button onClick={() => setShowPassword(!showPassword)} className="text-gray-400">
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password}</p>}
+        </div>
+
+        <button
+          onClick={handleSubmit}
+          className="w-full mt-4 py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide"
+        >
+          ENTRAR
+        </button>
+
+        <p className="text-center text-xs text-gray-400 mt-2">
+          {"N\u00e3o tem conta? "}
+          <button onClick={onGoToSignup} className="text-soft-blue font-semibold underline">Criar conta</button>
         </p>
       </div>
     </div>
@@ -1027,7 +1123,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout }) => {
 };
 
 const App = () => {
-  const [currentPage, setCurrentPage] = useState('login');
+  const [currentPage, setCurrentPage] = useState('signup');
   const [selectedPostIdx, setSelectedPostIdx] = useState(null);
   const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
   const [userName, setUserName] = useState('');
@@ -1209,14 +1305,31 @@ const App = () => {
     }
   ];
 
-  // Render Login page
+  // Render Login page (Entrar)
   if (currentPage === 'login') {
     return (
-      <LoginPage onLogin={({ email, username }) => {
-        setUserName(username);
-        setUserEmail(email);
-        setCurrentPage('onboarding');
-      }} />
+      <LoginPage
+        onLogin={({ email, username }) => {
+          setUserName(username);
+          setUserEmail(email);
+          setCurrentPage('inicio');
+        }}
+        onGoToSignup={() => setCurrentPage('signup')}
+      />
+    );
+  }
+
+  // Render Signup page (Criar Conta)
+  if (currentPage === 'signup') {
+    return (
+      <SignupPage
+        onSignup={({ email, username }) => {
+          setUserName(username);
+          setUserEmail(email);
+          setCurrentPage('onboarding');
+        }}
+        onGoToLogin={() => setCurrentPage('login')}
+      />
     );
   }
 
