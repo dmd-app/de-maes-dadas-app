@@ -782,7 +782,7 @@ const App = () => {
   if (currentPage === 'aldeia') {
     return (
       <>
-        <AldeiaPage onNavigate={(page) => setCurrentPage(page)} posts={rodasPosts} />
+        <AldeiaPage onNavigate={(page) => { setCurrentPage(page); window.scrollTo(0, 0); }} posts={rodasPosts} />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => setCurrentPage('inicio')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <Heart size={24} />
@@ -805,7 +805,7 @@ const App = () => {
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       <Header />
       <MoodCup />
-      <ActionGrid onNavigate={(page) => setCurrentPage(page)} onSendPost={handleSendPost} />
+      <ActionGrid onNavigate={(page) => { setCurrentPage(page); window.scrollTo(0, 0); }} onSendPost={handleSendPost} />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" />
       {/* Os Guardioes do Cuidado */}
       <section className="py-6 bg-soft-bg">
