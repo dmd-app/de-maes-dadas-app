@@ -578,9 +578,9 @@ const initialRodasPosts = [
     likes: 24,
     comments: 12,
     commentsList: [
-      { author: "Ana P.", time: "1h atr\u00e1s", text: "Eu te entendo demais. Aqui \u00e9 igual. Vamos marcar algo juntas?" },
-      { author: "Juliana R.", time: "1h atr\u00e1s", text: "Passei por isso por muito tempo. O que me ajudou foi entrar em um grupo de m\u00e3es na vizinhan\u00e7a." },
-      { author: "Camila F.", time: "45min atr\u00e1s", text: "Voc\u00ea n\u00e3o est\u00e1 sozinha. Estamos aqui." },
+      { author: "Ana P.", time: "1h atr\u00e1s", text: "Eu te entendo demais. Aqui \u00e9 igual. Vamos marcar algo juntas?", likes: 5, liked: false, replies: [] },
+      { author: "Juliana R.", time: "1h atr\u00e1s", text: "Passei por isso por muito tempo. O que me ajudou foi entrar em um grupo de m\u00e3es na vizinhan\u00e7a.", likes: 12, liked: false, replies: [] },
+      { author: "Camila F.", time: "45min atr\u00e1s", text: "Voc\u00ea n\u00e3o est\u00e1 sozinha. Estamos aqui.", likes: 8, liked: false, replies: [] },
     ],
   },
   {
@@ -593,10 +593,10 @@ const initialRodasPosts = [
     likes: 156,
     comments: 43,
     commentsList: [
-      { author: "Fernanda L.", time: "4h atr\u00e1s", text: "J\u00e1 passei por isso tantas vezes. Respira fundo, voc\u00ea \u00e9 humana." },
-      { author: "Renata B.", time: "3h atr\u00e1s", text: "A culpa \u00e9 o peso mais pesado da maternidade. Mas voc\u00ea reconhecer j\u00e1 \u00e9 um ato de amor." },
-      { author: "Beatriz S.", time: "2h atr\u00e1s", text: "Eu chorei lendo isso. Obrigada por compartilhar." },
-      { author: "Luana M.", time: "1h atr\u00e1s", text: "Nenhuma m\u00e3e \u00e9 perfeita. Voc\u00ea est\u00e1 fazendo o seu melhor." },
+      { author: "Fernanda L.", time: "4h atr\u00e1s", text: "J\u00e1 passei por isso tantas vezes. Respira fundo, voc\u00ea \u00e9 humana.", likes: 34, liked: false, replies: [] },
+      { author: "Renata B.", time: "3h atr\u00e1s", text: "A culpa \u00e9 o peso mais pesado da maternidade. Mas voc\u00ea reconhecer j\u00e1 \u00e9 um ato de amor.", likes: 21, liked: false, replies: [] },
+      { author: "Beatriz S.", time: "2h atr\u00e1s", text: "Eu chorei lendo isso. Obrigada por compartilhar.", likes: 15, liked: false, replies: [] },
+      { author: "Luana M.", time: "1h atr\u00e1s", text: "Nenhuma m\u00e3e \u00e9 perfeita. Voc\u00ea est\u00e1 fazendo o seu melhor.", likes: 9, liked: false, replies: [] },
     ],
   },
   {
@@ -609,8 +609,8 @@ const initialRodasPosts = [
     likes: 8,
     comments: 5,
     commentsList: [
-      { author: "Patricia A.", time: "20h atr\u00e1s", text: "Faz adapta\u00e7\u00e3o gradual. Primeiro dia 1h, segundo 2h... funciona muito!" },
-      { author: "Debora K.", time: "18h atr\u00e1s", text: "Leva um paninho com seu cheiro. Ajuda demais." },
+      { author: "Patricia A.", time: "20h atr\u00e1s", text: "Faz adapta\u00e7\u00e3o gradual. Primeiro dia 1h, segundo 2h... funciona muito!", likes: 3, liked: false, replies: [] },
+      { author: "Debora K.", time: "18h atr\u00e1s", text: "Leva um paninho com seu cheiro. Ajuda demais.", likes: 7, liked: false, replies: [] },
     ],
   },
   {
@@ -623,9 +623,9 @@ const initialRodasPosts = [
     likes: 89,
     comments: 27,
     commentsList: [
-      { author: "Amanda G.", time: "2h atr\u00e1s", text: "O meu tem 18 meses e \u00e9 a mesma coisa. Solidariedade total." },
-      { author: "Isabela T.", time: "1h atr\u00e1s", text: "Consultora de sono mudou minha vida. Se precisar, indico." },
-      { author: "Thais R.", time: "40min atr\u00e1s", text: "Fa\u00e7a revezamento com algu\u00e9m se puder. Voc\u00ea precisa dormir tamb\u00e9m." },
+      { author: "Amanda G.", time: "2h atr\u00e1s", text: "O meu tem 18 meses e \u00e9 a mesma coisa. Solidariedade total.", likes: 18, liked: false, replies: [] },
+      { author: "Isabela T.", time: "1h atr\u00e1s", text: "Consultora de sono mudou minha vida. Se precisar, indico.", likes: 11, liked: false, replies: [] },
+      { author: "Thais R.", time: "40min atr\u00e1s", text: "Fa\u00e7a revezamento com algu\u00e9m se puder. Voc\u00ea precisa dormir tamb\u00e9m.", likes: 6, liked: false, replies: [] },
     ],
   },
 ];
@@ -791,7 +791,7 @@ const AldeiaPage = ({ onNavigate, posts }) => {
                   <Heart size={14} /> {post.likes}
                 </span>
                 <span className="flex items-center gap-1 text-xs text-gray-400">
-                  <MessageCircle size={14} /> {post.comments}
+                  <MessageCircle size={14} /> {post.commentsList?.length || 0}
                 </span>
               </div>
             </div>
@@ -1122,13 +1122,21 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout }) => {
   );
 };
 
+const getSavedUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem('dmd_user') || 'null');
+  } catch {
+    return null;
+  }
+};
+
 const App = () => {
-  const saved = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('dmd_user') || 'null') : null;
-  const [currentPage, setCurrentPage] = useState(saved ? 'inicio' : 'signup');
+  const [savedUser] = useState(getSavedUser);
+  const [currentPage, setCurrentPage] = useState(savedUser ? 'inicio' : 'signup');
   const [selectedPostIdx, setSelectedPostIdx] = useState(null);
   const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
-  const [userName, setUserName] = useState(saved?.name || '');
-  const [userEmail, setUserEmail] = useState(saved?.email || '');
+  const [userName, setUserName] = useState(savedUser?.name || '');
+  const [userEmail, setUserEmail] = useState(savedUser?.email || '');
 
   const handleSendPost = (text) => {
     const newPost = {
