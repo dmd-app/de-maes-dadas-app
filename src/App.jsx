@@ -748,12 +748,14 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
       </div>
 
       {/* Floating New Post Button */}
-      <button
-        onClick={() => setIsNewPostOpen(true)}
-        className="fixed bottom-24 right-6 max-w-md w-14 h-14 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-all z-30"
-      >
-        <Plus size={28} />
-      </button>
+      <div className="sticky bottom-24 z-30 flex justify-end px-6 -mt-14 pointer-events-none">
+        <button
+          onClick={() => setIsNewPostOpen(true)}
+          className="w-14 h-14 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-all pointer-events-auto"
+        >
+          <Plus size={28} />
+        </button>
+      </div>
 
       {/* New Post Modal */}
       {isNewPostOpen && (
