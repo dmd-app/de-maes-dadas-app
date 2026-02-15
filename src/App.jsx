@@ -343,7 +343,7 @@ const AldeiaPage = ({ onNavigate }) => {
           </div>
           <div className="text-left">
             <h3 className="font-bold text-gray-800 text-sm">Biblioteca (O Espelho)</h3>
-            <p className="text-xs text-gray-400 mt-0.5">Conte\u00fados que refletem voc\u00ea</p>
+            <p className="text-xs text-gray-400 mt-0.5">{"Conteúdos que refletem você"}</p>
           </div>
         </button>
       </section>
