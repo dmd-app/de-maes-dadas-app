@@ -380,7 +380,7 @@ const Header = ({ userName }) => (
         <p className="text-lg text-soft-blue font-sans">{"Bem-vinda, "}{userName || "Mam\u00e3e"}{" \ud83d\udc97"}</p>
       </div>
     </div>
-    <div className="p-2 rounded-full border-2 border-soft-pink text-soft-pink">
+    <div className="text-soft-pink">
       <MessageCircle size={24} />
     </div>
   </header>
