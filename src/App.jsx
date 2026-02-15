@@ -1356,10 +1356,30 @@ const getSavedUser = () => {
 const App = () => {
   const [savedUser] = useState(getSavedUser);
   const [currentPage, setCurrentPage] = useState(savedUser ? 'inicio' : 'signup');
+  const [pageHistory, setPageHistory] = useState([]);
   const [selectedPostIdx, setSelectedPostIdx] = useState(null);
   const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
   const [userName, setUserName] = useState(savedUser?.name || '');
   const [userEmail, setUserEmail] = useState(savedUser?.email || '');
+
+  const navigateTo = (page) => {
+    setPageHistory((prev) => [...prev, currentPage]);
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  };
+
+  const goBack = () => {
+    setPageHistory((prev) => {
+      const newHistory = [...prev];
+      const previousPage = newHistory.pop();
+      if (previousPage) {
+        setCurrentPage(previousPage);
+        setSelectedPostIdx(null);
+        window.scrollTo(0, 0);
+      }
+      return newHistory;
+    });
+  };
 
   const handleSendPost = (text, category, categoryColor) => {
     const newPost = {
@@ -1375,14 +1395,12 @@ const App = () => {
     };
     setRodasPosts([newPost, ...rodasPosts]);
     setSelectedPostIdx(0);
-    setCurrentPage('postDetail');
-    window.scrollTo(0, 0);
+    navigateTo('postDetail');
   };
 
   const handleOpenPost = (idx) => {
     setSelectedPostIdx(idx);
-    setCurrentPage('postDetail');
-    window.scrollTo(0, 0);
+    navigateTo('postDetail');
   };
 
   const handleEditPost = ({ title, desc, category, categoryColor }) => {
@@ -1619,11 +1637,11 @@ const App = () => {
           }}
         />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-          <button onClick={() => { setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <Heart size={24} />
             <span>Inicio</span>
           </button>
-          <button onClick={() => { setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <MessageCircle size={24} />
             <span>Aldeia</span>
           </button>
@@ -1642,7 +1660,7 @@ const App = () => {
       <>
         <PostDetail
           post={rodasPosts[selectedPostIdx]}
-          onBack={() => { setCurrentPage('rodas'); setSelectedPostIdx(null); }}
+          onBack={goBack}
           onAddComment={handleAddComment}
           onLikePost={handleLikePost}
           onLikeComment={handleLikeComment}
@@ -1651,15 +1669,15 @@ const App = () => {
           onEditPost={handleEditPost}
         />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-          <button onClick={() => { setCurrentPage('inicio'); setSelectedPostIdx(null); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <Heart size={24} />
             <span>Inicio</span>
           </button>
-          <button onClick={() => { setCurrentPage('aldeia'); setSelectedPostIdx(null); }} className="flex flex-col items-center gap-1 text-gray-800">
+          <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 text-gray-800">
             <MessageCircle size={24} fill="#374151" stroke="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => { setCurrentPage('perfil'); setSelectedPostIdx(null); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={24} />
             <span>Perfil</span>
           </button>
@@ -1672,17 +1690,17 @@ const App = () => {
   if (currentPage === 'rodas') {
     return (
       <>
-        <RodasDeConversa onBack={() => setCurrentPage('aldeia')} posts={rodasPosts} onOpenPost={handleOpenPost} onSendPost={handleSendPost} />
+        <RodasDeConversa onBack={goBack} posts={rodasPosts} onOpenPost={handleOpenPost} onSendPost={handleSendPost} />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-          <button onClick={() => setCurrentPage('inicio')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <Heart size={24} />
             <span>Inicio</span>
           </button>
-          <button onClick={() => setCurrentPage('aldeia')} className="flex flex-col items-center gap-1 text-gray-800">
+          <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 text-gray-800">
             <MessageCircle size={24} fill="#374151" stroke="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => { setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={24} />
             <span>Perfil</span>
           </button>
@@ -1695,9 +1713,9 @@ const App = () => {
   if (currentPage === 'aldeia') {
     return (
       <>
-        <AldeiaPage onNavigate={(page) => { setCurrentPage(page); window.scrollTo(0, 0); }} posts={rodasPosts} />
+        <AldeiaPage onNavigate={(page) => navigateTo(page)} posts={rodasPosts} />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-          <button onClick={() => setCurrentPage('inicio')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <Heart size={24} />
             <span>Inicio</span>
           </button>
@@ -1705,7 +1723,7 @@ const App = () => {
             <MessageCircle size={24} fill="#374151" stroke="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => { setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={24} />
             <span>Perfil</span>
           </button>
@@ -1718,7 +1736,7 @@ const App = () => {
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       <Header userName={userName} />
       <MoodCup />
-      <ActionGrid onNavigate={(page) => { setCurrentPage(page); window.scrollTo(0, 0); }} onSendPost={handleSendPost} />
+      <ActionGrid onNavigate={(page) => navigateTo(page)} onSendPost={handleSendPost} />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" />
       {/* Os Guardioes do Cuidado */}
       <section className="py-6 bg-soft-bg">
@@ -1758,11 +1776,11 @@ const App = () => {
           <Heart size={24} fill="#374151" stroke="#374151" />
           <span className="font-semibold">Inicio</span>
         </button>
-        <button onClick={() => setCurrentPage('aldeia')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+        <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
           <MessageCircle size={24} />
           <span>Aldeia</span>
         </button>
-        <button onClick={() => { setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+        <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
           <User size={24} />
           <span>Perfil</span>
         </button>
