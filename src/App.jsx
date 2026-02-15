@@ -483,76 +483,78 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon }) => {
   };
 
   return (
-    <section className="px-6 py-4 grid grid-cols-2 gap-4 bg-soft-bg">
-      <button 
-        onClick={() => setIsPanicOpen(!isPanicOpen)}
-        className="col-span-2 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white p-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all"
-      >
-        <Heart fill="white" size={20} />
-        <span className="font-bold tracking-wide">ABRIR O CORAÇÃO</span>
-      </button>
+    <>
+      <section className="px-6 py-4 grid grid-cols-2 gap-4 bg-soft-bg">
+        <button 
+          onClick={() => setIsPanicOpen(!isPanicOpen)}
+          className="col-span-2 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white p-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all"
+        >
+          <Heart fill="white" size={20} />
+          <span className="font-bold tracking-wide">ABRIR O CORAÇÃO</span>
+        </button>
 
-      {/* Inline expand below button */}
-      <div className={`col-span-2 overflow-hidden transition-all duration-300 ease-in-out ${isPanicOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
-          <Heart size={36} className="text-[#FF66C4] mb-3 fill-[#FF66C4]" />
-          <h4 className="text-gray-800 font-bold mb-1">{"O que está pesando aí dentro?"}</h4>
-          <p className="text-gray-400 text-sm mb-4">Desabafe...</p>
-          
-          <textarea 
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF66C4] focus:outline-none text-gray-700 resize-none h-28 mb-4 text-sm"
-            placeholder="Escreva aqui seus sentimentos..."
-          ></textarea>
-          
-          <div className="flex flex-col gap-2 w-full">
-            <button 
-              onClick={handleSend}
-              className="w-full py-3 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-full shadow-md text-sm active:scale-[0.98] transition-all"
-            >
-              Enviar para a Aldeia
-            </button>
-            <button
-              onClick={() => { if (message.trim()) { onComingSoon && onComingSoon(); setIsPanicOpen(false); setMessage(''); } }}
-              className="w-full py-3 bg-amber-50 text-amber-700 font-bold rounded-full border border-amber-200 text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-            >
-              <PenLine size={16} />
-              Salvar no Journal
-            </button>
-            <button 
-              onClick={() => { setIsPanicOpen(false); setMessage(''); }}
-              className="w-full py-2.5 text-gray-400 font-medium text-sm"
-            >
-              Cancelar
-            </button>
+        {/* Inline expand below button */}
+        <div className={`col-span-2 overflow-hidden transition-all duration-300 ease-in-out ${isPanicOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
+            <Heart size={36} className="text-[#FF66C4] mb-3 fill-[#FF66C4]" />
+            <h4 className="text-gray-800 font-bold mb-1">{"O que está pesando aí dentro?"}</h4>
+            <p className="text-gray-400 text-sm mb-4">Desabafe...</p>
+            
+            <textarea 
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF66C4] focus:outline-none text-gray-700 resize-none h-28 mb-4 text-sm"
+              placeholder="Escreva aqui seus sentimentos..."
+            ></textarea>
+            
+            <div className="flex flex-col gap-2 w-full">
+              <button 
+                onClick={handleSend}
+                className="w-full py-3 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-full shadow-md text-sm active:scale-[0.98] transition-all"
+              >
+                Enviar para a Aldeia
+              </button>
+              <button
+                onClick={() => { if (message.trim()) { onComingSoon && onComingSoon(); setIsPanicOpen(false); setMessage(''); } }}
+                className="w-full py-3 bg-amber-50 text-amber-700 font-bold rounded-full border border-amber-200 text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+              >
+                <PenLine size={16} />
+                Salvar no Journal
+              </button>
+              <button 
+                onClick={() => { setIsPanicOpen(false); setMessage(''); }}
+                className="w-full py-2.5 text-gray-400 font-medium text-sm"
+              >
+                Cancelar
+              </button>
+            </div>
           </div>
         </div>
+      </section>
+
+      <div className="flex overflow-x-auto px-6 gap-4 pb-4 snap-x hide-scrollbar bg-soft-bg">
+        <button onClick={() => onNavigate && onNavigate('rodas')} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
+          <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
+            <Users size={24} />
+          </div>
+          <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de<br />Conversa</span>
+        </button>
+
+        <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
+          <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+            <PenLine size={24} />
+          </div>
+          <span className="text-gray-700 font-sans font-medium text-sm text-center">Journal</span>
+        </button>
+
+        <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
+          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
+            <BookOpen size={24} />
+          </div>
+          <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca<br />(O Espelho)</span>
+        </button>
       </div>
-
-    </section>
-    <div className="flex overflow-x-auto px-6 gap-4 pb-4 snap-x hide-scrollbar bg-soft-bg">
-      <button onClick={() => onNavigate && onNavigate('rodas')} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
-        <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
-          <Users size={24} />
-        </div>
-        <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de<br />Conversa</span>
-      </button>
-
-      <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
-        <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-          <PenLine size={24} />
-        </div>
-        <span className="text-gray-700 font-sans font-medium text-sm text-center">Journal</span>
-      </button>
-
-      <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
-        <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
-          <BookOpen size={24} />
-        </div>
-        <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca<br />(O Espelho)</span>
-      </button>
-    </div>
+    </>
   );
 };
 
