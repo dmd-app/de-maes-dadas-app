@@ -103,8 +103,17 @@ const MoodCup = () => {
   );
 };
 
-const ActionGrid = ({ onNavigate }) => {
+const ActionGrid = ({ onNavigate, onSendPost }) => {
   const [isPanicOpen, setIsPanicOpen] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const handleSend = () => {
+    if (message.trim()) {
+      onSendPost && onSendPost(message.trim());
+      setMessage('');
+      setIsPanicOpen(false);
+    }
+  };
 
   return (
     <section className="px-6 py-4 grid grid-cols-2 gap-4 bg-soft-bg">
@@ -120,22 +129,27 @@ const ActionGrid = ({ onNavigate }) => {
       <div className={`col-span-2 overflow-hidden transition-all duration-300 ease-in-out ${isPanicOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
           <Heart size={36} className="text-[#FF66C4] mb-3 fill-[#FF66C4]" />
-          <h4 className="text-gray-800 font-bold mb-1">O que está pesando aí dentro?</h4>
+          <h4 className="text-gray-800 font-bold mb-1">{"O que está pesando aí dentro?"}</h4>
           <p className="text-gray-400 text-sm mb-4">Desabafe...</p>
           
           <textarea 
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
             className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF66C4] focus:outline-none text-gray-700 resize-none h-28 mb-4 text-sm"
             placeholder="Escreva aqui seus sentimentos..."
           ></textarea>
           
           <div className="flex gap-3 w-full">
             <button 
-              onClick={() => setIsPanicOpen(false)}
+              onClick={() => { setIsPanicOpen(false); setMessage(''); }}
               className="flex-1 py-3 text-gray-500 font-medium rounded-full border border-gray-200 hover:bg-gray-50 text-sm"
             >
               Cancelar
             </button>
-            <button className="flex-1 py-3 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-full shadow-md text-sm">
+            <button 
+              onClick={handleSend}
+              className="flex-1 py-3 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-full shadow-md text-sm"
+            >
               Enviar para a Aldeia
             </button>
           </div>
@@ -195,7 +209,7 @@ const ContentSection = ({ title, items, badgeColor, cardWidth = "180px" }) => (
 );
 
 // --- RODAS DE CONVERSA PAGE ---
-const rodasPosts = [
+const initialRodasPosts = [
   {
     category: "Maternidade Solo",
     categoryColor: "bg-soft-blue text-white",
@@ -240,7 +254,7 @@ const rodasPosts = [
 
 const rodasFilters = ["Destaques", "Recentes", "Maternidade Solo", "Sono", "Desabafo"];
 
-const RodasDeConversa = ({ onBack }) => {
+const RodasDeConversa = ({ onBack, posts }) => {
   const [activeFilter, setActiveFilter] = useState("Destaques");
 
   return (
@@ -272,7 +286,7 @@ const RodasDeConversa = ({ onBack }) => {
 
       {/* Posts */}
       <div className="px-6 flex flex-col gap-4 pt-2">
-        {rodasPosts.map((post, idx) => (
+        {posts.map((post, idx) => (
           <div key={idx} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
             {/* Meta */}
             <div className="flex items-center gap-2 mb-3">
@@ -310,7 +324,7 @@ const RodasDeConversa = ({ onBack }) => {
 };
 
 // --- ALDEIA PAGE ---
-const AldeiaPage = ({ onNavigate }) => {
+const AldeiaPage = ({ onNavigate, posts }) => {
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       {/* Header */}
@@ -355,7 +369,7 @@ const AldeiaPage = ({ onNavigate }) => {
           <button onClick={() => onNavigate('rodas')} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
         </div>
         <div className="flex flex-col gap-3">
-          {rodasPosts.slice(0, 2).map((post, idx) => (
+          {posts.slice(0, 2).map((post, idx) => (
             <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-2">
                 <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
@@ -382,6 +396,22 @@ const AldeiaPage = ({ onNavigate }) => {
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState('inicio');
+  const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
+
+  const handleSendPost = (text) => {
+    const newPost = {
+      category: "Desabafo",
+      categoryColor: "bg-[#FF66C4] text-white",
+      author: "Eu",
+      time: "Agora",
+      title: text.length > 60 ? text.slice(0, 60) + "..." : text,
+      desc: text,
+      likes: 0,
+      comments: 0,
+    };
+    setRodasPosts([newPost, ...rodasPosts]);
+    setCurrentPage('rodas');
+  };
 
   const trilhas = [
     {
@@ -453,7 +483,7 @@ const App = () => {
   if (currentPage === 'rodas') {
     return (
       <>
-        <RodasDeConversa onBack={() => setCurrentPage('aldeia')} />
+        <RodasDeConversa onBack={() => setCurrentPage('aldeia')} posts={rodasPosts} />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => setCurrentPage('inicio')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <Heart size={24} />
@@ -476,7 +506,7 @@ const App = () => {
   if (currentPage === 'aldeia') {
     return (
       <>
-        <AldeiaPage onNavigate={(page) => setCurrentPage(page)} />
+        <AldeiaPage onNavigate={(page) => setCurrentPage(page)} posts={rodasPosts} />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => setCurrentPage('inicio')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <Heart size={24} />
@@ -499,7 +529,7 @@ const App = () => {
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       <Header />
       <MoodCup />
-      <ActionGrid onNavigate={(page) => setCurrentPage(page)} />
+      <ActionGrid onNavigate={(page) => setCurrentPage(page)} onSendPost={handleSendPost} />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" />
       {/* Os Guardioes do Cuidado */}
       <section className="py-6 bg-soft-bg">
