@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ArrowRight } from 'lucide-react';
+import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3 } from 'lucide-react';
 import './index.css';
 
 // --- LOGIN PAGE ---
@@ -891,11 +891,147 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
   );
 };
 
+// --- PROFILE PAGE ---
+const ProfilePage = ({ userName, userEmail, posts, onLogout }) => {
+  const myPosts = posts.filter((p) => p.author === "Eu");
+  const totalLikes = myPosts.reduce((sum, p) => sum + (p.likes || 0), 0);
+  const totalComments = myPosts.reduce((sum, p) => sum + (p.commentsList?.length || 0), 0);
+
+  const menuItems = [
+    { icon: Bell, label: "Notifica\u00e7\u00f5es", desc: "Gerencie seus alertas" },
+    { icon: Shield, label: "Privacidade", desc: "Controle quem v\u00ea seu perfil" },
+    { icon: HelpCircle, label: "Ajuda", desc: "D\u00favidas frequentes" },
+    { icon: Settings, label: "Configura\u00e7\u00f5es", desc: "Prefer\u00eancias do app" },
+  ];
+
+  return (
+    <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
+      {/* Header */}
+      <header className="relative overflow-hidden pt-12 pb-8 px-6">
+        <div className="w-48 h-48 rounded-full bg-[#FF66C4]/10 blur-3xl absolute -top-16 -right-16"></div>
+        <div className="w-36 h-36 rounded-full bg-soft-blue/10 blur-3xl absolute -bottom-10 -left-10"></div>
+        <div className="relative z-10">
+          <div className="flex items-start justify-between mb-6">
+            <h1 className="text-xl font-bold text-gray-800">Meu Perfil</h1>
+          </div>
+
+          {/* Avatar + Info */}
+          <div className="flex items-center gap-4">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center shadow-lg flex-shrink-0">
+              <span className="text-white text-2xl font-bold">
+                {userName ? userName.charAt(0).toUpperCase() : "M"}
+              </span>
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-bold text-gray-800">{userName || "Mam\u00e3e"}</h2>
+                <button className="text-gray-400 hover:text-soft-blue transition-colors">
+                  <Edit3 size={14} />
+                </button>
+              </div>
+              <p className="text-sm text-gray-400 mt-0.5">{userEmail}</p>
+              <p className="text-xs text-[#FF66C4] font-semibold mt-1">Membro da Aldeia</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Stats */}
+      <div className="px-6 pb-6">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 grid grid-cols-3 gap-4">
+          <div className="text-center">
+            <p className="text-xl font-bold text-gray-800">{myPosts.length}</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">Conversas</p>
+          </div>
+          <div className="text-center border-x border-gray-100">
+            <p className="text-xl font-bold text-[#FF66C4]">{totalLikes}</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">Curtidas</p>
+          </div>
+          <div className="text-center">
+            <p className="text-xl font-bold text-soft-blue">{totalComments}</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">{"Coment\u00e1rios"}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* My Posts */}
+      <div className="px-6 pb-6">
+        <h3 className="font-bold text-gray-800 mb-3">Minhas Conversas</h3>
+        {myPosts.length === 0 ? (
+          <div className="bg-white rounded-2xl p-6 border border-gray-100 text-center">
+            <MessageCircle size={32} className="text-gray-200 mx-auto mb-2" />
+            <p className="text-sm text-gray-400">{"Voc\u00ea ainda n\u00e3o iniciou nenhuma conversa."}</p>
+            <p className="text-xs text-gray-300 mt-1">{"Use o \"Abrir o Cora\u00e7\u00e3o\" para come\u00e7ar!"}</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {myPosts.map((post, idx) => (
+              <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
+                    {post.category}
+                  </span>
+                  <span className="text-xs text-gray-400">{post.time}</span>
+                </div>
+                <p className="text-sm font-semibold text-gray-700">{post.title}</p>
+                <div className="flex items-center gap-4 mt-2">
+                  <span className="flex items-center gap-1 text-xs text-gray-400">
+                    <Heart size={14} />
+                    <span>{post.likes || 0}</span>
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-gray-400">
+                    <MessageCircle size={14} />
+                    <span>{post.commentsList?.length || 0}</span>
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Menu */}
+      <div className="px-6 pb-6">
+        <h3 className="font-bold text-gray-800 mb-3">{"Configura\u00e7\u00f5es"}</h3>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          {menuItems.map((item, idx) => (
+            <button
+              key={idx}
+              className={`w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50 transition-colors ${idx < menuItems.length - 1 ? 'border-b border-gray-100' : ''}`}
+            >
+              <div className="w-10 h-10 rounded-xl bg-soft-bg flex items-center justify-center flex-shrink-0">
+                <item.icon size={20} className="text-gray-500" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-gray-700">{item.label}</p>
+                <p className="text-xs text-gray-400">{item.desc}</p>
+              </div>
+              <ChevronRight size={16} className="text-gray-300" />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Logout */}
+      <div className="px-6 pb-6">
+        <button
+          onClick={onLogout}
+          className="w-full flex items-center justify-center gap-2 py-4 bg-white rounded-2xl border border-red-100 text-red-400 font-semibold text-sm hover:bg-red-50 transition-colors shadow-sm"
+        >
+          <LogOut size={18} />
+          <span>Sair da conta</span>
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const App = () => {
   const [currentPage, setCurrentPage] = useState('login');
   const [selectedPostIdx, setSelectedPostIdx] = useState(null);
   const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
   const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
 
   const handleSendPost = (text) => {
     const newPost = {
@@ -1076,8 +1212,9 @@ const App = () => {
   // Render Login page
   if (currentPage === 'login') {
     return (
-      <LoginPage onLogin={({ username }) => {
+      <LoginPage onLogin={({ email, username }) => {
         setUserName(username);
+        setUserEmail(email);
         setCurrentPage('onboarding');
       }} />
     );
@@ -1090,6 +1227,38 @@ const App = () => {
         userName={userName}
         onComplete={() => setCurrentPage('inicio')}
       />
+    );
+  }
+
+  // Render Profile page
+  if (currentPage === 'perfil') {
+    return (
+      <>
+        <ProfilePage
+          userName={userName}
+          userEmail={userEmail}
+          posts={rodasPosts}
+          onLogout={() => {
+            setUserName('');
+            setUserEmail('');
+            setCurrentPage('login');
+          }}
+        />
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+          <button onClick={() => { setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <Heart size={24} />
+            <span>Inicio</span>
+          </button>
+          <button onClick={() => { setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <MessageCircle size={24} />
+            <span>Aldeia</span>
+          </button>
+          <button className="flex flex-col items-center gap-1 text-gray-800">
+            <User size={24} fill="#374151" stroke="#374151" />
+            <span className="font-semibold">Perfil</span>
+          </button>
+        </nav>
+      </>
     );
   }
 
@@ -1115,7 +1284,7 @@ const App = () => {
             <MessageCircle size={24} fill="#374151" stroke="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => { setCurrentPage('perfil'); setSelectedPostIdx(null); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={24} />
             <span>Perfil</span>
           </button>
@@ -1138,7 +1307,7 @@ const App = () => {
             <MessageCircle size={24} fill="#374151" stroke="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => { setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={24} />
             <span>Perfil</span>
           </button>
@@ -1161,7 +1330,7 @@ const App = () => {
             <MessageCircle size={24} fill="#374151" stroke="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => { setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={24} />
             <span>Perfil</span>
           </button>
@@ -1218,7 +1387,7 @@ const App = () => {
           <MessageCircle size={24} />
           <span>Aldeia</span>
         </button>
-        <button className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+        <button onClick={() => { setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
           <User size={24} />
           <span>Perfil</span>
         </button>
