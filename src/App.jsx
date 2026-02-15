@@ -1712,13 +1712,22 @@ const JournalPage = ({ onBack, entries, onAddEntry, editingEntryId, onUpdateEntr
 
 // --- MOCK CONTACTS & MESSAGES ---
 const mockContacts = [
+  { id: 0, name: "Grupo Geral", initials: "GG", color: "bg-gradient-to-br from-[#FF66C4] to-[#B946FF]", status: "online", lastSeen: "agora", isGroup: true, members: 28 },
   { id: 1, name: "Ana Paula", initials: "AP", color: "bg-pink-400", status: "online", lastSeen: "agora" },
   { id: 2, name: "Fernanda Lima", initials: "FL", color: "bg-purple-400", status: "online", lastSeen: "agora" },
   { id: 3, name: "Juliana Santos", initials: "JS", color: "bg-amber-400", status: "offline", lastSeen: "15:30" },
   { id: 4, name: "Camila Oliveira", initials: "CO", color: "bg-teal-400", status: "offline", lastSeen: "ontem" },
-];
+  ];
 
 const initialMessages = {
+  0: [
+    { id: 1, from: "them", sender: "Ana Paula", text: "Bom dia, meninas! Como est\u00e3o?", time: "08:30" },
+    { id: 2, from: "them", sender: "Fernanda Lima", text: "Bom dia! Tudo bem por aqui", time: "08:32" },
+    { id: 3, from: "me", text: "Bom dia! Estou \u00f3tima", time: "08:35" },
+    { id: 4, from: "them", sender: "Juliana Santos", text: "Algu\u00e9m viu o conte\u00fado novo sobre autocuidado?", time: "09:00" },
+    { id: 5, from: "them", sender: "Camila Oliveira", text: "Sim! Muito bom, recomendo demais", time: "09:05" },
+    { id: 6, from: "them", sender: "Ana Paula", text: "Vou ver agora! Obrigada pela dica", time: "09:10" },
+  ],
   1: [
     { id: 1, from: "them", text: "Oi! Como voc\u00ea est\u00e1 se sentindo hoje?", time: "09:15" },
     { id: 2, from: "me", text: "Oi Ana! Estou melhor, obrigada por perguntar", time: "09:18" },
@@ -1762,12 +1771,12 @@ const ChatPage = ({ contact, messages, onBack, onSendMessage }) => {
           <ArrowLeft size={22} />
         </button>
         <div className={`w-10 h-10 rounded-full ${contact.color} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
-          {contact.initials}
+          {contact.isGroup ? <Users size={18} /> : contact.initials}
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="font-bold text-gray-800 text-sm truncate">{contact.name}</h2>
           <p className={`text-[10px] ${contact.status === 'online' ? 'text-emerald-500' : 'text-gray-400'}`}>
-            {contact.status === 'online' ? 'Online' : `Visto por \u00faltimo \u00e0s ${contact.lastSeen}`}
+            {contact.isGroup ? `${contact.members} membros` : contact.status === 'online' ? 'Online' : `Visto por \u00faltimo \u00e0s ${contact.lastSeen}`}
           </p>
         </div>
       </header>
@@ -1782,6 +1791,9 @@ const ChatPage = ({ contact, messages, onBack, onSendMessage }) => {
                   ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white rounded-br-md'
                   : 'bg-white text-gray-700 rounded-bl-md shadow-sm border border-gray-100'
               }`}>
+                {contact.isGroup && msg.from !== 'me' && msg.sender && (
+                  <p className="text-[10px] font-bold text-[#FF66C4] mb-1">{msg.sender}</p>
+                )}
                 <p className="text-sm leading-relaxed">{msg.text}</p>
                 <p className={`text-[10px] mt-1 text-right ${msg.from === 'me' ? 'text-white/70' : 'text-gray-400'}`}>{msg.time}</p>
               </div>
@@ -1869,15 +1881,18 @@ const MessagesPage = ({ onBack, contacts, messages, onSelectContact }) => {
             >
               <div className="relative flex-shrink-0">
                 <div className={`w-12 h-12 rounded-full ${contact.color} flex items-center justify-center text-white font-bold text-sm`}>
-                  {contact.initials}
+                  {contact.isGroup ? <Users size={20} /> : contact.initials}
                 </div>
-                {contact.status === 'online' && (
+                {!contact.isGroup && contact.status === 'online' && (
                   <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-gray-800 text-sm truncate">{contact.name}</h3>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <h3 className="font-bold text-gray-800 text-sm truncate">{contact.name}</h3>
+                    {contact.isGroup && <span className="text-[10px] text-gray-400 flex-shrink-0">{contact.members}</span>}
+                  </div>
                   <span className="text-[10px] text-gray-400 flex-shrink-0 ml-2">{last.time}</span>
                 </div>
                 <p className={`text-xs truncate mt-0.5 ${unread ? 'text-gray-700 font-semibold' : 'text-gray-400'}`}>{last.text}</p>
