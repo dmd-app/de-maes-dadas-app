@@ -1373,11 +1373,19 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout }) => {
 };
 
 // --- JOURNAL PAGE ---
-const JournalPage = ({ onBack, entries, onAddEntry }) => {
+const JournalPage = ({ onBack, entries, onAddEntry, editingEntryId, onUpdateEntry, onClearEditing }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMonth, setViewMonth] = useState(new Date());
   const [isWriting, setIsWriting] = useState(false);
   const [journalText, setJournalText] = useState('');
+  const [editingId, setEditingId] = useState(editingEntryId || null);
+  const [editText, setEditText] = useState(() => {
+    if (editingEntryId) {
+      const entry = entries.find((e) => e.id === editingEntryId);
+      return entry ? entry.text : '';
+    }
+    return '';
+  });
 
   const monthNames = ["Janeiro", "Fevereiro", "Mar\u00e7o", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
   const dayNames = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "S\u00e1b"];
@@ -1497,14 +1505,53 @@ const JournalPage = ({ onBack, entries, onAddEntry }) => {
           <div className="flex flex-col gap-3">
             {selectedEntries.map((entry) => {
               const entryDate = new Date(entry.date);
+              const isEditing = editingId === entry.id;
               return (
-                <div key={entry.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                <div key={entry.id} className={`bg-white rounded-2xl p-4 shadow-sm border ${isEditing ? 'border-[#FF66C4]' : 'border-gray-100'}`}>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[10px] font-semibold text-[#FF66C4]">
                       {entryDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                     </span>
+                    {!isEditing && (
+                      <button
+                        onClick={() => { setEditingId(entry.id); setEditText(entry.text); }}
+                        className="text-gray-300 hover:text-[#FF66C4] transition-colors"
+                      >
+                        <Edit3 size={14} />
+                      </button>
+                    )}
                   </div>
-                  <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{entry.text}</p>
+                  {isEditing ? (
+                    <div>
+                      <textarea
+                        value={editText}
+                        onChange={(e) => setEditText(e.target.value)}
+                        className="w-full min-h-[100px] text-sm text-gray-700 outline-none p-3 bg-gray-50 rounded-xl border border-gray-200 resize-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
+                        autoFocus
+                      />
+                      <div className="flex gap-3 mt-3">
+                        <button
+                          onClick={() => { setEditingId(null); setEditText(''); onClearEditing && onClearEditing(); }}
+                          className="flex-1 py-2 text-gray-400 font-medium rounded-xl border border-gray-200 text-xs"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          onClick={() => { if (editText.trim()) { onUpdateEntry(entry.id, editText.trim()); setEditingId(null); setEditText(''); } }}
+                          disabled={!editText.trim()}
+                          className={`flex-1 py-2 rounded-xl font-bold text-xs transition-all active:scale-[0.98] ${
+                            editText.trim()
+                              ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-md'
+                              : 'bg-gray-100 text-gray-300'
+                          }`}
+                        >
+                          Salvar
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{entry.text}</p>
+                  )}
                 </div>
               );
             })}
@@ -1581,13 +1628,22 @@ const App = () => {
   const [userEmail, setUserEmail] = useState(savedUser?.email || '');
   const [showComingSoon, setShowComingSoon] = useState(false);
   const [journalEntries, setJournalEntries] = useState([]);
+  const [editingEntryId, setEditingEntryId] = useState(null);
 
   const handleSaveJournal = (text) => {
+    const newId = Date.now();
     setJournalEntries((prev) => [{
-      id: Date.now(),
+      id: newId,
       text,
       date: new Date().toISOString(),
     }, ...prev]);
+    setEditingEntryId(newId);
+    navigateTo('journal');
+  };
+
+  const handleUpdateJournalEntry = (id, newText) => {
+    setJournalEntries((prev) => prev.map((e) => e.id === id ? { ...e, text: newText } : e));
+    setEditingEntryId(null);
   };
 
   const navigateTo = (page) => {
@@ -1939,6 +1995,9 @@ const App = () => {
           onBack={goBack}
           entries={journalEntries}
           onAddEntry={(entry) => setJournalEntries((prev) => [entry, ...prev])}
+          editingEntryId={editingEntryId}
+          onUpdateEntry={handleUpdateJournalEntry}
+          onClearEditing={() => setEditingEntryId(null)}
         />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
