@@ -372,20 +372,20 @@ const OnboardingPage = ({ onComplete, userName }) => {
 // --- COMPONENTS ---
 
 const Header = ({ userName, onMessageClick }) => (
-  <header className="p-6 pb-2 bg-soft-bg">
-    <div className="flex justify-between items-center">
+  <>
+    <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 flex justify-between items-center border-b border-pink-100/50">
       <div>
-        <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
-        <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
+        <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-7" />
+        <p className="text-xs text-soft-pink font-sans font-medium">Aldeia Digital</p>
       </div>
-      <button onClick={onMessageClick} className="text-soft-pink active:scale-95 transition-transform">
-        <MessageCircle size={24} />
+      <button onClick={onMessageClick} className="text-soft-pink active:scale-95 transition-transform p-2 -mr-2">
+        <MessageCircle size={22} />
       </button>
-    </div>
-    <div className="mt-6">
+    </header>
+    <div className="px-6 pt-4 pb-2 bg-soft-bg">
       <p className="text-lg text-soft-blue font-sans">{"Bem-vinda, "}{userName || "Mam\u00e3e"}{" \ud83d\udc97"}</p>
     </div>
-  </header>
+  </>
 );
 
 const MoodCup = () => {
