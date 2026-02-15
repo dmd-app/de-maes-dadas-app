@@ -2163,8 +2163,8 @@ const App = () => {
       <>
         <AldeiaPage onNavigate={(page) => navigateTo(page)} posts={rodasPosts} onComingSoon={() => setShowComingSoon(true)} />
         {showComingSoon && (
-<div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-10">
-  <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl">
+          <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-10">
+            <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl">
               <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
                 <Heart size={28} className="text-[#FF66C4]" />
               </div>
@@ -2241,8 +2241,8 @@ const App = () => {
       
       {/* Coming Soon Popup */}
       {showComingSoon && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-10" onClick={() => setShowComingSoon(false)}>
-          <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-10">
+          <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl">
             <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
               <Heart size={28} className="text-[#FF66C4]" />
             </div>
