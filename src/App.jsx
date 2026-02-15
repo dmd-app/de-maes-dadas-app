@@ -415,7 +415,7 @@ const AldeiaPage = ({ onNavigate, posts }) => {
 };
 
 // --- POST DETAIL PAGE ---
-const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onReplyComment }) => {
+const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onReplyComment, onLikeReply }) => {
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState('');
@@ -578,6 +578,15 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
                         <span className="text-[10px] text-gray-400">{" \u2022 "}{reply.time}</span>
                       </div>
                       <p className="text-xs text-gray-600 leading-relaxed pl-7">{reply.text}</p>
+                      <div className="pl-7 mt-1.5">
+                        <button
+                          onClick={() => onLikeReply(comment.originalIdx, rIdx)}
+                          className={`flex items-center gap-1 text-[11px] transition-colors ${reply.liked ? 'text-[#FF66C4]' : 'text-gray-400 hover:text-[#FF66C4]'}`}
+                        >
+                          <Heart size={12} fill={reply.liked ? '#FF66C4' : 'none'} />
+                          <span>{reply.likes || 0}</span>
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -670,8 +679,31 @@ const App = () => {
     const post = { ...updated[selectedPostIdx] };
     const comments = [...(post.commentsList || [])];
     const comment = { ...comments[commentIdx] };
-    const newReply = { author: "Eu", time: "Agora", text };
+    const newReply = { author: "Eu", time: "Agora", text, likes: 0, liked: false };
     comment.replies = [...(comment.replies || []), newReply];
+    comments[commentIdx] = comment;
+    post.commentsList = comments;
+    updated[selectedPostIdx] = post;
+    setRodasPosts(updated);
+  };
+
+  const handleLikeReply = (commentIdx, replyIdx) => {
+    if (selectedPostIdx === null) return;
+    const updated = [...rodasPosts];
+    const post = { ...updated[selectedPostIdx] };
+    const comments = [...(post.commentsList || [])];
+    const comment = { ...comments[commentIdx] };
+    const replies = [...(comment.replies || [])];
+    const reply = { ...replies[replyIdx] };
+    if (reply.liked) {
+      reply.likes = (reply.likes || 1) - 1;
+      reply.liked = false;
+    } else {
+      reply.likes = (reply.likes || 0) + 1;
+      reply.liked = true;
+    }
+    replies[replyIdx] = reply;
+    comment.replies = replies;
     comments[commentIdx] = comment;
     post.commentsList = comments;
     updated[selectedPostIdx] = post;
@@ -755,6 +787,7 @@ const App = () => {
           onLikePost={handleLikePost}
           onLikeComment={handleLikeComment}
           onReplyComment={handleReplyComment}
+          onLikeReply={handleLikeReply}
         />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setCurrentPage('inicio'); setSelectedPostIdx(null); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
