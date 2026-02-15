@@ -1,6 +1,15 @@
 import { useState } from 'react';
-import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus } from 'lucide-react';
+import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, PenLine, CalendarDays } from 'lucide-react';
 import './index.css';
+
+// --- ALDEIA ICON (3 circles in triangle) ---
+const AldeiaIcon = ({ size = 24, filled = false, color = "currentColor" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="6" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
+    <circle cx="6" cy="16" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
+    <circle cx="18" cy="16" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
+  </svg>
+);
 
 // --- SIGNUP PAGE (Criar Conta) ---
 const SignupPage = ({ onSignup, onGoToLogin }) => {
@@ -255,7 +264,7 @@ const onboardingScreens = [
   {
     lines: [
       { text: "Aqui \u00e9 uma comunidade", style: "text-xl text-gray-800 font-bold" },
-      { text: "de apoio Real.", style: "text-xl text-[#FF66C4] font-bold" },
+      { text: "de apoio real.", style: "text-xl text-[#FF66C4] font-bold" },
       { text: "Sem idealiza\u00e7\u00f5es.", style: "text-gray-500 mt-4" },
       { text: "Sem M\u00e1scaras.", style: "text-gray-500" },
       { text: "Sem competi\u00e7\u00e3o.", style: "text-gray-500" },
@@ -371,7 +380,7 @@ const Header = ({ userName }) => (
         <p className="text-lg text-soft-blue font-sans">{"Bem-vinda, "}{userName || "Mam\u00e3e"}{" \ud83d\udc97"}</p>
       </div>
     </div>
-    <div className="p-2 rounded-full border-2 border-soft-pink text-soft-pink">
+    <div className="text-soft-pink">
       <MessageCircle size={24} />
     </div>
   </header>
@@ -461,7 +470,7 @@ const MoodCup = () => {
   );
 };
 
-const ActionGrid = ({ onNavigate, onSendPost }) => {
+const ActionGrid = ({ onNavigate, onSendPost, onComingSoon }) => {
   const [isPanicOpen, setIsPanicOpen] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -474,73 +483,91 @@ const ActionGrid = ({ onNavigate, onSendPost }) => {
   };
 
   return (
-    <section className="px-6 py-4 grid grid-cols-2 gap-4 bg-soft-bg">
-      <button 
-        onClick={() => setIsPanicOpen(!isPanicOpen)}
-        className="col-span-2 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white p-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all"
-      >
-        <Heart fill="white" size={20} />
-        <span className="font-bold tracking-wide">ABRIR O CORAÇÃO</span>
-      </button>
+    <>
+      <section className="px-6 py-4 grid grid-cols-2 gap-4 bg-soft-bg">
+        <button 
+          onClick={() => setIsPanicOpen(!isPanicOpen)}
+          className="col-span-2 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white p-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all"
+        >
+          <Heart fill="white" size={20} />
+          <span className="font-bold tracking-wide">ABRIR O CORAÇÃO</span>
+        </button>
 
-      {/* Inline expand below button */}
-      <div className={`col-span-2 overflow-hidden transition-all duration-300 ease-in-out ${isPanicOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
-          <Heart size={36} className="text-[#FF66C4] mb-3 fill-[#FF66C4]" />
-          <h4 className="text-gray-800 font-bold mb-1">{"O que está pesando aí dentro?"}</h4>
-          <p className="text-gray-400 text-sm mb-4">Desabafe...</p>
-          
-          <textarea 
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF66C4] focus:outline-none text-gray-700 resize-none h-28 mb-4 text-sm"
-            placeholder="Escreva aqui seus sentimentos..."
-          ></textarea>
-          
-          <div className="flex gap-3 w-full">
-            <button 
-              onClick={() => { setIsPanicOpen(false); setMessage(''); }}
-              className="flex-1 py-3 text-gray-500 font-medium rounded-full border border-gray-200 hover:bg-gray-50 text-sm"
-            >
-              Cancelar
-            </button>
-            <button 
-              onClick={handleSend}
-              className="flex-1 py-3 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-full shadow-md text-sm"
-            >
-              Enviar para a Aldeia
-            </button>
+        {/* Inline expand below button */}
+        <div className={`col-span-2 overflow-hidden transition-all duration-300 ease-in-out ${isPanicOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
+            <Heart size={36} className="text-[#FF66C4] mb-3 fill-[#FF66C4]" />
+            <h4 className="text-gray-800 font-bold mb-1">{"O que está pesando aí dentro?"}</h4>
+            <p className="text-gray-400 text-sm mb-4">Desabafe...</p>
+            
+            <textarea 
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF66C4] focus:outline-none text-gray-700 resize-none h-28 mb-4 text-sm"
+              placeholder="Escreva aqui seus sentimentos..."
+            ></textarea>
+            
+            <div className="flex flex-col gap-2 w-full">
+              <button 
+                onClick={handleSend}
+                className="w-full py-3 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-full shadow-md text-sm active:scale-[0.98] transition-all"
+              >
+                Enviar para a Aldeia
+              </button>
+              <button
+                onClick={() => { if (message.trim()) { onComingSoon && onComingSoon(); setIsPanicOpen(false); setMessage(''); } }}
+                className="w-full py-3 bg-amber-50 text-amber-700 font-bold rounded-full border border-amber-200 text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+              >
+                <PenLine size={16} />
+                Salvar no Journal
+              </button>
+              <button 
+                onClick={() => { setIsPanicOpen(false); setMessage(''); }}
+                className="w-full py-2.5 text-gray-400 font-medium text-sm"
+              >
+                Cancelar
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <button onClick={() => onNavigate && onNavigate('rodas')} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
-        <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
-          <Users size={24} />
-        </div>
-        <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de Conversa</span>
-      </button>
-      
-      <button className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
-        <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
-          <BookOpen size={24} />
-        </div>
-        <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca<br />(O Espelho)</span>
-      </button>
-    </section>
+      <div className="flex overflow-x-auto px-6 gap-4 pb-4 snap-x hide-scrollbar bg-soft-bg">
+        <button onClick={() => onNavigate && onNavigate('rodas')} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
+          <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
+            <Users size={24} />
+          </div>
+          <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de<br />Conversa</span>
+        </button>
+
+        <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
+          <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+            <PenLine size={24} />
+          </div>
+          <span className="text-gray-700 font-sans font-medium text-sm text-center">Journal</span>
+        </button>
+
+        <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
+          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
+            <BookOpen size={24} />
+          </div>
+          <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca<br />(O Espelho)</span>
+        </button>
+      </div>
+    </>
   );
 };
 
-const ContentSection = ({ title, items, badgeColor, cardWidth = "180px" }) => (
+const ContentSection = ({ title, items, badgeColor, cardWidth = "180px", onComingSoon }) => (
   <section className="py-6 bg-soft-bg">
     <div className="px-6 mb-4 flex justify-between items-center">
       <h3 className="text-lg font-sans font-bold text-gray-800">{title}</h3>
-      <a href="#" className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</a>
+      <button onClick={onComingSoon} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
     </div>
     
     <div className="flex overflow-x-auto px-6 gap-4 pb-8 snap-x hide-scrollbar">
       {items.map((item, idx) => (
-        <div key={idx} style={{ minWidth: cardWidth, maxWidth: cardWidth }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col">
+        <div key={idx} onClick={onComingSoon} style={{ minWidth: cardWidth, maxWidth: cardWidth }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col cursor-pointer">
           {/* Card Image Area */}
           <div className={`h-32 relative ${item.bgClass} flex items-center justify-center overflow-hidden`}>
              <span className={`absolute top-4 left-4 text-[10px] font-bold px-3 py-1 rounded-full ${badgeColor} z-10`}>
@@ -824,7 +851,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
 };
 
 // --- ALDEIA PAGE ---
-const AldeiaPage = ({ onNavigate, posts }) => {
+const AldeiaPage = ({ onNavigate, posts, onComingSoon }) => {
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       {/* Header */}
@@ -851,7 +878,7 @@ const AldeiaPage = ({ onNavigate, posts }) => {
           </div>
         </button>
 
-        <button className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow active:scale-[0.98]">
+        <button onClick={onComingSoon} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow active:scale-[0.98]">
           <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple flex-shrink-0">
             <BookOpen size={24} />
           </div>
@@ -895,10 +922,44 @@ const AldeiaPage = ({ onNavigate, posts }) => {
 };
 
 // --- POST DETAIL PAGE ---
-const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onReplyComment, onLikeReply }) => {
+const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onReplyComment, onLikeReply, onEditPost }) => {
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDesc, setEditDesc] = useState('');
+  const [editCategory, setEditCategory] = useState('');
+  const [showVersions, setShowVersions] = useState(false);
+
+  const isMyPost = post.author === "Eu";
+
+  const categoryOptions = [
+    { name: "Desabafo", color: "bg-[#FF66C4] text-white" },
+    { name: "Sono", color: "bg-indigo-400 text-white" },
+    { name: "Maternidade Solo", color: "bg-soft-blue text-white" },
+    { name: "Volta ao Trabalho", color: "bg-emerald-500 text-white" },
+  ];
+
+  const openEdit = () => {
+    setEditTitle(post.title);
+    setEditDesc(post.desc);
+    setEditCategory(post.category);
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (editTitle.trim() && editDesc.trim()) {
+      const cat = categoryOptions.find(c => c.name === editCategory);
+      onEditPost({
+        title: editTitle.trim(),
+        desc: editDesc.trim(),
+        category: editCategory,
+        categoryColor: cat?.color || post.categoryColor,
+      });
+      setIsEditing(false);
+    }
+  };
 
   const handleSendComment = () => {
     if (newComment.trim()) {
@@ -922,7 +983,12 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
         <button onClick={onBack} className="text-gray-700">
           <ArrowLeft size={24} />
         </button>
-        <h1 className="text-xl font-bold text-gray-800 font-sans">Conversa</h1>
+        <h1 className="text-xl font-bold text-gray-800 font-sans flex-1">Conversa</h1>
+        {isMyPost && (
+          <button onClick={openEdit} className="text-gray-400 hover:text-soft-blue transition-colors">
+            <Edit3 size={20} />
+          </button>
+        )}
       </header>
 
       {/* Full Post */}
@@ -933,6 +999,14 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
               {post.category}
             </span>
             <span className="text-xs text-gray-400">{post.author}{" \u2022 "}{post.time}</span>
+            {post.versions && post.versions.length > 0 && (
+              <button
+                onClick={() => setShowVersions(!showVersions)}
+                className="text-[10px] text-gray-300 hover:text-gray-500 ml-auto transition-colors"
+              >
+                {"(editado)"}
+              </button>
+            )}
           </div>
 
           <h2 className="font-bold text-gray-800 text-lg mb-2 leading-snug">{post.title}</h2>
@@ -955,6 +1029,90 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
           </div>
         </div>
       </div>
+
+      {/* Version History */}
+      {showVersions && post.versions && post.versions.length > 0 && (
+        <div className="px-6 pb-4">
+          <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+            <h4 className="text-xs font-bold text-gray-500 mb-3">{"Hist\u00f3rico de edi\u00e7\u00f5es"}</h4>
+            <div className="flex flex-col gap-3">
+              {post.versions.map((v, i) => (
+                <div key={i} className="bg-white rounded-xl p-3 border border-gray-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${v.categoryColor}`}>
+                      {v.category}
+                    </span>
+                    <span className="text-[10px] text-gray-400">{v.editedAt}</span>
+                  </div>
+                  <p className="text-xs font-semibold text-gray-600">{v.title}</p>
+                  <p className="text-[11px] text-gray-400 mt-1 line-clamp-2">{v.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {isEditing && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-8" onClick={() => setIsEditing(false)}>
+          <div className="bg-white rounded-3xl w-full max-w-sm p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-gray-800">Editar conversa</h3>
+              <button onClick={() => setIsEditing(false)} className="text-gray-400">
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Category */}
+            <p className="text-[11px] font-semibold text-gray-600 mb-2">Categoria</p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {categoryOptions.map((cat) => (
+                <button
+                  key={cat.name}
+                  onClick={() => setEditCategory(cat.name)}
+                  className={`px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${
+                    editCategory === cat.name ? cat.color : 'bg-gray-100 text-gray-500'
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Title */}
+            <p className="text-[11px] font-semibold text-gray-600 mb-1.5">{"T\u00edtulo"}</p>
+            <input
+              type="text"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              className="w-full text-sm text-gray-700 placeholder-gray-400 outline-none px-3 py-2.5 bg-gray-50 rounded-xl border border-gray-200 mb-3 focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
+              placeholder={"T\u00edtulo da conversa"}
+            />
+
+            {/* Text */}
+            <p className="text-[11px] font-semibold text-gray-600 mb-1.5">Texto</p>
+            <textarea
+              value={editDesc}
+              onChange={(e) => setEditDesc(e.target.value)}
+              className="w-full min-h-[80px] text-sm text-gray-700 placeholder-gray-400 outline-none p-3 bg-gray-50 rounded-xl border border-gray-200 resize-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
+              placeholder={"O que voc\u00ea quer compartilhar?"}
+            />
+
+            <button
+              onClick={handleSaveEdit}
+              disabled={!editTitle.trim() || !editDesc.trim()}
+              className={`w-full mt-3 py-3 rounded-xl font-bold text-sm tracking-wide transition-all active:scale-[0.98] ${
+                editTitle.trim() && editDesc.trim()
+                  ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-300'
+              }`}
+            >
+              SALVAR
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Comment Input - Below post, above comments */}
       <div className="px-6 pb-4">
@@ -1225,10 +1383,31 @@ const getSavedUser = () => {
 const App = () => {
   const [savedUser] = useState(getSavedUser);
   const [currentPage, setCurrentPage] = useState(savedUser ? 'inicio' : 'signup');
+  const [pageHistory, setPageHistory] = useState([]);
   const [selectedPostIdx, setSelectedPostIdx] = useState(null);
   const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
   const [userName, setUserName] = useState(savedUser?.name || '');
   const [userEmail, setUserEmail] = useState(savedUser?.email || '');
+  const [showComingSoon, setShowComingSoon] = useState(false);
+
+  const navigateTo = (page) => {
+    setPageHistory((prev) => [...prev, currentPage]);
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  };
+
+  const goBack = () => {
+    setPageHistory((prev) => {
+      const newHistory = [...prev];
+      const previousPage = newHistory.pop();
+      if (previousPage) {
+        setCurrentPage(previousPage);
+        setSelectedPostIdx(null);
+        window.scrollTo(0, 0);
+      }
+      return newHistory;
+    });
+  };
 
   const handleSendPost = (text, category, categoryColor) => {
     const newPost = {
@@ -1243,14 +1422,38 @@ const App = () => {
       commentsList: [],
     };
     setRodasPosts([newPost, ...rodasPosts]);
-    setCurrentPage('rodas');
-    window.scrollTo(0, 0);
+    setSelectedPostIdx(0);
+    navigateTo('postDetail');
   };
 
   const handleOpenPost = (idx) => {
     setSelectedPostIdx(idx);
-    setCurrentPage('postDetail');
-    window.scrollTo(0, 0);
+    navigateTo('postDetail');
+  };
+
+  const handleEditPost = ({ title, desc, category, categoryColor }) => {
+    if (selectedPostIdx === null) return;
+    const updated = [...rodasPosts];
+    const post = { ...updated[selectedPostIdx] };
+
+    // Save current version to history before overwriting
+    const previousVersion = {
+      title: post.title,
+      desc: post.desc,
+      category: post.category,
+      categoryColor: post.categoryColor,
+      editedAt: new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+    };
+    post.versions = [...(post.versions || []), previousVersion];
+
+    // Apply edits
+    post.title = title;
+    post.desc = desc;
+    post.category = category;
+    post.categoryColor = categoryColor;
+
+    updated[selectedPostIdx] = post;
+    setRodasPosts(updated);
   };
 
   const handleLikePost = () => {
@@ -1415,6 +1618,7 @@ const App = () => {
           setUserEmail(email);
           localStorage.setItem('dmd_user', JSON.stringify({ name: username, email }));
           setCurrentPage('inicio');
+          window.scrollTo(0, 0);
         }}
         onGoToSignup={() => setCurrentPage('signup')}
       />
@@ -1441,7 +1645,7 @@ const App = () => {
     return (
       <OnboardingPage
         userName={userName}
-        onComplete={() => setCurrentPage('inicio')}
+        onComplete={() => { setCurrentPage('inicio'); window.scrollTo(0, 0); }}
       />
     );
   }
@@ -1461,17 +1665,25 @@ const App = () => {
             setCurrentPage('login');
           }}
         />
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-          <button onClick={() => { setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={24} />
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+          <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <Heart size={20} />
             <span>Inicio</span>
           </button>
-          <button onClick={() => { setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <MessageCircle size={24} />
+          <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <AldeiaIcon size={20} />
             <span>Aldeia</span>
           </button>
+          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <PenLine size={20} />
+            <span>Journal</span>
+          </button>
+          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <CalendarDays size={20} />
+            <span>Eventos</span>
+          </button>
           <button className="flex flex-col items-center gap-1 text-gray-800">
-            <User size={24} fill="#374151" stroke="#374151" />
+            <User size={20} fill="#374151" stroke="#374151" />
             <span className="font-semibold">Perfil</span>
           </button>
         </nav>
@@ -1485,24 +1697,33 @@ const App = () => {
       <>
         <PostDetail
           post={rodasPosts[selectedPostIdx]}
-          onBack={() => { setCurrentPage('rodas'); setSelectedPostIdx(null); }}
+          onBack={goBack}
           onAddComment={handleAddComment}
           onLikePost={handleLikePost}
           onLikeComment={handleLikeComment}
           onReplyComment={handleReplyComment}
           onLikeReply={handleLikeReply}
+          onEditPost={handleEditPost}
         />
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-          <button onClick={() => { setCurrentPage('inicio'); setSelectedPostIdx(null); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={24} />
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+          <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <Heart size={20} />
             <span>Inicio</span>
           </button>
-          <button onClick={() => { setCurrentPage('aldeia'); setSelectedPostIdx(null); }} className="flex flex-col items-center gap-1 text-gray-800">
-            <MessageCircle size={24} fill="#374151" stroke="#374151" />
+          <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 text-gray-800">
+            <AldeiaIcon size={20} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => { setCurrentPage('perfil'); setSelectedPostIdx(null); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <User size={24} />
+          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <PenLine size={20} />
+            <span>Journal</span>
+          </button>
+          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <CalendarDays size={20} />
+            <span>Eventos</span>
+          </button>
+          <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <User size={20} />
             <span>Perfil</span>
           </button>
         </nav>
@@ -1514,18 +1735,22 @@ const App = () => {
   if (currentPage === 'rodas') {
     return (
       <>
-        <RodasDeConversa onBack={() => setCurrentPage('aldeia')} posts={rodasPosts} onOpenPost={handleOpenPost} onSendPost={handleSendPost} />
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-          <button onClick={() => setCurrentPage('inicio')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={24} />
+        <RodasDeConversa onBack={goBack} posts={rodasPosts} onOpenPost={handleOpenPost} onSendPost={handleSendPost} />
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+          <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <Heart size={22} />
             <span>Inicio</span>
           </button>
-          <button onClick={() => setCurrentPage('aldeia')} className="flex flex-col items-center gap-1 text-gray-800">
-            <MessageCircle size={24} fill="#374151" stroke="#374151" />
+          <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 text-gray-800">
+            <AldeiaIcon size={22} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => { setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <User size={24} />
+          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <PenLine size={22} />
+            <span>Journal</span>
+          </button>
+          <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <User size={22} />
             <span>Perfil</span>
           </button>
         </nav>
@@ -1537,17 +1762,38 @@ const App = () => {
   if (currentPage === 'aldeia') {
     return (
       <>
-        <AldeiaPage onNavigate={(page) => { setCurrentPage(page); window.scrollTo(0, 0); }} posts={rodasPosts} />
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-          <button onClick={() => setCurrentPage('inicio')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={24} />
+        <AldeiaPage onNavigate={(page) => navigateTo(page)} posts={rodasPosts} onComingSoon={() => setShowComingSoon(true)} />
+        {showComingSoon && (
+          <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-10" onClick={() => setShowComingSoon(false)}>
+            <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
+                <Heart size={28} className="text-[#FF66C4]" />
+              </div>
+              <h3 className="font-bold text-gray-800 text-lg mb-2">Coming Soon</h3>
+              <p className="text-sm text-gray-500 leading-relaxed mb-5">{"Estamos preparando algo especial para voc\u00ea. Em breve estar\u00e1 dispon\u00edvel!"}</p>
+              <button
+                onClick={() => setShowComingSoon(false)}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+              >
+                ENTENDI
+              </button>
+            </div>
+          </div>
+        )}
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+          <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <Heart size={22} />
             <span>Inicio</span>
           </button>
           <button className="flex flex-col items-center gap-1 text-gray-800">
-            <MessageCircle size={24} fill="#374151" stroke="#374151" />
+            <AldeiaIcon size={22} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => { setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <PenLine size={22} />
+            <span>Journal</span>
+          </button>
+          <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={24} />
             <span>Perfil</span>
           </button>
@@ -1560,14 +1806,14 @@ const App = () => {
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       <Header userName={userName} />
       <MoodCup />
-      <ActionGrid onNavigate={(page) => { setCurrentPage(page); window.scrollTo(0, 0); }} onSendPost={handleSendPost} />
-      <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" />
+      <ActionGrid onNavigate={(page) => navigateTo(page)} onSendPost={handleSendPost} onComingSoon={() => setShowComingSoon(true)} />
+      <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" onComingSoon={() => setShowComingSoon(true)} />
       {/* Os Guardioes do Cuidado */}
       <section className="py-6 bg-soft-bg">
         <div className="px-6 mb-2">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-sans font-bold text-gray-800">Os Guardi&#245;es do Cuidado</h3>
-            <a href="#" className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</a>
+            <button onClick={() => setShowComingSoon(true)} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
           </div>
           <p className="text-xs text-gray-400 leading-relaxed mt-1">
             Encontros com saberes que sustentam a vida. N&#227;o s&#227;o gurus. S&#227;o pessoas que caminham com o corpo, a escuta e a experi&#234;ncia.
@@ -1575,7 +1821,7 @@ const App = () => {
         </div>
         <div className="flex overflow-x-auto px-6 gap-4 pb-8 pt-2 snap-x hide-scrollbar">
           {guardioes.map((item, idx) => (
-            <div key={idx} style={{ minWidth: "180px", maxWidth: "180px" }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col">
+            <div key={idx} onClick={() => setShowComingSoon(true)} style={{ minWidth: "180px", maxWidth: "180px" }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col cursor-pointer">
               <div className={`h-32 relative ${item.bgClass} flex items-center justify-center overflow-hidden`}>
                 <span className="absolute top-4 left-4 text-[10px] font-bold px-3 py-1 rounded-full bg-white/90 text-emerald-700 z-10">
                   {item.tag}
@@ -1592,20 +1838,43 @@ const App = () => {
         </div>
       </section>
 
-      <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" cardWidth="280px" />
+      <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" cardWidth="280px" onComingSoon={() => setShowComingSoon(true)} />
       
+      {/* Coming Soon Popup */}
+      {showComingSoon && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-10" onClick={() => setShowComingSoon(false)}>
+          <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
+              <Heart size={28} className="text-[#FF66C4]" />
+            </div>
+            <h3 className="font-bold text-gray-800 text-lg mb-2">Coming Soon</h3>
+            <p className="text-sm text-gray-500 leading-relaxed mb-5">{"Estamos preparando algo especial para voc\u00ea. Em breve estar\u00e1 dispon\u00edvel!"}</p>
+            <button
+              onClick={() => setShowComingSoon(false)}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+            >
+              ENTENDI
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Footer Navigation - Floating */}
-      <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+      <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
         <button className="flex flex-col items-center gap-1 text-gray-800">
-          <Heart size={24} fill="#374151" stroke="#374151" />
+          <Heart size={22} fill="#374151" stroke="#374151" />
           <span className="font-semibold">Inicio</span>
         </button>
-        <button onClick={() => setCurrentPage('aldeia')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-          <MessageCircle size={24} />
+        <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <AldeiaIcon size={22} />
           <span>Aldeia</span>
         </button>
-        <button onClick={() => { setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-          <User size={24} />
+        <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <PenLine size={22} />
+          <span>Journal</span>
+        </button>
+        <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <User size={22} />
           <span>Perfil</span>
         </button>
       </nav>
