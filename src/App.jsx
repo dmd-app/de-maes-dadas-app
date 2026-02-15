@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, PenLine, CalendarDays } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, PenLine, CalendarDays, Search } from 'lucide-react';
 import './index.css';
 
 // --- ALDEIA ICON (3 circles in triangle) ---
@@ -371,7 +371,7 @@ const OnboardingPage = ({ onComplete, userName }) => {
 
 // --- COMPONENTS ---
 
-const Header = ({ userName }) => (
+const Header = ({ userName, onMessageClick }) => (
   <header className="p-6 pb-2 flex justify-between items-start bg-soft-bg">
     <div>
       <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
@@ -380,9 +380,9 @@ const Header = ({ userName }) => (
         <p className="text-lg text-soft-blue font-sans">{"Bem-vinda, "}{userName || "Mam\u00e3e"}{" \ud83d\udc97"}</p>
       </div>
     </div>
-    <div className="text-soft-pink">
+    <button onClick={onMessageClick} className="text-soft-pink active:scale-95 transition-transform">
       <MessageCircle size={24} />
-    </div>
+    </button>
   </header>
 );
 
@@ -1710,6 +1710,189 @@ const JournalPage = ({ onBack, entries, onAddEntry, editingEntryId, onUpdateEntr
   );
 };
 
+// --- MOCK CONTACTS & MESSAGES ---
+const mockContacts = [
+  { id: 1, name: "Ana Paula", initials: "AP", color: "bg-pink-400", status: "online", lastSeen: "agora" },
+  { id: 2, name: "Fernanda Lima", initials: "FL", color: "bg-purple-400", status: "online", lastSeen: "agora" },
+  { id: 3, name: "Juliana Santos", initials: "JS", color: "bg-amber-400", status: "offline", lastSeen: "15:30" },
+  { id: 4, name: "Camila Oliveira", initials: "CO", color: "bg-teal-400", status: "offline", lastSeen: "ontem" },
+];
+
+const initialMessages = {
+  1: [
+    { id: 1, from: "them", text: "Oi! Como voc\u00ea est\u00e1 se sentindo hoje?", time: "09:15" },
+    { id: 2, from: "me", text: "Oi Ana! Estou melhor, obrigada por perguntar", time: "09:18" },
+    { id: 3, from: "them", text: "Que bom! Se precisar conversar, estou aqui \u2764\ufe0f", time: "09:20" },
+  ],
+  2: [
+    { id: 1, from: "them", text: "Menina, viu o conte\u00fado novo das Jornadas?", time: "10:00" },
+    { id: 2, from: "me", text: "Ainda n\u00e3o! Vou ver agora", time: "10:05" },
+    { id: 3, from: "them", text: "\u00c9 muito bom, sobre autocuidado!", time: "10:06" },
+  ],
+  3: [
+    { id: 1, from: "me", text: "Ju, vamos marcar um caf\u00e9 essa semana?", time: "Ontem" },
+    { id: 2, from: "them", text: "Vamos sim! Quinta funciona pra voc\u00ea?", time: "Ontem" },
+  ],
+  4: [
+    { id: 1, from: "them", text: "Bem-vinda ao grupo! Qualquer d\u00favida pode me chamar", time: "12/02" },
+  ],
+};
+
+// --- CHAT PAGE (WhatsApp-style) ---
+const ChatPage = ({ contact, messages, onBack, onSendMessage }) => {
+  const [text, setText] = useState('');
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSend = () => {
+    if (text.trim()) {
+      onSendMessage(text.trim());
+      setText('');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
+      {/* Chat Header */}
+      <header className="bg-white px-4 py-3 flex items-center gap-3 shadow-sm sticky top-0 z-10 border-b border-gray-100">
+        <button onClick={onBack} className="text-gray-600">
+          <ArrowLeft size={22} />
+        </button>
+        <div className={`w-10 h-10 rounded-full ${contact.color} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
+          {contact.initials}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h2 className="font-bold text-gray-800 text-sm truncate">{contact.name}</h2>
+          <p className={`text-[10px] ${contact.status === 'online' ? 'text-emerald-500' : 'text-gray-400'}`}>
+            {contact.status === 'online' ? 'Online' : `Visto por \u00faltimo \u00e0s ${contact.lastSeen}`}
+          </p>
+        </div>
+      </header>
+
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto px-4 py-4" style={{ paddingBottom: '80px' }}>
+        <div className="flex flex-col gap-2">
+          {messages.map((msg) => (
+            <div key={msg.id} className={`flex ${msg.from === 'me' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl ${
+                msg.from === 'me'
+                  ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white rounded-br-md'
+                  : 'bg-white text-gray-700 rounded-bl-md shadow-sm border border-gray-100'
+              }`}>
+                <p className="text-sm leading-relaxed">{msg.text}</p>
+                <p className={`text-[10px] mt-1 text-right ${msg.from === 'me' ? 'text-white/70' : 'text-gray-400'}`}>{msg.time}</p>
+              </div>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+
+      {/* Input Area */}
+      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-100 px-4 py-3 flex items-center gap-3">
+        <input
+          type="text"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+          placeholder="Digite uma mensagem..."
+          className="flex-1 bg-gray-100 rounded-full px-4 py-2.5 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
+        />
+        <button
+          onClick={handleSend}
+          disabled={!text.trim()}
+          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-95 ${
+            text.trim()
+              ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-md'
+              : 'bg-gray-200 text-gray-400'
+          }`}
+        >
+          <Send size={18} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// --- MESSAGES PAGE (Conversations List) ---
+const MessagesPage = ({ onBack, contacts, messages, onSelectContact }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredContacts = contacts.filter((c) =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getLastMessage = (contactId) => {
+    const msgs = messages[contactId];
+    if (!msgs || msgs.length === 0) return { text: 'Nenhuma mensagem', time: '' };
+    const last = msgs[msgs.length - 1];
+    return { text: last.from === 'me' ? `Voc\u00ea: ${last.text}` : last.text, time: last.time };
+  };
+
+  return (
+    <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
+      {/* Header */}
+      <header className="p-6 pb-4 flex items-center gap-4 bg-soft-bg sticky top-0 z-10">
+        <button onClick={onBack} className="text-gray-700">
+          <ArrowLeft size={24} />
+        </button>
+        <h1 className="text-xl font-bold text-gray-800 font-sans flex-1">Mensagens</h1>
+      </header>
+
+      {/* Search */}
+      <div className="px-6 pb-4">
+        <div className="bg-white rounded-xl flex items-center gap-3 px-4 py-3 border border-gray-100">
+          <Search size={18} className="text-gray-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Buscar conversa..."
+            className="flex-1 text-sm text-gray-700 outline-none bg-transparent"
+          />
+        </div>
+      </div>
+
+      {/* Conversation List */}
+      <div className="px-6 flex flex-col gap-2">
+        {filteredContacts.map((contact) => {
+          const last = getLastMessage(contact.id);
+          const unread = contact.status === 'online' && messages[contact.id]?.slice(-1)[0]?.from === 'them';
+          return (
+            <button
+              key={contact.id}
+              onClick={() => onSelectContact(contact)}
+              className="bg-white rounded-2xl p-4 flex items-center gap-3 shadow-sm border border-gray-100 hover:shadow-md transition-all active:scale-[0.99] text-left w-full"
+            >
+              <div className="relative flex-shrink-0">
+                <div className={`w-12 h-12 rounded-full ${contact.color} flex items-center justify-center text-white font-bold text-sm`}>
+                  {contact.initials}
+                </div>
+                {contact.status === 'online' && (
+                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white" />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-gray-800 text-sm truncate">{contact.name}</h3>
+                  <span className="text-[10px] text-gray-400 flex-shrink-0 ml-2">{last.time}</span>
+                </div>
+                <p className={`text-xs truncate mt-0.5 ${unread ? 'text-gray-700 font-semibold' : 'text-gray-400'}`}>{last.text}</p>
+              </div>
+              {unread && (
+                <span className="w-2.5 h-2.5 rounded-full bg-[#FF66C4] flex-shrink-0" />
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const getSavedUser = () => {
   try {
     return JSON.parse(localStorage.getItem('dmd_user') || 'null');
@@ -1729,6 +1912,21 @@ const App = () => {
   const [showComingSoon, setShowComingSoon] = useState(false);
   const [journalEntries, setJournalEntries] = useState([]);
   const [editingEntryId, setEditingEntryId] = useState(null);
+  const [chatMessages, setChatMessages] = useState(initialMessages);
+  const [currentChat, setCurrentChat] = useState(null);
+
+  const handleSendChatMessage = (text) => {
+    if (!currentChat) return;
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    setChatMessages((prev) => ({
+      ...prev,
+      [currentChat.id]: [
+        ...(prev[currentChat.id] || []),
+        { id: Date.now(), from: 'me', text, time: timeStr }
+      ]
+    }));
+  };
 
   const handleSaveJournal = (text) => {
     const newId = Date.now();
@@ -1758,12 +1956,13 @@ const App = () => {
   };
 
   const goBack = () => {
-    setPageHistory((prev) => {
-      const newHistory = [...prev];
-      const previousPage = newHistory.pop();
-      if (previousPage) {
-        setCurrentPage(previousPage);
-        setSelectedPostIdx(null);
+  setPageHistory((prev) => {
+  const newHistory = [...prev];
+  const previousPage = newHistory.pop();
+  if (previousPage) {
+  setCurrentPage(previousPage);
+  setSelectedPostIdx(null);
+  setCurrentChat(null);
         window.scrollTo(0, 0);
       }
       return newHistory;
@@ -1969,6 +2168,52 @@ const App = () => {
       bgClass: "bg-gradient-to-br from-blue-300 to-blue-500" // Blue Gradient
     }
   ];
+
+  // Render Mensagens page
+  if (currentPage === 'mensagens') {
+    if (currentChat) {
+      return (
+        <ChatPage
+          contact={currentChat}
+          messages={chatMessages[currentChat.id] || []}
+          onBack={() => setCurrentChat(null)}
+          onSendMessage={handleSendChatMessage}
+        />
+      );
+    }
+    return (
+      <>
+        <MessagesPage
+          onBack={goBack}
+          contacts={mockContacts}
+          messages={chatMessages}
+          onSelectContact={(contact) => setCurrentChat(contact)}
+        />
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+          <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <Heart size={20} />
+            <span>Inicio</span>
+          </button>
+          <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <AldeiaIcon size={20} />
+            <span>Aldeia</span>
+          </button>
+          <button onClick={() => navigateTo('journal')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <PenLine size={20} />
+            <span>Journal</span>
+          </button>
+          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <CalendarDays size={20} />
+            <span>Eventos</span>
+          </button>
+          <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <User size={20} />
+            <span>Perfil</span>
+          </button>
+        </nav>
+      </>
+    );
+  }
 
   // Render Login page (Entrar)
   if (currentPage === 'login') {
@@ -2203,7 +2448,7 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
-      <Header userName={userName} />
+      <Header userName={userName} onMessageClick={() => navigateTo('mensagens')} />
       <MoodCup />
       <ActionGrid onNavigate={(page) => navigateTo(page)} onSendPost={handleSendPost} onComingSoon={() => setShowComingSoon(true)} onSaveJournal={handleSaveJournal} />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" onComingSoon={() => setShowComingSoon(true)} />
