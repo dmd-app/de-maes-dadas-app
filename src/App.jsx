@@ -411,6 +411,7 @@ const App = () => {
     };
     setRodasPosts([newPost, ...rodasPosts]);
     setCurrentPage('rodas');
+    window.scrollTo(0, 0);
   };
 
   const trilhas = [
