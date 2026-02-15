@@ -415,7 +415,7 @@ const AldeiaPage = ({ onNavigate, posts }) => {
 };
 
 // --- POST DETAIL PAGE ---
-const PostDetail = ({ post, onBack, onAddComment, onLikeComment, onReplyComment }) => {
+const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onReplyComment }) => {
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState('');
@@ -460,8 +460,8 @@ const PostDetail = ({ post, onBack, onAddComment, onLikeComment, onReplyComment 
 
           <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
             <div className="flex items-center gap-4">
-              <button className="flex items-center gap-1.5 text-gray-400 hover:text-[#FF66C4] transition-colors">
-                <Heart size={18} />
+              <button onClick={onLikePost} className={`flex items-center gap-1.5 transition-colors ${post.liked ? 'text-[#FF66C4]' : 'text-gray-400 hover:text-[#FF66C4]'}`}>
+                <Heart size={18} fill={post.liked ? '#FF66C4' : 'none'} />
                 <span className="text-sm font-medium">{post.likes}</span>
               </button>
               <span className="flex items-center gap-1.5 text-gray-400">
@@ -618,6 +618,21 @@ const App = () => {
     window.scrollTo(0, 0);
   };
 
+  const handleLikePost = () => {
+    if (selectedPostIdx === null) return;
+    const updated = [...rodasPosts];
+    const post = { ...updated[selectedPostIdx] };
+    if (post.liked) {
+      post.likes = (post.likes || 1) - 1;
+      post.liked = false;
+    } else {
+      post.likes = (post.likes || 0) + 1;
+      post.liked = true;
+    }
+    updated[selectedPostIdx] = post;
+    setRodasPosts(updated);
+  };
+
   const handleAddComment = (text) => {
     if (selectedPostIdx === null) return;
     const updated = [...rodasPosts];
@@ -737,6 +752,7 @@ const App = () => {
           post={rodasPosts[selectedPostIdx]}
           onBack={() => { setCurrentPage('rodas'); setSelectedPostIdx(null); }}
           onAddComment={handleAddComment}
+          onLikePost={handleLikePost}
           onLikeComment={handleLikeComment}
           onReplyComment={handleReplyComment}
         />
