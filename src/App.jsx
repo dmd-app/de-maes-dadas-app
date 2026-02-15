@@ -511,8 +511,11 @@ const PostDetail = ({ post, onBack, onAddComment, onLikeComment, onReplyComment 
         )}
 
         <div className="flex flex-col gap-3">
-          {post.commentsList?.map((comment, idx) => (
-            <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          {post.commentsList
+            ?.map((comment, idx) => ({ ...comment, originalIdx: idx }))
+            .sort((a, b) => ((b.likes || 0) + (b.replies?.length || 0)) - ((a.likes || 0) + (a.replies?.length || 0)))
+            .map((comment) => (
+            <div key={comment.originalIdx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-7 h-7 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink flex-shrink-0">
                   <User size={14} />
@@ -525,14 +528,14 @@ const PostDetail = ({ post, onBack, onAddComment, onLikeComment, onReplyComment 
               {/* Comment actions: like + reply */}
               <div className="flex items-center gap-4 pl-9 mt-2">
                 <button
-                  onClick={() => onLikeComment(idx)}
+                  onClick={() => onLikeComment(comment.originalIdx)}
                   className={`flex items-center gap-1 text-xs transition-colors ${comment.liked ? 'text-[#FF66C4]' : 'text-gray-400 hover:text-[#FF66C4]'}`}
                 >
                   <Heart size={14} fill={comment.liked ? '#FF66C4' : 'none'} />
                   <span>{comment.likes || 0}</span>
                 </button>
                 <button
-                  onClick={() => { setReplyingTo(replyingTo === idx ? null : idx); setReplyText(''); }}
+                  onClick={() => { setReplyingTo(replyingTo === comment.originalIdx ? null : comment.originalIdx); setReplyText(''); }}
                   className="flex items-center gap-1 text-xs text-gray-400 hover:text-soft-blue transition-colors"
                 >
                   <MessageCircle size={14} />
@@ -541,19 +544,19 @@ const PostDetail = ({ post, onBack, onAddComment, onLikeComment, onReplyComment 
               </div>
 
               {/* Reply input */}
-              {replyingTo === idx && (
+              {replyingTo === comment.originalIdx && (
                 <div className="pl-9 mt-3 flex items-center gap-2">
                   <input
                     type="text"
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSendReply(idx)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSendReply(comment.originalIdx)}
                     className="flex-1 text-xs text-gray-700 placeholder-gray-400 outline-none px-3 py-2 bg-gray-50 rounded-xl border border-gray-200 focus:ring-1 focus:ring-[#FF66C4]"
                     placeholder={"Escreva uma resposta..."}
                     autoFocus
                   />
                   <button
-                    onClick={() => handleSendReply(idx)}
+                    onClick={() => handleSendReply(comment.originalIdx)}
                     className={`p-2 rounded-xl transition-all ${replyText.trim() ? 'bg-[#FF66C4] text-white' : 'bg-gray-100 text-gray-300'}`}
                     disabled={!replyText.trim()}
                   >
