@@ -40,20 +40,16 @@ const SignupPage = ({ onSignup, onGoToLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-soft-bg max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
-      <div className="relative overflow-hidden pt-16 pb-10 px-8">
-        <div className="w-40 h-40 rounded-full bg-[#FF66C4]/10 blur-3xl absolute -top-10 -right-10"></div>
-        <div className="w-32 h-32 rounded-full bg-soft-blue/10 blur-3xl absolute -bottom-5 -left-10"></div>
-        <div className="relative z-10">
-          <img src="/images/logo-horizontal-azul.png" alt="DeMaesDadas" className="h-10 mb-2" />
-          <p className="text-sm text-soft-pink font-medium">Aldeia Digital</p>
-          <h1 className="text-2xl font-bold text-gray-800 mt-6 leading-tight text-balance">
-            {"Entre para a sua aldeia"}
-          </h1>
-          <p className="text-sm text-gray-400 mt-2">
-            {"Crie sua conta e comece sua jornada"}
-          </p>
-        </div>
+    <div className="min-h-screen bg-soft-bg max-w-md mx-auto font-sans text-gray-800 flex flex-col">
+      <div className="pt-16 pb-10 px-8">
+        <img src="/images/logo-horizontal-azul.png" alt="DeMaesDadas" className="h-10 mb-2" />
+        <p className="text-sm text-soft-pink font-medium">Aldeia Digital</p>
+        <h1 className="text-2xl font-bold text-gray-800 mt-6 leading-tight text-balance">
+          {"Entre para a sua aldeia"}
+        </h1>
+        <p className="text-sm text-gray-400 mt-2">
+          {"Crie sua conta e comece sua jornada"}
+        </p>
       </div>
 
       <div className="flex-1 px-8 pb-10 flex flex-col gap-4">
