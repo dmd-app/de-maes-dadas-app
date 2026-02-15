@@ -2035,7 +2035,7 @@ const App = () => {
             <AldeiaIcon size={20} />
             <span>Aldeia</span>
           </button>
-          <button onClick={() => { setPageHistory([]); setCurrentPage('journal'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => navigateTo('journal')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <PenLine size={20} />
             <span>Journal</span>
           </button>
@@ -2075,7 +2075,7 @@ const App = () => {
             <AldeiaIcon size={20} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('journal'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => { setSelectedPostIdx(null); navigateTo('journal'); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <PenLine size={20} />
             <span>Journal</span>
           </button>
@@ -2144,7 +2144,7 @@ const App = () => {
             <AldeiaIcon size={22} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => { setPageHistory([]); setCurrentPage('journal'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => navigateTo('journal')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <PenLine size={22} />
             <span>Journal</span>
           </button>
@@ -2188,7 +2188,7 @@ const App = () => {
             <AldeiaIcon size={22} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => { setPageHistory([]); setCurrentPage('journal'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+          <button onClick={() => navigateTo('journal')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <PenLine size={22} />
             <span>Journal</span>
           </button>
@@ -2268,7 +2268,7 @@ const App = () => {
           <AldeiaIcon size={22} />
           <span>Aldeia</span>
         </button>
-        <button onClick={() => { setPageHistory([]); setCurrentPage('journal'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+        <button onClick={() => navigateTo('journal')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
           <PenLine size={22} />
           <span>Journal</span>
         </button>
