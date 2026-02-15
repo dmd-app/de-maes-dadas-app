@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, PenLine } from 'lucide-react';
+import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, PenLine, CalendarDays } from 'lucide-react';
 import './index.css';
 
 // --- ALDEIA ICON (3 circles in triangle) ---
@@ -1656,21 +1656,25 @@ const App = () => {
             setCurrentPage('login');
           }}
         />
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={22} />
+            <Heart size={20} />
             <span>Inicio</span>
           </button>
           <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <AldeiaIcon size={22} />
+            <AldeiaIcon size={20} />
             <span>Aldeia</span>
           </button>
           <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <PenLine size={22} />
+            <PenLine size={20} />
             <span>Journal</span>
           </button>
+          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <CalendarDays size={20} />
+            <span>Eventos</span>
+          </button>
           <button className="flex flex-col items-center gap-1 text-gray-800">
-            <User size={22} fill="#374151" stroke="#374151" />
+            <User size={20} fill="#374151" stroke="#374151" />
             <span className="font-semibold">Perfil</span>
           </button>
         </nav>
@@ -1692,21 +1696,25 @@ const App = () => {
           onLikeReply={handleLikeReply}
           onEditPost={handleEditPost}
         />
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={22} />
+            <Heart size={20} />
             <span>Inicio</span>
           </button>
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 text-gray-800">
-            <AldeiaIcon size={22} filled color="#374151" />
+            <AldeiaIcon size={20} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
           <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <PenLine size={22} />
+            <PenLine size={20} />
             <span>Journal</span>
           </button>
+          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <CalendarDays size={20} />
+            <span>Eventos</span>
+          </button>
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <User size={22} />
+            <User size={20} />
             <span>Perfil</span>
           </button>
         </nav>
