@@ -1123,11 +1123,12 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout }) => {
 };
 
 const App = () => {
-  const [currentPage, setCurrentPage] = useState('signup');
+  const saved = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('dmd_user') || 'null') : null;
+  const [currentPage, setCurrentPage] = useState(saved ? 'inicio' : 'signup');
   const [selectedPostIdx, setSelectedPostIdx] = useState(null);
   const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
-  const [userName, setUserName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
+  const [userName, setUserName] = useState(saved?.name || '');
+  const [userEmail, setUserEmail] = useState(saved?.email || '');
 
   const handleSendPost = (text) => {
     const newPost = {
@@ -1312,6 +1313,7 @@ const App = () => {
         onLogin={({ email, username }) => {
           setUserName(username);
           setUserEmail(email);
+          localStorage.setItem('dmd_user', JSON.stringify({ name: username, email }));
           setCurrentPage('inicio');
         }}
         onGoToSignup={() => setCurrentPage('signup')}
@@ -1326,6 +1328,7 @@ const App = () => {
         onSignup={({ email, username }) => {
           setUserName(username);
           setUserEmail(email);
+          localStorage.setItem('dmd_user', JSON.stringify({ name: username, email }));
           setCurrentPage('onboarding');
         }}
         onGoToLogin={() => setCurrentPage('login')}
@@ -1354,6 +1357,7 @@ const App = () => {
           onLogout={() => {
             setUserName('');
             setUserEmail('');
+            localStorage.removeItem('dmd_user');
             setCurrentPage('login');
           }}
         />
