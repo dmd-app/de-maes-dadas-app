@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, PenLine, CalendarDays, Search } from 'lucide-react';
 import './index.css';
-import logoImg from '/images/logo-horizontal-azul.png';
 
 // --- ALDEIA ICON (3 circles in triangle) ---
 const AldeiaIcon = ({ size = 24, filled = false, color = "currentColor" }) => (
@@ -43,7 +42,7 @@ const SignupPage = ({ onSignup, onGoToLogin }) => {
   return (
     <div className="min-h-screen bg-soft-bg max-w-md mx-auto font-sans text-gray-800 flex flex-col">
       <div className="pt-16 pb-10 px-8">
-        <img src={logoImg} alt="DeMaesDadas" className="h-10 mb-2" />
+        <img src="/images/logo-horizontal-azul.png" alt="DeMaesDadas" className="h-10 mb-2" />
         <p className="text-sm text-soft-pink font-medium">Aldeia Digital</p>
         <h1 className="text-2xl font-bold text-gray-800 mt-6 leading-tight text-balance">
           {"Entre para a sua aldeia"}
@@ -170,7 +169,7 @@ const LoginPage = ({ onLogin, onGoToSignup }) => {
         <div className="w-40 h-40 rounded-full bg-[#FF66C4]/10 blur-3xl absolute -top-10 -right-10"></div>
         <div className="w-32 h-32 rounded-full bg-soft-blue/10 blur-3xl absolute -bottom-5 -left-10"></div>
         <div className="relative z-10">
-          <img src={logoImg} alt="DeMaesDadas" className="h-10 mb-2" />
+          <img src="/images/logo-horizontal-azul.png" alt="DeMaesDadas" className="h-10 mb-2" />
           <p className="text-sm text-soft-pink font-medium">Aldeia Digital</p>
           <h1 className="text-2xl font-bold text-gray-800 mt-6 leading-tight text-balance">
             {"Bem-vinda de volta"}
@@ -372,7 +371,7 @@ const Header = ({ userName, onMessageClick }) => (
   <>
     <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 flex justify-between items-center border-b border-pink-100/50">
       <div>
-        <img src={logoImg} alt="DeMãesDadas" className="h-7" />
+        <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-7" />
         <p className="text-xs text-soft-pink font-sans font-medium">Aldeia Digital</p>
       </div>
       <button onClick={onMessageClick} className="text-soft-pink active:scale-95 transition-transform p-2 -mr-2">
@@ -855,7 +854,7 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon }) => {
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       {/* Header */}
       <header className="p-6 pb-2 bg-soft-bg">
-        <img src={logoImg} alt="DeMãesDadas" className="h-8" />
+        <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
         <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
         <div className="mt-6">
           <p className="text-lg text-soft-blue font-sans">A sua aldeia</p>
