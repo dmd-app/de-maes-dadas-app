@@ -470,7 +470,7 @@ const MoodCup = () => {
   );
 };
 
-const ActionGrid = ({ onNavigate, onSendPost }) => {
+const ActionGrid = ({ onNavigate, onSendPost, onComingSoon }) => {
   const [isPanicOpen, setIsPanicOpen] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -530,7 +530,7 @@ const ActionGrid = ({ onNavigate, onSendPost }) => {
         <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de Conversa</span>
       </button>
       
-      <button className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
+      <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
         <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
           <BookOpen size={24} />
         </div>
@@ -540,16 +540,16 @@ const ActionGrid = ({ onNavigate, onSendPost }) => {
   );
 };
 
-const ContentSection = ({ title, items, badgeColor, cardWidth = "180px" }) => (
+const ContentSection = ({ title, items, badgeColor, cardWidth = "180px", onComingSoon }) => (
   <section className="py-6 bg-soft-bg">
     <div className="px-6 mb-4 flex justify-between items-center">
       <h3 className="text-lg font-sans font-bold text-gray-800">{title}</h3>
-      <a href="#" className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</a>
+      <button onClick={onComingSoon} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
     </div>
     
     <div className="flex overflow-x-auto px-6 gap-4 pb-8 snap-x hide-scrollbar">
       {items.map((item, idx) => (
-        <div key={idx} style={{ minWidth: cardWidth, maxWidth: cardWidth }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col">
+        <div key={idx} onClick={onComingSoon} style={{ minWidth: cardWidth, maxWidth: cardWidth }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col cursor-pointer">
           {/* Card Image Area */}
           <div className={`h-32 relative ${item.bgClass} flex items-center justify-center overflow-hidden`}>
              <span className={`absolute top-4 left-4 text-[10px] font-bold px-3 py-1 rounded-full ${badgeColor} z-10`}>
@@ -833,7 +833,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
 };
 
 // --- ALDEIA PAGE ---
-const AldeiaPage = ({ onNavigate, posts }) => {
+const AldeiaPage = ({ onNavigate, posts, onComingSoon }) => {
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       {/* Header */}
@@ -860,7 +860,7 @@ const AldeiaPage = ({ onNavigate, posts }) => {
           </div>
         </button>
 
-        <button className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow active:scale-[0.98]">
+        <button onClick={onComingSoon} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow active:scale-[0.98]">
           <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple flex-shrink-0">
             <BookOpen size={24} />
           </div>
@@ -1370,6 +1370,7 @@ const App = () => {
   const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
   const [userName, setUserName] = useState(savedUser?.name || '');
   const [userEmail, setUserEmail] = useState(savedUser?.email || '');
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
   const navigateTo = (page) => {
     setPageHistory((prev) => [...prev, currentPage]);
@@ -1723,7 +1724,24 @@ const App = () => {
   if (currentPage === 'aldeia') {
     return (
       <>
-        <AldeiaPage onNavigate={(page) => navigateTo(page)} posts={rodasPosts} />
+        <AldeiaPage onNavigate={(page) => navigateTo(page)} posts={rodasPosts} onComingSoon={() => setShowComingSoon(true)} />
+        {showComingSoon && (
+          <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-10" onClick={() => setShowComingSoon(false)}>
+            <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
+                <Heart size={28} className="text-[#FF66C4]" />
+              </div>
+              <h3 className="font-bold text-gray-800 text-lg mb-2">Coming Soon</h3>
+              <p className="text-sm text-gray-500 leading-relaxed mb-5">{"Estamos preparando algo especial para voc\u00ea. Em breve estar\u00e1 dispon\u00edvel!"}</p>
+              <button
+                onClick={() => setShowComingSoon(false)}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+              >
+                ENTENDI
+              </button>
+            </div>
+          </div>
+        )}
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <Heart size={24} />
@@ -1746,14 +1764,14 @@ const App = () => {
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       <Header userName={userName} />
       <MoodCup />
-      <ActionGrid onNavigate={(page) => navigateTo(page)} onSendPost={handleSendPost} />
-      <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" />
+      <ActionGrid onNavigate={(page) => navigateTo(page)} onSendPost={handleSendPost} onComingSoon={() => setShowComingSoon(true)} />
+      <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" onComingSoon={() => setShowComingSoon(true)} />
       {/* Os Guardioes do Cuidado */}
       <section className="py-6 bg-soft-bg">
         <div className="px-6 mb-2">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-sans font-bold text-gray-800">Os Guardi&#245;es do Cuidado</h3>
-            <a href="#" className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</a>
+            <button onClick={() => setShowComingSoon(true)} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
           </div>
           <p className="text-xs text-gray-400 leading-relaxed mt-1">
             Encontros com saberes que sustentam a vida. N&#227;o s&#227;o gurus. S&#227;o pessoas que caminham com o corpo, a escuta e a experi&#234;ncia.
@@ -1761,7 +1779,7 @@ const App = () => {
         </div>
         <div className="flex overflow-x-auto px-6 gap-4 pb-8 pt-2 snap-x hide-scrollbar">
           {guardioes.map((item, idx) => (
-            <div key={idx} style={{ minWidth: "180px", maxWidth: "180px" }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col">
+            <div key={idx} onClick={() => setShowComingSoon(true)} style={{ minWidth: "180px", maxWidth: "180px" }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col cursor-pointer">
               <div className={`h-32 relative ${item.bgClass} flex items-center justify-center overflow-hidden`}>
                 <span className="absolute top-4 left-4 text-[10px] font-bold px-3 py-1 rounded-full bg-white/90 text-emerald-700 z-10">
                   {item.tag}
@@ -1778,8 +1796,27 @@ const App = () => {
         </div>
       </section>
 
-      <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" cardWidth="280px" />
+      <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" cardWidth="280px" onComingSoon={() => setShowComingSoon(true)} />
       
+      {/* Coming Soon Popup */}
+      {showComingSoon && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-10" onClick={() => setShowComingSoon(false)}>
+          <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
+              <Heart size={28} className="text-[#FF66C4]" />
+            </div>
+            <h3 className="font-bold text-gray-800 text-lg mb-2">Coming Soon</h3>
+            <p className="text-sm text-gray-500 leading-relaxed mb-5">{"Estamos preparando algo especial para voc\u00ea. Em breve estar\u00e1 dispon\u00edvel!"}</p>
+            <button
+              onClick={() => setShowComingSoon(false)}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+            >
+              ENTENDI
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Footer Navigation - Floating */}
       <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
         <button className="flex flex-col items-center gap-1 text-gray-800">
