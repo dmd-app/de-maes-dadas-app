@@ -530,30 +530,29 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon }) => {
         </div>
       </div>
 
-      <div className="col-span-2 flex overflow-x-auto gap-4 pb-2 snap-x hide-scrollbar">
-        <button onClick={() => onNavigate && onNavigate('rodas')} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
-          <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
-            <Users size={24} />
-          </div>
-          <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de<br />Conversa</span>
-        </button>
-
-        <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
-          <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-            <PenLine size={24} />
-          </div>
-          <span className="text-gray-700 font-sans font-medium text-sm text-center">Journal</span>
-        </button>
-
-        <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "150px" }}>
-          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
-            <BookOpen size={24} />
-          </div>
-          <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca<br />(O Espelho)</span>
-        </button>
-        <div className="flex-shrink-0 w-2" aria-hidden="true" />
-      </div>
     </section>
+    <div className="flex overflow-x-auto px-6 gap-4 pb-4 snap-x hide-scrollbar bg-soft-bg">
+      <button onClick={() => onNavigate && onNavigate('rodas')} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
+        <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
+          <Users size={24} />
+        </div>
+        <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de<br />Conversa</span>
+      </button>
+
+      <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
+        <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+          <PenLine size={24} />
+        </div>
+        <span className="text-gray-700 font-sans font-medium text-sm text-center">Journal</span>
+      </button>
+
+      <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
+        <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
+          <BookOpen size={24} />
+        </div>
+        <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca<br />(O Espelho)</span>
+      </button>
+    </div>
   );
 };
 
