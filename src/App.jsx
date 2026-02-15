@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2 } from 'lucide-react';
+import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send } from 'lucide-react';
 import './index.css';
 
 // --- COMPONENTS ---
@@ -219,6 +219,11 @@ const initialRodasPosts = [
     desc: "Sinto que quando chega sexta-feira, todo mundo tem planos em fam\u00edlia e eu fico aqui...",
     likes: 24,
     comments: 12,
+    commentsList: [
+      { author: "Ana P.", time: "1h atr\u00e1s", text: "Eu te entendo demais. Aqui \u00e9 igual. Vamos marcar algo juntas?" },
+      { author: "Juliana R.", time: "1h atr\u00e1s", text: "Passei por isso por muito tempo. O que me ajudou foi entrar em um grupo de m\u00e3es na vizinhan\u00e7a." },
+      { author: "Camila F.", time: "45min atr\u00e1s", text: "Voc\u00ea n\u00e3o est\u00e1 sozinha. Estamos aqui." },
+    ],
   },
   {
     category: "Desabafo",
@@ -229,6 +234,12 @@ const initialRodasPosts = [
     desc: "Foi por uma bobagem. O copo de leite caiu. Mas eu explodi como se fosse o fim do mundo.",
     likes: 156,
     comments: 43,
+    commentsList: [
+      { author: "Fernanda L.", time: "4h atr\u00e1s", text: "J\u00e1 passei por isso tantas vezes. Respira fundo, voc\u00ea \u00e9 humana." },
+      { author: "Renata B.", time: "3h atr\u00e1s", text: "A culpa \u00e9 o peso mais pesado da maternidade. Mas voc\u00ea reconhecer j\u00e1 \u00e9 um ato de amor." },
+      { author: "Beatriz S.", time: "2h atr\u00e1s", text: "Eu chorei lendo isso. Obrigada por compartilhar." },
+      { author: "Luana M.", time: "1h atr\u00e1s", text: "Nenhuma m\u00e3e \u00e9 perfeita. Voc\u00ea est\u00e1 fazendo o seu melhor." },
+    ],
   },
   {
     category: "Volta ao Trabalho",
@@ -239,6 +250,10 @@ const initialRodasPosts = [
     desc: "Meu beb\u00ea tem 6 meses e eu s\u00f3 choro pensando em deixar ele l\u00e1 semana que vem.",
     likes: 8,
     comments: 5,
+    commentsList: [
+      { author: "Patricia A.", time: "20h atr\u00e1s", text: "Faz adapta\u00e7\u00e3o gradual. Primeiro dia 1h, segundo 2h... funciona muito!" },
+      { author: "Debora K.", time: "18h atr\u00e1s", text: "Leva um paninho com seu cheiro. Ajuda demais." },
+    ],
   },
   {
     category: "Sono",
@@ -249,12 +264,17 @@ const initialRodasPosts = [
     desc: "Meu filho tem 14 meses e ainda n\u00e3o dorme a noite toda. Estou destruida.",
     likes: 89,
     comments: 27,
+    commentsList: [
+      { author: "Amanda G.", time: "2h atr\u00e1s", text: "O meu tem 18 meses e \u00e9 a mesma coisa. Solidariedade total." },
+      { author: "Isabela T.", time: "1h atr\u00e1s", text: "Consultora de sono mudou minha vida. Se precisar, indico." },
+      { author: "Thais R.", time: "40min atr\u00e1s", text: "Fa\u00e7a revezamento com algu\u00e9m se puder. Voc\u00ea precisa dormir tamb\u00e9m." },
+    ],
   },
 ];
 
 const rodasFilters = ["Destaques", "Recentes", "Maternidade Solo", "Sono", "Desabafo"];
 
-const RodasDeConversa = ({ onBack, posts }) => {
+const RodasDeConversa = ({ onBack, posts, onOpenPost }) => {
   const [activeFilter, setActiveFilter] = useState("Destaques");
 
   return (
@@ -287,7 +307,7 @@ const RodasDeConversa = ({ onBack, posts }) => {
       {/* Posts */}
       <div className="px-6 flex flex-col gap-4 pt-2">
         {posts.map((post, idx) => (
-          <div key={idx} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+          <div key={idx} onClick={() => onOpenPost && onOpenPost(idx)} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform">
             {/* Meta */}
             <div className="flex items-center gap-2 mb-3">
               <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
@@ -394,8 +414,114 @@ const AldeiaPage = ({ onNavigate, posts }) => {
   );
 };
 
+// --- POST DETAIL PAGE ---
+const PostDetail = ({ post, onBack, onAddComment }) => {
+  const [newComment, setNewComment] = useState('');
+
+  const handleSendComment = () => {
+    if (newComment.trim()) {
+      onAddComment(newComment.trim());
+      setNewComment('');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-soft-bg pb-32 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
+      {/* Header */}
+      <header className="p-6 pb-4 flex items-center gap-4 bg-soft-bg sticky top-0 z-10">
+        <button onClick={onBack} className="text-gray-700">
+          <ArrowLeft size={24} />
+        </button>
+        <h1 className="text-xl font-bold text-gray-800 font-sans">Conversa</h1>
+      </header>
+
+      {/* Full Post */}
+      <div className="px-6 pb-4">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-2 mb-3">
+            <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
+              {post.category}
+            </span>
+            <span className="text-xs text-gray-400">{post.author}{" \u2022 "}{post.time}</span>
+          </div>
+
+          <h2 className="font-bold text-gray-800 text-lg mb-2 leading-snug">{post.title}</h2>
+          <p className="text-sm text-gray-600 leading-relaxed">{post.desc}</p>
+
+          <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+            <div className="flex items-center gap-4">
+              <button className="flex items-center gap-1.5 text-gray-400 hover:text-[#FF66C4] transition-colors">
+                <Heart size={18} />
+                <span className="text-sm font-medium">{post.likes}</span>
+              </button>
+              <span className="flex items-center gap-1.5 text-gray-400">
+                <MessageCircle size={18} />
+                <span className="text-sm font-medium">{post.commentsList?.length || 0}</span>
+              </span>
+            </div>
+            <button className="text-gray-300 hover:text-gray-500 transition-colors">
+              <Share2 size={18} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Comments Section */}
+      <div className="px-6">
+        <h3 className="font-bold text-gray-800 mb-4">
+          {"Coment\u00e1rios"} ({post.commentsList?.length || 0})
+        </h3>
+
+        {(!post.commentsList || post.commentsList.length === 0) && (
+          <div className="bg-white rounded-2xl p-6 border border-gray-100 text-center">
+            <MessageCircle size={32} className="text-gray-200 mx-auto mb-2" />
+            <p className="text-sm text-gray-400">{"Nenhum coment\u00e1rio ainda. Seja a primeira!"}</p>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-3">
+          {post.commentsList?.map((comment, idx) => (
+            <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-7 h-7 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink flex-shrink-0">
+                  <User size={14} />
+                </div>
+                <span className="text-sm font-semibold text-gray-700">{comment.author}</span>
+                <span className="text-xs text-gray-400">{" \u2022 "}{comment.time}</span>
+              </div>
+              <p className="text-sm text-gray-600 leading-relaxed pl-9">{comment.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Comment Input - Fixed at bottom */}
+      <div className="fixed bottom-20 left-0 right-0 max-w-md mx-auto px-4 z-20">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-3 flex items-center gap-2">
+          <input
+            type="text"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendComment()}
+            className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none px-3 py-2 bg-gray-50 rounded-xl"
+            placeholder={"Escreva um coment\u00e1rio..."}
+          />
+          <button
+            onClick={handleSendComment}
+            className={`p-2.5 rounded-xl transition-all ${newComment.trim() ? 'bg-[#FF66C4] text-white' : 'bg-gray-100 text-gray-300'}`}
+            disabled={!newComment.trim()}
+          >
+            <Send size={18} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const App = () => {
   const [currentPage, setCurrentPage] = useState('inicio');
+  const [selectedPostIdx, setSelectedPostIdx] = useState(null);
   const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
 
   const handleSendPost = (text) => {
@@ -408,10 +534,29 @@ const App = () => {
       desc: text,
       likes: 0,
       comments: 0,
+      commentsList: [],
     };
     setRodasPosts([newPost, ...rodasPosts]);
     setCurrentPage('rodas');
     window.scrollTo(0, 0);
+  };
+
+  const handleOpenPost = (idx) => {
+    setSelectedPostIdx(idx);
+    setCurrentPage('postDetail');
+    window.scrollTo(0, 0);
+  };
+
+  const handleAddComment = (text) => {
+    if (selectedPostIdx === null) return;
+    const updated = [...rodasPosts];
+    const newComment = { author: "Eu", time: "Agora", text };
+    updated[selectedPostIdx] = {
+      ...updated[selectedPostIdx],
+      commentsList: [...(updated[selectedPostIdx].commentsList || []), newComment],
+      comments: (updated[selectedPostIdx].comments || 0) + 1,
+    };
+    setRodasPosts(updated);
   };
 
   const trilhas = [
@@ -480,11 +625,38 @@ const App = () => {
     }
   ];
 
+  // Render Post Detail page
+  if (currentPage === 'postDetail' && selectedPostIdx !== null) {
+    return (
+      <>
+        <PostDetail
+          post={rodasPosts[selectedPostIdx]}
+          onBack={() => { setCurrentPage('rodas'); setSelectedPostIdx(null); }}
+          onAddComment={handleAddComment}
+        />
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+          <button onClick={() => { setCurrentPage('inicio'); setSelectedPostIdx(null); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <Heart size={24} />
+            <span>Inicio</span>
+          </button>
+          <button onClick={() => { setCurrentPage('aldeia'); setSelectedPostIdx(null); }} className="flex flex-col items-center gap-1 text-gray-800">
+            <MessageCircle size={24} fill="#374151" stroke="#374151" />
+            <span className="font-semibold">Aldeia</span>
+          </button>
+          <button className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <User size={24} />
+            <span>Perfil</span>
+          </button>
+        </nav>
+      </>
+    );
+  }
+
   // Render Rodas de Conversa page
   if (currentPage === 'rodas') {
     return (
       <>
-        <RodasDeConversa onBack={() => setCurrentPage('aldeia')} posts={rodasPosts} />
+        <RodasDeConversa onBack={() => setCurrentPage('aldeia')} posts={rodasPosts} onOpenPost={handleOpenPost} />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => setCurrentPage('inicio')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <Heart size={24} />
