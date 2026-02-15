@@ -2,6 +2,15 @@ import { useState } from 'react';
 import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus } from 'lucide-react';
 import './index.css';
 
+// --- ALDEIA ICON (3 circles in triangle) ---
+const AldeiaIcon = ({ size = 24, filled = false, color = "currentColor" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="6" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
+    <circle cx="6" cy="16" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
+    <circle cx="18" cy="16" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
+  </svg>
+);
+
 // --- SIGNUP PAGE (Criar Conta) ---
 const SignupPage = ({ onSignup, onGoToLogin }) => {
   const [email, setEmail] = useState('');
@@ -1643,7 +1652,7 @@ const App = () => {
             <span>Inicio</span>
           </button>
           <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <MessageCircle size={24} />
+            <AldeiaIcon size={24} />
             <span>Aldeia</span>
           </button>
           <button className="flex flex-col items-center gap-1 text-gray-800">
@@ -1675,7 +1684,7 @@ const App = () => {
             <span>Inicio</span>
           </button>
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 text-gray-800">
-            <MessageCircle size={24} fill="#374151" stroke="#374151" />
+            <AldeiaIcon size={24} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
@@ -1698,7 +1707,7 @@ const App = () => {
             <span>Inicio</span>
           </button>
           <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 text-gray-800">
-            <MessageCircle size={24} fill="#374151" stroke="#374151" />
+            <AldeiaIcon size={24} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
           <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
@@ -1721,7 +1730,7 @@ const App = () => {
             <span>Inicio</span>
           </button>
           <button className="flex flex-col items-center gap-1 text-gray-800">
-            <MessageCircle size={24} fill="#374151" stroke="#374151" />
+            <AldeiaIcon size={24} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
           <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
@@ -1778,7 +1787,7 @@ const App = () => {
           <span className="font-semibold">Inicio</span>
         </button>
         <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-          <MessageCircle size={24} />
+          <AldeiaIcon size={24} />
           <span>Aldeia</span>
         </button>
         <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
