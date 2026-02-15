@@ -545,12 +545,13 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon }) => {
           <span className="text-gray-700 font-sans font-medium text-sm text-center">Journal</span>
         </button>
 
-        <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
+        <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "150px" }}>
           <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
             <BookOpen size={24} />
           </div>
           <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca<br />(O Espelho)</span>
         </button>
+        <div className="flex-shrink-0 w-2" aria-hidden="true" />
       </div>
     </section>
   );
