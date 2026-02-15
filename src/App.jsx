@@ -1,16 +1,278 @@
 import { useState } from 'react';
-import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send } from 'lucide-react';
+import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ArrowRight } from 'lucide-react';
 import './index.css';
+
+// --- LOGIN PAGE ---
+const LoginPage = ({ onLogin }) => {
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+    if (!email.trim()) newErrors.email = 'Email obrigat\u00f3rio';
+    else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Email inv\u00e1lido';
+    if (!username.trim()) newErrors.username = 'Nome obrigat\u00f3rio';
+    if (!password.trim()) newErrors.password = 'Senha obrigat\u00f3ria';
+    else if (password.length < 6) newErrors.password = 'M\u00ednimo 6 caracteres';
+    if (!acceptedTerms) newErrors.terms = 'Aceite os termos';
+    return newErrors;
+  };
+
+  const handleSubmit = () => {
+    const newErrors = validate();
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length === 0) {
+      onLogin({ email, username });
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-soft-bg max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
+      {/* Top decorative area */}
+      <div className="relative overflow-hidden pt-16 pb-10 px-8">
+        <div className="w-40 h-40 rounded-full bg-[#FF66C4]/10 blur-3xl absolute -top-10 -right-10"></div>
+        <div className="w-32 h-32 rounded-full bg-soft-blue/10 blur-3xl absolute -bottom-5 -left-10"></div>
+        <div className="relative z-10">
+          <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-10 mb-2" />
+          <p className="text-sm text-soft-pink font-medium">Aldeia Digital</p>
+          <h1 className="text-2xl font-bold text-gray-800 mt-6 leading-tight text-balance">
+            {"Entre para a sua aldeia"}
+          </h1>
+          <p className="text-sm text-gray-400 mt-2">
+            {"Crie sua conta e comece sua jornada"}
+          </p>
+        </div>
+      </div>
+
+      {/* Form */}
+      <div className="flex-1 px-8 pb-10 flex flex-col gap-4">
+        {/* Email */}
+        <div>
+          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Email</label>
+          <div className={`flex items-center gap-3 bg-white rounded-xl border ${errors.email ? 'border-red-300' : 'border-gray-200'} px-4 py-3 focus-within:ring-2 focus-within:ring-soft-blue/30 transition-all`}>
+            <Mail size={18} className="text-gray-400 flex-shrink-0" />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="seu@email.com"
+              className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+            />
+          </div>
+          {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email}</p>}
+        </div>
+
+        {/* Username */}
+        <div>
+          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">{"Nome de usu\u00e1rio"}</label>
+          <div className={`flex items-center gap-3 bg-white rounded-xl border ${errors.username ? 'border-red-300' : 'border-gray-200'} px-4 py-3 focus-within:ring-2 focus-within:ring-soft-blue/30 transition-all`}>
+            <User size={18} className="text-gray-400 flex-shrink-0" />
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Como quer ser chamada?"
+              className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+            />
+          </div>
+          {errors.username && <p className="text-xs text-red-400 mt-1">{errors.username}</p>}
+        </div>
+
+        {/* Password */}
+        <div>
+          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Senha</label>
+          <div className={`flex items-center gap-3 bg-white rounded-xl border ${errors.password ? 'border-red-300' : 'border-gray-200'} px-4 py-3 focus-within:ring-2 focus-within:ring-soft-blue/30 transition-all`}>
+            <Lock size={18} className="text-gray-400 flex-shrink-0" />
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Mínimo 6 caracteres"
+              className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+            />
+            <button onClick={() => setShowPassword(!showPassword)} className="text-gray-400">
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password}</p>}
+        </div>
+
+        {/* Terms */}
+        <div className="flex items-start gap-3 mt-1">
+          <button
+            onClick={() => setAcceptedTerms(!acceptedTerms)}
+            className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${acceptedTerms ? 'bg-soft-blue border-soft-blue' : errors.terms ? 'border-red-300' : 'border-gray-300'}`}
+          >
+            {acceptedTerms && <Check size={14} className="text-white" />}
+          </button>
+          <p className="text-xs text-gray-500 leading-relaxed">
+            {"Li e aceito os "}
+            <span className="text-soft-blue font-semibold underline">{"Termos e Condi\u00e7\u00f5es"}</span>
+            {" e a "}
+            <span className="text-soft-blue font-semibold underline">{"Pol\u00edtica de Privacidade"}</span>
+          </p>
+        </div>
+        {errors.terms && <p className="text-xs text-red-400 -mt-2">{errors.terms}</p>}
+
+        {/* Submit Button */}
+        <button
+          onClick={handleSubmit}
+          className="w-full mt-4 py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide"
+        >
+          CRIAR CONTA
+        </button>
+
+        <p className="text-center text-xs text-gray-400 mt-2">
+          {"J\u00e1 tem conta? "}
+          <button onClick={handleSubmit} className="text-soft-blue font-semibold underline">Entrar</button>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// --- ONBOARDING ---
+const onboardingScreens = [
+  {
+    lines: [
+      { text: "Que bom que voc\u00ea chegou.", style: "text-2xl font-bold text-gray-800 leading-tight" },
+      { text: "Aqui, voc\u00ea n\u00e3o precisa dar conta.", style: "text-lg text-gray-500 mt-3" },
+    ],
+    accent: "from-[#FF66C4]/20 to-[#B946FF]/20",
+  },
+  {
+    subtitle: "Se voc\u00ea chegou at\u00e9 aqui, talvez j\u00e1 tenha sentido:",
+    lines: [
+      { text: "Que maternar pode ser lindo...", style: "text-gray-700 font-medium" },
+      { text: "Mas tamb\u00e9m \u00e9 solit\u00e1rio.", style: "text-gray-400 italic" },
+      { text: "Que voc\u00ea \u00e9 forte...", style: "text-gray-700 font-medium mt-3" },
+      { text: "Mas \u00e0s vezes est\u00e1 exausta.", style: "text-gray-400 italic" },
+      { text: "Que ama profundamente...", style: "text-gray-700 font-medium mt-3" },
+      { text: "Mas que tamb\u00e9m quer voltar a se escutar.", style: "text-gray-400 italic" },
+    ],
+    accent: "from-soft-blue/10 to-[#06B6D4]/10",
+  },
+  {
+    lines: [
+      { text: "Aqui \u00e9 uma comunidade", style: "text-xl text-gray-800 font-bold" },
+      { text: "de apoio Real.", style: "text-xl text-[#FF66C4] font-bold" },
+      { text: "Sem idealiza\u00e7\u00f5es.", style: "text-gray-500 mt-4" },
+      { text: "Sem M\u00e1scaras.", style: "text-gray-500" },
+      { text: "Sem competi\u00e7\u00e3o.", style: "text-gray-500" },
+    ],
+    accent: "from-[#FF66C4]/15 to-pink-100/30",
+  },
+  {
+    lines: [
+      { text: "N\u00f3s n\u00e3o oferecemos respostas prontas.", style: "text-lg text-gray-800 font-bold leading-snug" },
+      { text: "Oferecemos ferramentas.", style: "text-gray-600 mt-4 font-medium" },
+      { text: "Perguntas certas.", style: "text-gray-600 font-medium" },
+      { text: "Espa\u00e7os de escuta.", style: "text-gray-600 font-medium" },
+      { text: "Presen\u00e7a.", style: "text-[#FF66C4] font-bold text-lg" },
+    ],
+    accent: "from-emerald-100/40 to-teal-100/30",
+  },
+  {
+    lines: [
+      { text: "Porque transforma\u00e7\u00e3o n\u00e3o acontece sozinha.", style: "text-gray-700 font-medium" },
+      { text: "Empoderamento n\u00e3o nasce no isolamento.", style: "text-gray-700 font-medium mt-2" },
+      { text: "E autocuidado n\u00e3o \u00e9 luxo \u2013 \u00e9 base.", style: "text-gray-800 font-bold mt-2" },
+      { text: "Bem-vinda \u00e0 aldeia. \ud83d\udc99", style: "text-2xl font-bold text-soft-blue mt-8" },
+    ],
+    accent: "from-soft-blue/15 to-[#B946FF]/10",
+  },
+];
+
+const OnboardingPage = ({ onComplete, userName }) => {
+  const [step, setStep] = useState(0);
+  const screen = onboardingScreens[step];
+  const isLast = step === onboardingScreens.length - 1;
+
+  return (
+    <div className="min-h-screen bg-soft-bg max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
+      {/* Progress dots */}
+      <div className="flex items-center justify-center gap-2 pt-10 pb-2 px-8">
+        {onboardingScreens.map((_, i) => (
+          <div
+            key={i}
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              i === step ? 'w-8 bg-[#FF66C4]' : i < step ? 'w-4 bg-[#FF66C4]/40' : 'w-4 bg-gray-200'
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* Skip */}
+      {!isLast && (
+        <div className="flex justify-end px-8 pt-4">
+          <button onClick={onComplete} className="text-xs text-gray-400 font-medium">
+            Pular
+          </button>
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="flex-1 flex flex-col justify-center px-10 pb-10 relative">
+        {/* Decorative bg */}
+        <div className={`absolute inset-0 bg-gradient-to-br ${screen.accent} rounded-3xl mx-6 my-10 opacity-50`}></div>
+
+        <div className="relative z-10 flex flex-col">
+          {step === 0 && userName && (
+            <p className="text-sm text-[#FF66C4] font-semibold mb-6">{userName},</p>
+          )}
+
+          {screen.subtitle && (
+            <p className="text-sm text-gray-500 mb-6 leading-relaxed">{screen.subtitle}</p>
+          )}
+
+          {screen.lines.map((line, i) => (
+            <p key={i} className={`${line.style} leading-relaxed`}>{line.text}</p>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom navigation */}
+      <div className="px-8 pb-10 flex items-center justify-between">
+        {step > 0 ? (
+          <button
+            onClick={() => setStep(step - 1)}
+            className="text-sm text-gray-400 font-medium"
+          >
+            Voltar
+          </button>
+        ) : (
+          <div />
+        )}
+
+        <button
+          onClick={() => isLast ? onComplete() : setStep(step + 1)}
+          className={`flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-sm transition-all active:scale-[0.97] ${
+            isLast
+              ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-lg'
+              : 'bg-white text-gray-700 border border-gray-200 shadow-sm'
+          }`}
+        >
+          {isLast ? 'ENTRAR NA ALDEIA' : 'Continuar'}
+          <ArrowRight size={16} />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 // --- COMPONENTS ---
 
-const Header = () => (
+const Header = ({ userName }) => (
   <header className="p-6 pb-2 flex justify-between items-start bg-soft-bg">
     <div>
       <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
       <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
       <div className="mt-6">
-        <p className="text-lg text-soft-blue font-sans">Bem-vinda, Mamãe 💗</p>
+        <p className="text-lg text-soft-blue font-sans">{"Bem-vinda, "}{userName || "Mam\u00e3e"}{" \ud83d\udc97"}</p>
       </div>
     </div>
     <div className="p-2 rounded-full border-2 border-soft-pink text-soft-pink">
@@ -630,9 +892,10 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
 };
 
 const App = () => {
-  const [currentPage, setCurrentPage] = useState('inicio');
+  const [currentPage, setCurrentPage] = useState('login');
   const [selectedPostIdx, setSelectedPostIdx] = useState(null);
   const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
+  const [userName, setUserName] = useState('');
 
   const handleSendPost = (text) => {
     const newPost = {
@@ -810,6 +1073,26 @@ const App = () => {
     }
   ];
 
+  // Render Login page
+  if (currentPage === 'login') {
+    return (
+      <LoginPage onLogin={({ username }) => {
+        setUserName(username);
+        setCurrentPage('onboarding');
+      }} />
+    );
+  }
+
+  // Render Onboarding
+  if (currentPage === 'onboarding') {
+    return (
+      <OnboardingPage
+        userName={userName}
+        onComplete={() => setCurrentPage('inicio')}
+      />
+    );
+  }
+
   // Render Post Detail page
   if (currentPage === 'postDetail' && selectedPostIdx !== null) {
     return (
@@ -889,7 +1172,7 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
-      <Header />
+      <Header userName={userName} />
       <MoodCup />
       <ActionGrid onNavigate={(page) => { setCurrentPage(page); window.scrollTo(0, 0); }} onSendPost={handleSendPost} />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" />
