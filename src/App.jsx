@@ -2217,10 +2217,7 @@ const App = () => {
             <PenLine size={20} />
             <span>Journal</span>
           </button>
-          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <CalendarDays size={20} />
-            <span>Eventos</span>
-          </button>
+
           <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={20} />
             <span>Perfil</span>
@@ -2299,10 +2296,7 @@ const App = () => {
             <PenLine size={20} />
             <span>Journal</span>
           </button>
-          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <CalendarDays size={20} />
-            <span>Eventos</span>
-          </button>
+
           <button className="flex flex-col items-center gap-1 text-gray-800">
             <User size={20} fill="#374151" stroke="#374151" />
             <span className="font-semibold">Perfil</span>
@@ -2339,10 +2333,7 @@ const App = () => {
             <PenLine size={20} />
             <span>Journal</span>
           </button>
-          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <CalendarDays size={20} />
-            <span>Eventos</span>
-          </button>
+
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={20} />
             <span>Perfil</span>
@@ -2377,10 +2368,7 @@ const App = () => {
             <PenLine size={20} />
             <span className="font-semibold">Journal</span>
           </button>
-          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <CalendarDays size={20} />
-            <span>Eventos</span>
-          </button>
+
           <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={20} />
             <span>Perfil</span>
