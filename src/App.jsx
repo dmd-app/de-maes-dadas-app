@@ -372,17 +372,19 @@ const OnboardingPage = ({ onComplete, userName }) => {
 // --- COMPONENTS ---
 
 const Header = ({ userName, onMessageClick }) => (
-  <header className="p-6 pb-2 flex justify-between items-start bg-soft-bg">
-    <div>
-      <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
-      <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
-      <div className="mt-6">
-        <p className="text-lg text-soft-blue font-sans">{"Bem-vinda, "}{userName || "Mam\u00e3e"}{" \ud83d\udc97"}</p>
+  <header className="p-6 pb-2 bg-soft-bg">
+    <div className="flex justify-between items-center">
+      <div>
+        <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
+        <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
       </div>
+      <button onClick={onMessageClick} className="text-soft-pink active:scale-95 transition-transform">
+        <MessageCircle size={24} />
+      </button>
     </div>
-    <button onClick={onMessageClick} className="text-soft-pink active:scale-95 transition-transform">
-      <MessageCircle size={24} />
-    </button>
+    <div className="mt-6">
+      <p className="text-lg text-soft-blue font-sans">{"Bem-vinda, "}{userName || "Mam\u00e3e"}{" \ud83d\udc97"}</p>
+    </div>
   </header>
 );
 
