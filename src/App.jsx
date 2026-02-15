@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Flag, Heart, Users, BookOpen, MessageCircle, User, X } from 'lucide-react';
+import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2 } from 'lucide-react';
 import './index.css';
 
 // --- COMPONENTS ---
@@ -103,7 +103,7 @@ const MoodCup = () => {
   );
 };
 
-const ActionGrid = () => {
+const ActionGrid = ({ onNavigate }) => {
   const [isPanicOpen, setIsPanicOpen] = useState(false);
 
   return (
@@ -142,7 +142,7 @@ const ActionGrid = () => {
         </div>
       </div>
 
-      <button className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
+      <button onClick={() => onNavigate && onNavigate('rodas')} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow">
         <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
           <Users size={24} />
         </div>
@@ -194,7 +194,195 @@ const ContentSection = ({ title, items, badgeColor, cardWidth = "180px" }) => (
   </section>
 );
 
+// --- RODAS DE CONVERSA PAGE ---
+const rodasPosts = [
+  {
+    category: "Maternidade Solo",
+    categoryColor: "bg-soft-blue text-white",
+    author: "Mariana S.",
+    time: "2h atr\u00e1s",
+    title: "Como voc\u00eas lidam com a solid\u00e3o no fim de semana?",
+    desc: "Sinto que quando chega sexta-feira, todo mundo tem planos em fam\u00edlia e eu fico aqui...",
+    likes: 24,
+    comments: 12,
+  },
+  {
+    category: "Desabafo",
+    categoryColor: "bg-[#FF66C4] text-white",
+    author: "An\u00f4nima",
+    time: "5h atr\u00e1s",
+    title: "Eu gritei hoje. E a culpa t\u00e1 me consumindo.",
+    desc: "Foi por uma bobagem. O copo de leite caiu. Mas eu explodi como se fosse o fim do mundo.",
+    likes: 156,
+    comments: 43,
+  },
+  {
+    category: "Volta ao Trabalho",
+    categoryColor: "bg-emerald-500 text-white",
+    author: "Carla T.",
+    time: "1d atr\u00e1s",
+    title: "Dicas para a adapta\u00e7\u00e3o na creche?",
+    desc: "Meu beb\u00ea tem 6 meses e eu s\u00f3 choro pensando em deixar ele l\u00e1 semana que vem.",
+    likes: 8,
+    comments: 5,
+  },
+  {
+    category: "Sono",
+    categoryColor: "bg-indigo-400 text-white",
+    author: "Renata M.",
+    time: "3h atr\u00e1s",
+    title: "Algu\u00e9m mais acorda 5x por noite?",
+    desc: "Meu filho tem 14 meses e ainda n\u00e3o dorme a noite toda. Estou destruida.",
+    likes: 89,
+    comments: 27,
+  },
+];
+
+const rodasFilters = ["Destaques", "Recentes", "Maternidade Solo", "Sono", "Desabafo"];
+
+const RodasDeConversa = ({ onBack }) => {
+  const [activeFilter, setActiveFilter] = useState("Destaques");
+
+  return (
+    <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
+      {/* Header */}
+      <header className="p-6 pb-4 flex items-center gap-4 bg-soft-bg">
+        <button onClick={onBack} className="text-gray-700">
+          <ArrowLeft size={24} />
+        </button>
+        <h1 className="text-xl font-bold text-gray-800 font-sans">Rodas de Conversa</h1>
+      </header>
+
+      {/* Filter Chips */}
+      <div className="flex overflow-x-auto px-6 gap-3 pb-4 hide-scrollbar">
+        {rodasFilters.map((filter) => (
+          <button
+            key={filter}
+            onClick={() => setActiveFilter(filter)}
+            className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+              activeFilter === filter
+                ? "bg-soft-blue text-white"
+                : "bg-white text-gray-600 border border-gray-200"
+            }`}
+          >
+            {filter}
+          </button>
+        ))}
+      </div>
+
+      {/* Posts */}
+      <div className="px-6 flex flex-col gap-4 pt-2">
+        {rodasPosts.map((post, idx) => (
+          <div key={idx} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+            {/* Meta */}
+            <div className="flex items-center gap-2 mb-3">
+              <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
+                {post.category}
+              </span>
+              <span className="text-xs text-gray-400">{'  \u2022  '}{post.author}{'  \u2022  '}{post.time}</span>
+            </div>
+
+            {/* Content */}
+            <h3 className="font-bold text-gray-800 mb-1 leading-snug">{post.title}</h3>
+            <p className="text-sm text-gray-500 leading-relaxed mb-4">{post.desc}</p>
+
+            {/* Actions */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <button className="flex items-center gap-1.5 text-gray-400 hover:text-[#FF66C4] transition-colors">
+                  <Heart size={18} />
+                  <span className="text-sm font-medium">{post.likes}</span>
+                </button>
+                <button className="flex items-center gap-1.5 text-gray-400 hover:text-soft-blue transition-colors">
+                  <MessageCircle size={18} />
+                  <span className="text-sm font-medium">{post.comments}</span>
+                </button>
+              </div>
+              <button className="text-gray-300 hover:text-gray-500 transition-colors">
+                <Share2 size={18} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// --- ALDEIA PAGE ---
+const AldeiaPage = ({ onNavigate }) => {
+  return (
+    <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
+      {/* Header */}
+      <header className="p-6 pb-2 bg-soft-bg">
+        <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
+        <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
+        <div className="mt-6">
+          <p className="text-lg text-soft-blue font-sans">A sua aldeia</p>
+        </div>
+      </header>
+
+      {/* Quick Actions */}
+      <section className="px-6 py-4 flex flex-col gap-4">
+        <button
+          onClick={() => onNavigate('rodas')}
+          className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow active:scale-[0.98]"
+        >
+          <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink flex-shrink-0">
+            <Users size={24} />
+          </div>
+          <div className="text-left">
+            <h3 className="font-bold text-gray-800 text-sm">Rodas de Conversa</h3>
+            <p className="text-xs text-gray-400 mt-0.5">Desabafe, pergunte e acolha</p>
+          </div>
+        </button>
+
+        <button className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow active:scale-[0.98]">
+          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple flex-shrink-0">
+            <BookOpen size={24} />
+          </div>
+          <div className="text-left">
+            <h3 className="font-bold text-gray-800 text-sm">Biblioteca (O Espelho)</h3>
+            <p className="text-xs text-gray-400 mt-0.5">Conte\u00fados que refletem voc\u00ea</p>
+          </div>
+        </button>
+      </section>
+
+      {/* Recent Posts Preview */}
+      <section className="px-6 py-4">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-sans font-bold text-gray-800">Conversas Recentes</h3>
+          <button onClick={() => onNavigate('rodas')} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
+        </div>
+        <div className="flex flex-col gap-3">
+          {rodasPosts.slice(0, 2).map((post, idx) => (
+            <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-2">
+                <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
+                  {post.category}
+                </span>
+                <span className="text-xs text-gray-400">{post.author}{'  \u2022  '}{post.time}</span>
+              </div>
+              <h4 className="font-bold text-gray-800 text-sm mb-1">{post.title}</h4>
+              <div className="flex items-center gap-3 mt-2">
+                <span className="flex items-center gap-1 text-xs text-gray-400">
+                  <Heart size={14} /> {post.likes}
+                </span>
+                <span className="flex items-center gap-1 text-xs text-gray-400">
+                  <MessageCircle size={14} /> {post.comments}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+};
+
 const App = () => {
+  const [currentPage, setCurrentPage] = useState('inicio');
+
   const trilhas = [
     {
       title: "Quem Cuida de Quem Cuida?",
@@ -261,11 +449,57 @@ const App = () => {
     }
   ];
 
+  // Render Rodas de Conversa page
+  if (currentPage === 'rodas') {
+    return (
+      <>
+        <RodasDeConversa onBack={() => setCurrentPage('aldeia')} />
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+          <button onClick={() => setCurrentPage('inicio')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <Heart size={24} />
+            <span>Inicio</span>
+          </button>
+          <button onClick={() => setCurrentPage('aldeia')} className="flex flex-col items-center gap-1 text-gray-800">
+            <MessageCircle size={24} fill="#374151" stroke="#374151" />
+            <span className="font-semibold">Aldeia</span>
+          </button>
+          <button className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <User size={24} />
+            <span>Perfil</span>
+          </button>
+        </nav>
+      </>
+    );
+  }
+
+  // Render Aldeia page
+  if (currentPage === 'aldeia') {
+    return (
+      <>
+        <AldeiaPage onNavigate={(page) => setCurrentPage(page)} />
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+          <button onClick={() => setCurrentPage('inicio')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <Heart size={24} />
+            <span>Inicio</span>
+          </button>
+          <button className="flex flex-col items-center gap-1 text-gray-800">
+            <MessageCircle size={24} fill="#374151" stroke="#374151" />
+            <span className="font-semibold">Aldeia</span>
+          </button>
+          <button className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <User size={24} />
+            <span>Perfil</span>
+          </button>
+        </nav>
+      </>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       <Header />
       <MoodCup />
-      <ActionGrid />
+      <ActionGrid onNavigate={(page) => setCurrentPage(page)} />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" />
       {/* Os Guardioes do Cuidado */}
       <section className="py-6 bg-soft-bg">
@@ -305,11 +539,11 @@ const App = () => {
           <Heart size={24} fill="#374151" stroke="#374151" />
           <span className="font-semibold">Inicio</span>
         </button>
-        <button className="flex flex-col items-center gap-1 hover:text-[#FF66C4] transition-colors">
+        <button onClick={() => setCurrentPage('aldeia')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
           <MessageCircle size={24} />
           <span>Aldeia</span>
         </button>
-        <button className="flex flex-col items-center gap-1 hover:text-[#FF66C4] transition-colors">
+        <button className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
           <User size={24} />
           <span>Perfil</span>
         </button>
