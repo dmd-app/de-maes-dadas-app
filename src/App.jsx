@@ -1515,14 +1515,7 @@ const JournalPage = ({ onBack, entries, onAddEntry, editingEntryId, onUpdateEntr
                     <span className="text-[10px] font-semibold text-[#FF66C4]">
                       {entryDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                     </span>
-                    {!isEditing && (
-                      <button
-                        onClick={() => { setEditingId(entry.id); setEditText(entry.text); }}
-                        className="text-gray-300 hover:text-[#FF66C4] transition-colors"
-                      >
-                        <Edit3 size={14} />
-                      </button>
-                    )}
+
                   </div>
                   {isEditing ? (
                     <div>
