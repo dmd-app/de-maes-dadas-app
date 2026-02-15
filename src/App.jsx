@@ -415,8 +415,10 @@ const AldeiaPage = ({ onNavigate, posts }) => {
 };
 
 // --- POST DETAIL PAGE ---
-const PostDetail = ({ post, onBack, onAddComment }) => {
+const PostDetail = ({ post, onBack, onAddComment, onLikeComment, onReplyComment }) => {
   const [newComment, setNewComment] = useState('');
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [replyText, setReplyText] = useState('');
 
   const handleSendComment = () => {
     if (newComment.trim()) {
@@ -425,8 +427,16 @@ const PostDetail = ({ post, onBack, onAddComment }) => {
     }
   };
 
+  const handleSendReply = (commentIdx) => {
+    if (replyText.trim()) {
+      onReplyComment(commentIdx, replyText.trim());
+      setReplyText('');
+      setReplyingTo(null);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-soft-bg pb-32 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
+    <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       {/* Header */}
       <header className="p-6 pb-4 flex items-center gap-4 bg-soft-bg sticky top-0 z-10">
         <button onClick={onBack} className="text-gray-700">
@@ -466,6 +476,27 @@ const PostDetail = ({ post, onBack, onAddComment }) => {
         </div>
       </div>
 
+      {/* Comment Input - Below post, above comments */}
+      <div className="px-6 pb-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-3 flex items-center gap-2">
+          <input
+            type="text"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendComment()}
+            className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none px-3 py-2 bg-gray-50 rounded-xl"
+            placeholder={"Escreva um coment\u00e1rio..."}
+          />
+          <button
+            onClick={handleSendComment}
+            className={`p-2.5 rounded-xl transition-all ${newComment.trim() ? 'bg-[#FF66C4] text-white' : 'bg-gray-100 text-gray-300'}`}
+            disabled={!newComment.trim()}
+          >
+            <Send size={18} />
+          </button>
+        </div>
+      </div>
+
       {/* Comments Section */}
       <div className="px-6">
         <h3 className="font-bold text-gray-800 mb-4">
@@ -490,29 +521,66 @@ const PostDetail = ({ post, onBack, onAddComment }) => {
                 <span className="text-xs text-gray-400">{" \u2022 "}{comment.time}</span>
               </div>
               <p className="text-sm text-gray-600 leading-relaxed pl-9">{comment.text}</p>
+
+              {/* Comment actions: like + reply */}
+              <div className="flex items-center gap-4 pl-9 mt-2">
+                <button
+                  onClick={() => onLikeComment(idx)}
+                  className={`flex items-center gap-1 text-xs transition-colors ${comment.liked ? 'text-[#FF66C4]' : 'text-gray-400 hover:text-[#FF66C4]'}`}
+                >
+                  <Heart size={14} fill={comment.liked ? '#FF66C4' : 'none'} />
+                  <span>{comment.likes || 0}</span>
+                </button>
+                <button
+                  onClick={() => { setReplyingTo(replyingTo === idx ? null : idx); setReplyText(''); }}
+                  className="flex items-center gap-1 text-xs text-gray-400 hover:text-soft-blue transition-colors"
+                >
+                  <MessageCircle size={14} />
+                  <span>Responder</span>
+                </button>
+              </div>
+
+              {/* Reply input */}
+              {replyingTo === idx && (
+                <div className="pl-9 mt-3 flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSendReply(idx)}
+                    className="flex-1 text-xs text-gray-700 placeholder-gray-400 outline-none px-3 py-2 bg-gray-50 rounded-xl border border-gray-200 focus:ring-1 focus:ring-[#FF66C4]"
+                    placeholder={"Escreva uma resposta..."}
+                    autoFocus
+                  />
+                  <button
+                    onClick={() => handleSendReply(idx)}
+                    className={`p-2 rounded-xl transition-all ${replyText.trim() ? 'bg-[#FF66C4] text-white' : 'bg-gray-100 text-gray-300'}`}
+                    disabled={!replyText.trim()}
+                  >
+                    <Send size={14} />
+                  </button>
+                </div>
+              )}
+
+              {/* Replies */}
+              {comment.replies && comment.replies.length > 0 && (
+                <div className="pl-9 mt-3 flex flex-col gap-2">
+                  {comment.replies.map((reply, rIdx) => (
+                    <div key={rIdx} className="bg-gray-50 rounded-xl p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple flex-shrink-0">
+                          <User size={10} />
+                        </div>
+                        <span className="text-xs font-semibold text-gray-700">{reply.author}</span>
+                        <span className="text-[10px] text-gray-400">{" \u2022 "}{reply.time}</span>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-relaxed pl-7">{reply.text}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Comment Input - Fixed at bottom */}
-      <div className="fixed bottom-20 left-0 right-0 max-w-md mx-auto px-4 z-20">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-3 flex items-center gap-2">
-          <input
-            type="text"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSendComment()}
-            className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none px-3 py-2 bg-gray-50 rounded-xl"
-            placeholder={"Escreva um coment\u00e1rio..."}
-          />
-          <button
-            onClick={handleSendComment}
-            className={`p-2.5 rounded-xl transition-all ${newComment.trim() ? 'bg-[#FF66C4] text-white' : 'bg-gray-100 text-gray-300'}`}
-            disabled={!newComment.trim()}
-          >
-            <Send size={18} />
-          </button>
         </div>
       </div>
     </div>
@@ -550,12 +618,45 @@ const App = () => {
   const handleAddComment = (text) => {
     if (selectedPostIdx === null) return;
     const updated = [...rodasPosts];
-    const newComment = { author: "Eu", time: "Agora", text };
+    const newComment = { author: "Eu", time: "Agora", text, likes: 0, liked: false, replies: [] };
     updated[selectedPostIdx] = {
       ...updated[selectedPostIdx],
       commentsList: [...(updated[selectedPostIdx].commentsList || []), newComment],
       comments: (updated[selectedPostIdx].comments || 0) + 1,
     };
+    setRodasPosts(updated);
+  };
+
+  const handleLikeComment = (commentIdx) => {
+    if (selectedPostIdx === null) return;
+    const updated = [...rodasPosts];
+    const post = { ...updated[selectedPostIdx] };
+    const comments = [...(post.commentsList || [])];
+    const comment = { ...comments[commentIdx] };
+    if (comment.liked) {
+      comment.likes = (comment.likes || 1) - 1;
+      comment.liked = false;
+    } else {
+      comment.likes = (comment.likes || 0) + 1;
+      comment.liked = true;
+    }
+    comments[commentIdx] = comment;
+    post.commentsList = comments;
+    updated[selectedPostIdx] = post;
+    setRodasPosts(updated);
+  };
+
+  const handleReplyComment = (commentIdx, text) => {
+    if (selectedPostIdx === null) return;
+    const updated = [...rodasPosts];
+    const post = { ...updated[selectedPostIdx] };
+    const comments = [...(post.commentsList || [])];
+    const comment = { ...comments[commentIdx] };
+    const newReply = { author: "Eu", time: "Agora", text };
+    comment.replies = [...(comment.replies || []), newReply];
+    comments[commentIdx] = comment;
+    post.commentsList = comments;
+    updated[selectedPostIdx] = post;
     setRodasPosts(updated);
   };
 
@@ -633,6 +734,8 @@ const App = () => {
           post={rodasPosts[selectedPostIdx]}
           onBack={() => { setCurrentPage('rodas'); setSelectedPostIdx(null); }}
           onAddComment={handleAddComment}
+          onLikeComment={handleLikeComment}
+          onReplyComment={handleReplyComment}
         />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-8 py-5 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setCurrentPage('inicio'); setSelectedPostIdx(null); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
