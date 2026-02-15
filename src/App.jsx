@@ -1378,15 +1378,15 @@ const JournalPage = ({ onBack, entries, onAddEntry, editingEntryId, onUpdateEntr
   const [viewMonth, setViewMonth] = useState(new Date());
   const [isWriting, setIsWriting] = useState(false);
   const [journalText, setJournalText] = useState('');
-  const [editingId, setEditingId] = useState(editingEntryId || null);
-  const [editText, setEditText] = useState(() => {
+  const [editingId, setEditingId] = useState(null);
+  const [editText, setEditText] = useState('');
+  const [viewingEntry, setViewingEntry] = useState(() => {
     if (editingEntryId) {
       const entry = entries.find((e) => e.id === editingEntryId);
-      return entry ? entry.text : '';
+      return entry || null;
     }
-    return '';
+    return null;
   });
-  const [viewingEntry, setViewingEntry] = useState(null);
   const [detailEditing, setDetailEditing] = useState(false);
   const [detailEditText, setDetailEditText] = useState('');
 
