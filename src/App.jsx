@@ -506,18 +506,25 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon }) => {
             placeholder="Escreva aqui seus sentimentos..."
           ></textarea>
           
-          <div className="flex gap-3 w-full">
-            <button 
-              onClick={() => { setIsPanicOpen(false); setMessage(''); }}
-              className="flex-1 py-3 text-gray-500 font-medium rounded-full border border-gray-200 hover:bg-gray-50 text-sm"
-            >
-              Cancelar
-            </button>
+          <div className="flex flex-col gap-2 w-full">
             <button 
               onClick={handleSend}
-              className="flex-1 py-3 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-full shadow-md text-sm"
+              className="w-full py-3 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-full shadow-md text-sm active:scale-[0.98] transition-all"
             >
               Enviar para a Aldeia
+            </button>
+            <button
+              onClick={() => { if (message.trim()) { onComingSoon && onComingSoon(); setIsPanicOpen(false); setMessage(''); } }}
+              className="w-full py-3 bg-amber-50 text-amber-700 font-bold rounded-full border border-amber-200 text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+            >
+              <PenLine size={16} />
+              Salvar no Journal
+            </button>
+            <button 
+              onClick={() => { setIsPanicOpen(false); setMessage(''); }}
+              className="w-full py-2.5 text-gray-400 font-medium text-sm"
+            >
+              Cancelar
             </button>
           </div>
         </div>
