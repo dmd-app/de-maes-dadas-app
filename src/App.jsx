@@ -255,7 +255,7 @@ const onboardingScreens = [
   {
     lines: [
       { text: "Aqui \u00e9 uma comunidade", style: "text-xl text-gray-800 font-bold" },
-      { text: "de apoio Real.", style: "text-xl text-[#FF66C4] font-bold" },
+      { text: "de apoio real.", style: "text-xl text-[#FF66C4] font-bold" },
       { text: "Sem idealiza\u00e7\u00f5es.", style: "text-gray-500 mt-4" },
       { text: "Sem M\u00e1scaras.", style: "text-gray-500" },
       { text: "Sem competi\u00e7\u00e3o.", style: "text-gray-500" },
