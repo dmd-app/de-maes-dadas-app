@@ -372,7 +372,7 @@ const Header = ({ userName }) => (
       </div>
     </div>
     <div className="p-2 rounded-full border-2 border-soft-pink text-soft-pink">
-      <User size={24} />
+      <MessageCircle size={24} />
     </div>
   </header>
 );
