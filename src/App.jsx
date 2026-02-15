@@ -185,7 +185,7 @@ const LoginPage = ({ onLogin, onGoToSignup }) => {
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="seu@email.com ou nome de usu\u00e1rio"
+              placeholder={"seu@email.com ou nome de usu\u00e1rio"}
               className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
           </div>
