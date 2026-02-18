@@ -854,25 +854,19 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon }) => {
       <section className="px-6 py-4 grid grid-cols-2 gap-4">
         <button
           onClick={() => onNavigate('rodas')}
-          className="bg-white p-5 rounded-2xl border border-gray-100 flex flex-col items-center gap-3 active:scale-[0.98] transition-all"
+          className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all"
         >
-          <div className="w-14 h-14 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
-            <Users size={26} />
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
+            <MessageCircle size={24} />
           </div>
-          <div className="text-center">
-            <h3 className="font-bold text-gray-800 text-sm leading-tight">Rodas de Conversa</h3>
-            <p className="text-[10px] text-gray-400 mt-1">Desabafe, pergunte e acolha</p>
-          </div>
+          <h3 className="font-semibold text-gray-700 text-sm text-center leading-tight">Rodas de Conversa</h3>
         </button>
 
-        <button onClick={onComingSoon} className="bg-white p-5 rounded-2xl border border-gray-100 flex flex-col items-center gap-3 active:scale-[0.98] transition-all">
-          <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
-            <BookOpen size={26} />
+        <button onClick={onComingSoon} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
+            <BookOpen size={24} />
           </div>
-          <div className="text-center">
-            <h3 className="font-bold text-gray-800 text-sm leading-tight">{"Biblioteca (O Espelho)"}</h3>
-            <p className="text-[10px] text-gray-400 mt-1">{"Conte\u00fados que refletem voc\u00ea"}</p>
-          </div>
+          <h3 className="font-semibold text-gray-700 text-sm text-center leading-tight">{"Biblioteca\n(O Espelho)"}</h3>
         </button>
       </section>
 
