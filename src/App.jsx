@@ -332,6 +332,11 @@ const OnboardingPage = ({ onComplete }) => {
                 </div>
               ))}
             </div>
+
+            <div className="mt-6 pt-6 border-t border-white">
+              <p className="text-sm text-gray-700 font-semibold leading-relaxed">{"Seguran\u00e7a emocional \u00e9 prioridade."}</p>
+              <p className="text-sm text-gray-700 font-semibold leading-relaxed">{"Pertencer come\u00e7a pelo respeito."}</p>
+            </div>
           </div>
 
           <div className="px-8 pb-10 flex flex-col gap-3">
