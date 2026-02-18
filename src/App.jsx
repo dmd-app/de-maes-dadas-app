@@ -1842,17 +1842,41 @@ const App = () => {
   if (currentPage === 'perfil') {
     if (!isLoggedIn) {
       return (
-        <SignupPage
-          onSignup={({ email, username }) => {
-            setUserName(username);
-            setUserEmail(email);
-            const userData = { name: username, email };
-            localStorage.setItem('dmd_user', JSON.stringify(userData));
-            setSavedUser(userData);
-            goAfterAuth();
-          }}
-          onGoToLogin={() => setCurrentPage('login')}
-        />
+        <>
+          <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col items-center justify-center px-8">
+            <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mb-6">
+              <User size={36} className="text-gray-400" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-800 mb-2 text-center">{"Voc\u00ea ainda n\u00e3o est\u00e1 conectada"}</h2>
+            <p className="text-sm text-gray-400 text-center mb-8 leading-relaxed">{"Crie sua conta ou fa\u00e7a login para acessar seu perfil e todas as funcionalidades."}</p>
+            <button
+              onClick={() => navigateTo('signup')}
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all mb-3"
+            >
+              Criar Conta
+            </button>
+            <button
+              onClick={() => navigateTo('login')}
+              className="w-full py-3.5 rounded-xl border-2 border-[#FF66C4] text-[#FF66C4] font-bold text-sm active:scale-[0.98] transition-all"
+            >
+              {"J\u00e1 tenho conta"}
+            </button>
+          </div>
+          <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+            <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+              <Heart size={20} />
+              <span>Inicio</span>
+            </button>
+            <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+              <AldeiaIcon size={20} />
+              <span>Aldeia</span>
+            </button>
+            <button className="flex flex-col items-center gap-1 text-gray-800">
+              <User size={20} fill="#374151" stroke="#374151" />
+              <span className="font-semibold">Perfil</span>
+            </button>
+          </nav>
+        </>
       );
     }
     return (
