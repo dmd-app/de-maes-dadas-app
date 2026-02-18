@@ -1520,9 +1520,43 @@ const App = () => {
   const [showComingSoon, setShowComingSoon] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
   const [reviewPopupType, setReviewPopupType] = useState(null);
+  const [onboardingSeen, setOnboardingSeen] = useState(() => localStorage.getItem('dmd_onboarding_seen') === 'true');
 
   const isLoggedIn = !!savedUser;
 
+  const completeOnboarding = () => {
+    setOnboardingSeen(true);
+    localStorage.setItem('dmd_onboarding_seen', 'true');
+  };
+
+  const goAfterAuth = () => {
+    if (onboardingSeen) {
+      resolvePendingAction();
+    } else {
+      setCurrentPage('onboarding');
+    }
+  };
+
+  const resolvePendingAction = () => {
+    if (pendingAction) {
+      if (pendingAction.type === 'post') {
+        handleSendPost(pendingAction.text, 'Desabafo', 'bg-[#FF66C4] text-white');
+        setReviewPopupType('post');
+        setPendingAction(null);
+      } else if (pendingAction.type === 'rodas') {
+        setPendingAction(null);
+        setCurrentPage('rodas');
+        window.scrollTo(0, 0);
+      } else {
+        setPendingAction(null);
+        setCurrentPage('inicio');
+        window.scrollTo(0, 0);
+      }
+    } else {
+      setCurrentPage('inicio');
+      window.scrollTo(0, 0);
+    }
+  };
 
   const navigateTo = (page) => {
     setPageHistory((prev) => [...prev, currentPage]);
@@ -1531,13 +1565,16 @@ const App = () => {
   };
 
   const goBack = () => {
-  setPageHistory((prev) => {
-  const newHistory = [...prev];
-  const previousPage = newHistory.pop();
-  if (previousPage) {
-  setCurrentPage(previousPage);
-  setSelectedPostIdx(null);
-
+    setPageHistory((prev) => {
+      const newHistory = [...prev];
+      let previousPage = newHistory.pop();
+      // Skip auth/onboarding pages in history
+      while (previousPage && ['onboarding', 'signup', 'login'].includes(previousPage)) {
+        previousPage = newHistory.pop();
+      }
+      if (previousPage) {
+        setCurrentPage(previousPage);
+        setSelectedPostIdx(null);
         window.scrollTo(0, 0);
       }
       return newHistory;
@@ -1766,8 +1803,7 @@ const App = () => {
           const userData = { name: username, email };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
-          setCurrentPage('onboarding');
-          window.scrollTo(0, 0);
+          goAfterAuth();
         }}
         onGoToSignup={() => setCurrentPage('signup')}
       />
@@ -1784,37 +1820,21 @@ const App = () => {
           const userData = { name: username, email };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
-          setCurrentPage('onboarding');
+          goAfterAuth();
         }}
         onGoToLogin={() => setCurrentPage('login')}
       />
     );
   }
 
-  // Render Onboarding
+  // Render Onboarding (only shown once)
   if (currentPage === 'onboarding') {
     return (
       <OnboardingPage
         userName={userName}
         onComplete={() => {
-          if (pendingAction) {
-            if (pendingAction.type === 'post') {
-              handleSendPost(pendingAction.text, 'Desabafo', 'bg-[#FF66C4] text-white');
-              setReviewPopupType('post');
-              setPendingAction(null);
-            } else if (pendingAction.type === 'rodas') {
-              setPendingAction(null);
-              setCurrentPage('rodas');
-              window.scrollTo(0, 0);
-            } else {
-              setPendingAction(null);
-              setCurrentPage('inicio');
-              window.scrollTo(0, 0);
-            }
-          } else {
-            setCurrentPage('inicio');
-            window.scrollTo(0, 0);
-          }
+          completeOnboarding();
+          resolvePendingAction();
         }}
       />
     );
@@ -1831,7 +1851,7 @@ const App = () => {
             const userData = { name: username, email };
             localStorage.setItem('dmd_user', JSON.stringify(userData));
             setSavedUser(userData);
-            setCurrentPage('onboarding');
+            goAfterAuth();
           }}
           onGoToLogin={() => setCurrentPage('login')}
         />
@@ -1847,7 +1867,9 @@ const App = () => {
             setUserName('');
             setUserEmail('');
             setSavedUser(null);
+            setOnboardingSeen(false);
             localStorage.removeItem('dmd_user');
+            localStorage.removeItem('dmd_onboarding_seen');
             setCurrentPage('inicio');
           }}
         />
@@ -1920,7 +1942,7 @@ const App = () => {
             localStorage.setItem('dmd_user', JSON.stringify(userData));
             setSavedUser(userData);
             setPendingAction({ type: 'rodas' });
-            setCurrentPage('onboarding');
+            goAfterAuth();
           }}
           onGoToLogin={() => setCurrentPage('login')}
         />
