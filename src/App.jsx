@@ -777,6 +777,9 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
   const getFilteredPosts = () => {
     let indexed = posts.map((post, idx) => ({ ...post, originalIdx: idx }));
 
+    // Hide inactive posts from feed
+    indexed = indexed.filter((p) => p.status !== 'inactive');
+
     // Category filters
     if (activeFilter !== "Destaques" && activeFilter !== "Recentes") {
       indexed = indexed.filter((p) => p.category === activeFilter);
@@ -979,7 +982,7 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogi
           }} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
         </div>
         <div className="flex flex-col gap-3">
-          {posts.slice(0, 2).map((post, idx) => (
+          {posts.filter((p) => p.status !== 'inactive').slice(0, 2).map((post, idx) => (
             <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-2">
                 <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
