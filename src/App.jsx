@@ -431,16 +431,21 @@ const ComingSoonPopup = ({ onClose, isLoggedIn }) => {
   );
 };
 
-const PostPendingPopup = ({ onClose }) => {
+const ReviewPendingPopup = ({ onClose, type }) => {
+  const isComment = type === 'comment' || type === 'reply';
   return (
     <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-10">
       <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl">
         <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
           <Check size={28} className="text-green-600" />
         </div>
-        <h3 className="font-bold text-gray-800 text-lg mb-2">{"Post enviado!"}</h3>
+        <h3 className="font-bold text-gray-800 text-lg mb-2">
+          {isComment ? "Coment\u00e1rio enviado!" : "Post enviado!"}
+        </h3>
         <p className="text-sm text-gray-500 leading-relaxed mb-5">
-          {"Seu post ser\u00e1 analisado e em algumas horas dever\u00e1 estar no ar."}
+          {isComment
+            ? "Seu coment\u00e1rio ser\u00e1 analisado e em algumas horas dever\u00e1 estar no ar."
+            : "Seu post ser\u00e1 analisado e em algumas horas dever\u00e1 estar no ar."}
         </p>
         <button
           onClick={onClose}
@@ -1229,10 +1234,10 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
       {/* Comments Section */}
       <div className="px-6">
         <h3 className="font-bold text-gray-800 mb-4">
-          {"Coment\u00e1rios"} ({post.commentsList?.length || 0})
+          {"Coment\u00e1rios"} ({post.commentsList?.filter((c) => c.status !== 'inactive').length || 0})
         </h3>
 
-        {(!post.commentsList || post.commentsList.length === 0) && (
+        {(!post.commentsList || post.commentsList.filter((c) => c.status !== 'inactive').length === 0) && (
           <div className="bg-white rounded-2xl p-6 border border-gray-100 text-center">
             <MessageCircle size={32} className="text-gray-200 mx-auto mb-2" />
             <p className="text-sm text-gray-400">{"Nenhum coment\u00e1rio ainda. Seja a primeira!"}</p>
@@ -1242,6 +1247,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
         <div className="flex flex-col gap-3">
           {post.commentsList
             ?.map((comment, idx) => ({ ...comment, originalIdx: idx }))
+            .filter((c) => c.status !== 'inactive')
             .sort((a, b) => ((b.likes || 0) + (b.replies?.length || 0)) - ((a.likes || 0) + (a.replies?.length || 0)))
             .map((comment) => (
             <div key={comment.originalIdx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
@@ -1295,9 +1301,9 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
               )}
 
               {/* Replies */}
-              {comment.replies && comment.replies.length > 0 && (
+              {comment.replies && comment.replies.filter((r) => r.status !== 'inactive').length > 0 && (
                 <div className="pl-9 mt-3 flex flex-col gap-2">
-                  {comment.replies.map((reply, rIdx) => (
+                  {comment.replies.filter((r) => r.status !== 'inactive').map((reply, rIdx) => (
                     <div key={rIdx} className="bg-gray-50 rounded-xl p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple flex-shrink-0">
@@ -1485,7 +1491,7 @@ const App = () => {
   const [userEmail, setUserEmail] = useState(savedUser?.email || '');
   const [showComingSoon, setShowComingSoon] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
-  const [showPostPendingPopup, setShowPostPendingPopup] = useState(false);
+  const [reviewPopupType, setReviewPopupType] = useState(null);
 
   const isLoggedIn = !!savedUser;
 
@@ -1525,7 +1531,7 @@ const App = () => {
     };
     setRodasPosts([newPost, ...rodasPosts]);
     setSelectedPostIdx(0);
-    setShowPostPendingPopup(true);
+    setReviewPopupType('post');
     navigateTo('postDetail');
   };
 
@@ -1558,7 +1564,7 @@ const App = () => {
 
     updated[selectedPostIdx] = post;
     setRodasPosts(updated);
-    setShowPostPendingPopup(true);
+    setReviewPopupType('post');
   };
 
   const handleLikePost = () => {
@@ -1583,13 +1589,14 @@ const App = () => {
   const handleAddComment = (text) => {
     if (selectedPostIdx === null) return;
     const updated = [...rodasPosts];
-    const newComment = { author: "Eu", time: "Agora", text, likes: 0, liked: false, replies: [] };
+    const newComment = { author: "Eu", time: "Agora", text, likes: 0, liked: false, replies: [], status: 'inactive' };
     updated[selectedPostIdx] = {
       ...updated[selectedPostIdx],
       commentsList: [...(updated[selectedPostIdx].commentsList || []), newComment],
       comments: (updated[selectedPostIdx].comments || 0) + 1,
     };
     setRodasPosts(updated);
+    setReviewPopupType('comment');
   };
 
   const handleLikeComment = (commentIdx) => {
@@ -1617,12 +1624,13 @@ const App = () => {
     const post = { ...updated[selectedPostIdx] };
     const comments = [...(post.commentsList || [])];
     const comment = { ...comments[commentIdx] };
-    const newReply = { author: "Eu", time: "Agora", text, likes: 0, liked: false };
+    const newReply = { author: "Eu", time: "Agora", text, likes: 0, liked: false, status: 'inactive' };
     comment.replies = [...(comment.replies || []), newReply];
     comments[commentIdx] = comment;
     post.commentsList = comments;
     updated[selectedPostIdx] = post;
     setRodasPosts(updated);
+    setReviewPopupType('reply');
   };
 
   const handleLikeReply = (commentIdx, replyIdx) => {
@@ -1764,7 +1772,7 @@ const App = () => {
           if (pendingAction) {
             if (pendingAction.type === 'post') {
               handleSendPost(pendingAction.text, 'Desabafo', 'bg-[#FF66C4] text-white');
-              setShowPostPendingPopup(true);
+              setReviewPopupType('post');
               setPendingAction(null);
             } else if (pendingAction.type === 'rodas') {
               setPendingAction(null);
@@ -1849,8 +1857,8 @@ const App = () => {
           onLikeReply={handleLikeReply}
           onEditPost={handleEditPost}
         />
-        {showPostPendingPopup && (
-          <PostPendingPopup onClose={() => setShowPostPendingPopup(false)} />
+        {reviewPopupType && (
+          <ReviewPendingPopup type={reviewPopupType} onClose={() => setReviewPopupType(null)} />
         )}
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
@@ -2000,9 +2008,9 @@ const App = () => {
         <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} />
       )}
 
-      {/* Post Pending Popup */}
-      {showPostPendingPopup && (
-        <PostPendingPopup onClose={() => setShowPostPendingPopup(false)} />
+      {/* Review Pending Popup */}
+      {reviewPopupType && (
+        <ReviewPendingPopup type={reviewPopupType} onClose={() => setReviewPopupType(null)} />
       )}
 
       {/* Footer Navigation - Floating */}
