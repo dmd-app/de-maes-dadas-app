@@ -2019,6 +2019,9 @@ const App = () => {
         }}
       />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" onComingSoon={() => setShowComingSoon(true)} />
+
+      <div className="mx-6 h-px bg-white" />
+
       {/* Os Guardioes do Cuidado */}
       <section className="py-4 bg-soft-bg">
         <div className="px-6 mb-2">
