@@ -1928,6 +1928,7 @@ const App = () => {
             localStorage.removeItem('dmd_user');
             localStorage.removeItem('dmd_onboarding_seen');
             setCurrentPage('inicio');
+            window.scrollTo(0, 0);
           }}
           onDeleteAccount={() => {
             setUserName('');
@@ -1937,6 +1938,7 @@ const App = () => {
             localStorage.removeItem('dmd_user');
             localStorage.removeItem('dmd_onboarding_seen');
             setCurrentPage('inicio');
+            window.scrollTo(0, 0);
           }}
         />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
