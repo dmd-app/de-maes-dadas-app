@@ -251,130 +251,105 @@ const LoginPage = ({ onLogin, onGoToSignup, onBack }) => {
 };
 
 // --- ONBOARDING ---
-const onboardingScreens = [
-  {
-    lines: [
-      { text: "Que bom que voc\u00ea chegou.", style: "text-2xl font-bold text-gray-800 leading-tight" },
-      { text: "Aqui, voc\u00ea n\u00e3o precisa dar conta.", style: "text-lg text-gray-500 mt-3" },
-    ],
-    accent: "from-[#FF66C4]/20 to-[#B946FF]/20",
-  },
-  {
-    subtitle: "Se voc\u00ea chegou at\u00e9 aqui, talvez j\u00e1 tenha sentido:",
-    lines: [
-      { text: "Que maternar pode ser lindo...", style: "text-gray-700 font-medium" },
-      { text: "Mas tamb\u00e9m \u00e9 solit\u00e1rio.", style: "text-gray-400 italic" },
-      { text: "Que voc\u00ea \u00e9 forte...", style: "text-gray-700 font-medium mt-3" },
-      { text: "Mas \u00e0s vezes est\u00e1 exausta.", style: "text-gray-400 italic" },
-      { text: "Que ama profundamente...", style: "text-gray-700 font-medium mt-3" },
-      { text: "Mas que tamb\u00e9m quer voltar a se escutar.", style: "text-gray-400 italic" },
-    ],
-    accent: "from-soft-blue/10 to-[#06B6D4]/10",
-  },
-  {
-    lines: [
-      { text: "Aqui \u00e9 uma comunidade", style: "text-xl text-gray-800 font-bold" },
-      { text: "de apoio real.", style: "text-xl text-[#FF66C4] font-bold" },
-      { text: "Sem idealiza\u00e7\u00f5es.", style: "text-gray-500 mt-4" },
-      { text: "Sem M\u00e1scaras.", style: "text-gray-500" },
-      { text: "Sem competi\u00e7\u00e3o.", style: "text-gray-500" },
-    ],
-    accent: "from-[#FF66C4]/15 to-pink-100/30",
-  },
-  {
-    lines: [
-      { text: "N\u00f3s n\u00e3o oferecemos respostas prontas.", style: "text-lg text-gray-800 font-bold leading-snug" },
-      { text: "Oferecemos ferramentas.", style: "text-gray-600 mt-4 font-medium" },
-      { text: "Perguntas certas.", style: "text-gray-600 font-medium" },
-      { text: "Espa\u00e7os de escuta.", style: "text-gray-600 font-medium" },
-      { text: "Presen\u00e7a.", style: "text-[#FF66C4] font-bold text-lg" },
-    ],
-    accent: "from-emerald-100/40 to-teal-100/30",
-  },
-  {
-    lines: [
-      { text: "Porque transforma\u00e7\u00e3o n\u00e3o acontece sozinha.", style: "text-gray-700 font-medium" },
-      { text: "Empoderamento n\u00e3o nasce no isolamento.", style: "text-gray-700 font-medium mt-2" },
-      { text: "E autocuidado n\u00e3o \u00e9 luxo \u2013 \u00e9 base.", style: "text-gray-800 font-bold mt-2" },
-      { text: "Bem-vinda \u00e0 aldeia. \ud83d\udc99", style: "text-2xl font-bold text-soft-blue mt-8" },
-    ],
-    accent: "from-soft-blue/15 to-[#B946FF]/10",
-  },
+const onboardingAgreements = [
+  { title: "Confidencialidade", desc: "O que \u00e9 compartilhado aqui, fica aqui." },
+  { title: "Escuta sem julgamento", desc: "N\u00e3o corrigimos. N\u00e3o comparamos. N\u00e3o invalidamos." },
+  { title: "Respeito \u00e0s diferen\u00e7as", desc: "Cada maternidade tem seu contexto." },
+  { title: "Zero competi\u00e7\u00e3o", desc: "Aqui n\u00e3o existe \u201cm\u00e3e melhor\u201d." },
+  { title: "Cuidado com as palavras", desc: "Oferecemos ferramentas \u2014 n\u00e3o imposi\u00e7\u00f5es." },
 ];
 
-const OnboardingPage = ({ onComplete, userName }) => {
+const OnboardingPage = ({ onComplete }) => {
   const [step, setStep] = useState(0);
-  const screen = onboardingScreens[step];
-  const isLast = step === onboardingScreens.length - 1;
 
   return (
     <div className="min-h-screen bg-soft-bg max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
       {/* Progress dots */}
-      <div className="flex items-center justify-center gap-2 pt-10 pb-2 px-8">
-        {onboardingScreens.map((_, i) => (
+      <div className="flex items-center justify-center gap-3 pt-10 pb-2 px-8">
+        {[0, 1].map((i) => (
           <div
             key={i}
             className={`h-1.5 rounded-full transition-all duration-300 ${
-              i === step ? 'w-8 bg-[#FF66C4]' : i < step ? 'w-4 bg-[#FF66C4]/40' : 'w-4 bg-gray-200'
+              i === step ? 'w-10 bg-[#FF66C4]' : i < step ? 'w-6 bg-[#FF66C4]/40' : 'w-6 bg-gray-200'
             }`}
           />
         ))}
       </div>
 
-      {/* Skip */}
-      {!isLast && (
-        <div className="flex justify-end px-8 pt-4">
-          <button onClick={onComplete} className="text-xs text-gray-400 font-medium">
-            Pular
-          </button>
-        </div>
+      {step === 0 && (
+        <>
+          <div className="flex-1 flex flex-col justify-center px-10 pb-10">
+            <h2 className="text-2xl font-bold text-gray-800 leading-tight">
+              {"Aqui \u00e9 uma comunidade"}
+            </h2>
+            <h2 className="text-2xl font-bold text-[#FF66C4] leading-tight mb-6">
+              de apoio real.
+            </h2>
+
+            <div className="flex flex-col gap-1.5 mb-8">
+              <p className="text-gray-500">{"Sem idealiza\u00e7\u00f5es."}</p>
+              <p className="text-gray-500">{"Sem m\u00e1scaras."}</p>
+              <p className="text-gray-500">{"Sem competi\u00e7\u00e3o."}</p>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <p className="text-gray-700 font-medium">{"N\u00f3s n\u00e3o oferecemos respostas prontas."}</p>
+              <p className="text-gray-600">Oferecemos ferramentas.</p>
+              <p className="text-gray-600">Perguntas certas.</p>
+              <p className="text-gray-600">{"Espa\u00e7os de escuta."}</p>
+              <p className="text-[#FF66C4] font-bold text-lg mt-1">{"Presen\u00e7a."}</p>
+            </div>
+          </div>
+
+          <div className="px-8 pb-10">
+            <button
+              onClick={() => setStep(1)}
+              className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-white text-gray-700 border border-gray-200 shadow-sm font-bold text-sm transition-all active:scale-[0.97]"
+            >
+              Continuar
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        </>
       )}
 
-      {/* Content */}
-      <div className="flex-1 flex flex-col justify-center px-10 pb-10 relative">
-        {/* Decorative bg */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${screen.accent} rounded-3xl mx-6 my-10 opacity-50`}></div>
+      {step === 1 && (
+        <>
+          <div className="flex-1 flex flex-col px-10 pt-8 pb-10">
+            <h2 className="text-2xl font-bold text-gray-800 leading-tight mb-1">Nosso Acordo</h2>
+            <p className="text-sm text-gray-400 mb-6">{"Para que essa seja uma comunidade segura, combinamos:"}</p>
 
-        <div className="relative z-10 flex flex-col">
-          {step === 0 && userName && (
-            <p className="text-sm text-[#FF66C4] font-semibold mb-6">{userName},</p>
-          )}
+            <div className="flex flex-col gap-4">
+              {onboardingAgreements.map((item, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-[#FF66C4]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check size={14} className="text-[#FF66C4]" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-800 text-sm">{item.title}</p>
+                    <p className="text-xs text-gray-400 leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-          {screen.subtitle && (
-            <p className="text-sm text-gray-500 mb-6 leading-relaxed">{screen.subtitle}</p>
-          )}
-
-          {screen.lines.map((line, i) => (
-            <p key={i} className={`${line.style} leading-relaxed`}>{line.text}</p>
-          ))}
-        </div>
-      </div>
-
-      {/* Bottom navigation */}
-      <div className="px-8 pb-10 flex items-center justify-between">
-        {step > 0 ? (
-          <button
-            onClick={() => setStep(step - 1)}
-            className="text-sm text-gray-400 font-medium"
-          >
-            Voltar
-          </button>
-        ) : (
-          <div />
-        )}
-
-        <button
-          onClick={() => isLast ? onComplete() : setStep(step + 1)}
-          className={`flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-sm transition-all active:scale-[0.97] ${
-            isLast
-              ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-lg'
-              : 'bg-white text-gray-700 border border-gray-200 shadow-sm'
-          }`}
-        >
-          {isLast ? 'ENTRAR NA ALDEIA' : 'Continuar'}
-          <ArrowRight size={16} />
-        </button>
-      </div>
+          <div className="px-8 pb-10 flex flex-col gap-3">
+            <button
+              onClick={onComplete}
+              className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-lg font-bold text-sm transition-all active:scale-[0.97]"
+            >
+              Aceitar
+            </button>
+            <button
+              onClick={() => setStep(0)}
+              className="text-sm text-gray-400 font-medium text-center"
+            >
+              Voltar
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
