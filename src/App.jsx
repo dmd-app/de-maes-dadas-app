@@ -2122,21 +2122,21 @@ const App = () => {
       desc: "A política do cuidado e a solidão da mulher moderna.",
       tag: "ALDEIA",
       bgClass: "bg-[#EAD6C6]",
-      image: "/images/quem-cuida.jpg"
+      image: "/images/quem-cuida.jpeg"
     },
     {
       title: "O Luto da Identidade",
       desc: "Quem era você antes de ser mãe? Vamos reencontrar essa mulher.",
       tag: "DIVÃ",
       bgClass: "bg-gradient-to-br from-pink-200 to-red-100",
-      image: "/images/luto-identidade.jpg"
+      image: "/images/luto-identidade.jpeg"
     },
     {
       title: "A Luz Vermelha da Raiva",
       desc: "Entenda por que você explode e como lidar com a culpa.",
       tag: "PSICOLOGIA",
       bgClass: "bg-gradient-to-br from-yellow-200 to-orange-100",
-      image: "/images/luz-vermelha-raiva.jpg"
+      image: "/images/luz-vermelha-raiva.jpeg"
     }
   ];
 
