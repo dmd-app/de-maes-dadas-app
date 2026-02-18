@@ -645,7 +645,7 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequir
 };
 
 const ContentSection = ({ title, items, badgeColor, cardWidth = "180px", onComingSoon }) => (
-  <section className="py-6 bg-soft-bg">
+  <section className="py-4 bg-soft-bg">
     <div className="px-6 mb-4 flex justify-between items-center">
       <h3 className="text-lg font-sans font-bold text-gray-800">{title}</h3>
       <button onClick={onComingSoon} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
@@ -2020,7 +2020,7 @@ const App = () => {
       />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" onComingSoon={() => setShowComingSoon(true)} />
       {/* Os Guardioes do Cuidado */}
-      <section className="py-6 bg-soft-bg">
+      <section className="py-4 bg-soft-bg">
         <div className="px-6 mb-2">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-sans font-bold text-gray-800">Os Guardi&#245;es do Cuidado</h3>
