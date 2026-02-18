@@ -2175,10 +2175,16 @@ const App = () => {
       bgClass: "bg-gradient-to-br from-[#d946ef] to-[#8b5cf6]" // Purple/Pink Gradient like screenshot
     },
     {
-      title: "Mães de Bebês",
-      desc: "Ninguém dorme aqui. Apoio para o puerpério imediato.",
+      title: "M\u00e3es de Beb\u00eas 0-12 Meses",
+      desc: "Ningu\u00e9m dorme aqui. Apoio para o puerp\u00e9rio imediato.",
       tag: "TRIBO",
-      bgClass: "bg-gradient-to-br from-blue-300 to-blue-500" // Blue Gradient
+      bgClass: "bg-gradient-to-br from-blue-300 to-blue-500"
+    },
+    {
+      title: "Mam\u00e3es Politizadas",
+      desc: "Maternidade tamb\u00e9m \u00e9 pol\u00edtica. Debates e a\u00e7\u00e3o coletiva.",
+      tag: "TRIBO",
+      bgClass: "bg-gradient-to-br from-emerald-400 to-teal-600"
     }
   ];
 
