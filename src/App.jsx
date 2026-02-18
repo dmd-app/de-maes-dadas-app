@@ -12,7 +12,7 @@ const AldeiaIcon = ({ size = 24, filled = false, color = "currentColor" }) => (
 );
 
 // --- SIGNUP PAGE (Criar Conta) ---
-const SignupPage = ({ onSignup, onGoToLogin }) => {
+const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -41,7 +41,14 @@ const SignupPage = ({ onSignup, onGoToLogin }) => {
 
   return (
     <div className="min-h-screen bg-soft-bg max-w-md mx-auto font-sans text-gray-800 flex flex-col">
-      <div className="pt-16 pb-10 px-8">
+      {onBack && (
+        <div className="px-6 pt-6">
+          <button onClick={onBack} className="text-gray-500 active:scale-95 transition-transform">
+            <ArrowLeft size={22} />
+          </button>
+        </div>
+      )}
+      <div className={`${onBack ? 'pt-4' : 'pt-16'} pb-10 px-8`}>
         <img src="/images/logo-horizontal-azul.png" alt="DeMaesDadas" className="h-10 mb-2" />
         <p className="text-sm text-soft-pink font-medium">Aldeia Digital</p>
         <h1 className="text-2xl font-bold text-gray-800 mt-6 leading-tight text-balance">
@@ -138,7 +145,7 @@ const SignupPage = ({ onSignup, onGoToLogin }) => {
 };
 
 // --- LOGIN PAGE (Entrar) ---
-const LoginPage = ({ onLogin, onGoToSignup }) => {
+const LoginPage = ({ onLogin, onGoToSignup, onBack }) => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -165,7 +172,14 @@ const LoginPage = ({ onLogin, onGoToSignup }) => {
 
   return (
     <div className="min-h-screen bg-soft-bg max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
-      <div className="relative overflow-hidden pt-16 pb-10 px-8">
+      {onBack && (
+        <div className="px-6 pt-6 relative z-20">
+          <button onClick={onBack} className="text-gray-500 active:scale-95 transition-transform">
+            <ArrowLeft size={22} />
+          </button>
+        </div>
+      )}
+      <div className={`relative overflow-hidden ${onBack ? 'pt-4' : 'pt-16'} pb-10 px-8`}>
         <div className="w-40 h-40 rounded-full bg-[#FF66C4]/10 blur-3xl absolute -top-10 -right-10"></div>
         <div className="w-32 h-32 rounded-full bg-soft-blue/10 blur-3xl absolute -bottom-5 -left-10"></div>
         <div className="relative z-10">
@@ -1795,6 +1809,7 @@ const App = () => {
   if (currentPage === 'login') {
     return (
       <LoginPage
+        onBack={pageHistory.length > 0 ? goBack : null}
         onLogin={({ email, username }) => {
           setUserName(username);
           setUserEmail(email);
@@ -1812,6 +1827,7 @@ const App = () => {
   if (currentPage === 'signup') {
     return (
       <SignupPage
+        onBack={pageHistory.length > 0 ? goBack : null}
         onSignup={({ email, username }) => {
           setUserName(username);
           setUserEmail(email);
