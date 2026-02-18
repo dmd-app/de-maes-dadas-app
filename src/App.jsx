@@ -603,7 +603,7 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequir
                 className={`w-full py-3 font-bold rounded-full text-sm transition-all active:scale-[0.98] ${
                   draftMessage.trim()
                     ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-md'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-400'
                 }`}
               >
                 Enviar para a Aldeia
