@@ -372,8 +372,8 @@ const ComingSoonPopup = ({ onClose, isLoggedIn }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-10">
-      <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl">
+    <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-6">
+      <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl">
         <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
           <Heart size={28} className="text-[#FF66C4]" />
         </div>
@@ -391,12 +391,12 @@ const ComingSoonPopup = ({ onClose, isLoggedIn }) => {
                 value={notifyEmail}
                 onChange={(e) => setNotifyEmail(e.target.value)}
                 placeholder="seu@email.com"
-                className="flex-1 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
+                className="flex-1 min-w-0 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
               />
               <button
                 onClick={handleNotify}
                 disabled={!notifyEmail.trim() || !notifyEmail.includes('@')}
-                className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all active:scale-[0.98] ${
+                className={`shrink-0 px-4 py-2.5 rounded-xl font-bold text-xs transition-all active:scale-[0.98] ${
                   notifyEmail.trim() && notifyEmail.includes('@')
                     ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white'
                     : 'bg-gray-100 text-gray-300'
