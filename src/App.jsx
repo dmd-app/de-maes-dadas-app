@@ -1572,11 +1572,9 @@ const App = () => {
       while (previousPage && ['onboarding', 'signup', 'login'].includes(previousPage)) {
         previousPage = newHistory.pop();
       }
-      if (previousPage) {
-        setCurrentPage(previousPage);
-        setSelectedPostIdx(null);
-        window.scrollTo(0, 0);
-      }
+      setCurrentPage(previousPage || 'inicio');
+      setSelectedPostIdx(null);
+      window.scrollTo(0, 0);
       return newHistory;
     });
   };
