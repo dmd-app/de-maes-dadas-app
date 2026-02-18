@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, PenLine, CalendarDays } from 'lucide-react';
+import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus } from 'lucide-react';
 import './index.css';
 
 // --- ALDEIA ICON (3 circles in triangle) ---
@@ -12,7 +12,7 @@ const AldeiaIcon = ({ size = 24, filled = false, color = "currentColor" }) => (
 );
 
 // --- SIGNUP PAGE (Criar Conta) ---
-const SignupPage = ({ onSignup, onGoToLogin }) => {
+const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -40,20 +40,23 @@ const SignupPage = ({ onSignup, onGoToLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-soft-bg max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
-      <div className="relative overflow-hidden pt-16 pb-10 px-8">
-        <div className="w-40 h-40 rounded-full bg-[#FF66C4]/10 blur-3xl absolute -top-10 -right-10"></div>
-        <div className="w-32 h-32 rounded-full bg-soft-blue/10 blur-3xl absolute -bottom-5 -left-10"></div>
-        <div className="relative z-10">
-          <img src="/images/logo-horizontal-azul.png" alt="DeMaesDadas" className="h-10 mb-2" />
-          <p className="text-sm text-soft-pink font-medium">Aldeia Digital</p>
-          <h1 className="text-2xl font-bold text-gray-800 mt-6 leading-tight text-balance">
-            {"Entre para a sua aldeia"}
-          </h1>
-          <p className="text-sm text-gray-400 mt-2">
-            {"Crie sua conta e comece sua jornada"}
-          </p>
+    <div className="min-h-screen bg-soft-bg max-w-md mx-auto font-sans text-gray-800 flex flex-col">
+      {onBack && (
+        <div className="px-6 pt-6">
+          <button onClick={onBack} className="text-gray-500 active:scale-95 transition-transform">
+            <ArrowLeft size={22} />
+          </button>
         </div>
+      )}
+      <div className={`${onBack ? 'pt-4' : 'pt-16'} pb-10 px-8`}>
+        <img src="/images/logo-horizontal-azul.png" alt="DeMaesDadas" className="h-10 mb-2" />
+        <p className="text-sm text-soft-pink font-medium">Aldeia Digital</p>
+        <h1 className="text-2xl font-bold text-gray-800 mt-6 leading-tight text-balance">
+          {"Entre para a sua aldeia"}
+        </h1>
+        <p className="text-sm text-gray-400 mt-2">
+          {"Crie sua conta e comece sua jornada"}
+        </p>
       </div>
 
       <div className="flex-1 px-8 pb-10 flex flex-col gap-4">
@@ -142,7 +145,7 @@ const SignupPage = ({ onSignup, onGoToLogin }) => {
 };
 
 // --- LOGIN PAGE (Entrar) ---
-const LoginPage = ({ onLogin, onGoToSignup }) => {
+const LoginPage = ({ onLogin, onGoToSignup, onBack }) => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -169,7 +172,14 @@ const LoginPage = ({ onLogin, onGoToSignup }) => {
 
   return (
     <div className="min-h-screen bg-soft-bg max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
-      <div className="relative overflow-hidden pt-16 pb-10 px-8">
+      {onBack && (
+        <div className="px-6 pt-6 relative z-20">
+          <button onClick={onBack} className="text-gray-500 active:scale-95 transition-transform">
+            <ArrowLeft size={22} />
+          </button>
+        </div>
+      )}
+      <div className={`relative overflow-hidden ${onBack ? 'pt-4' : 'pt-16'} pb-10 px-8`}>
         <div className="w-40 h-40 rounded-full bg-[#FF66C4]/10 blur-3xl absolute -top-10 -right-10"></div>
         <div className="w-32 h-32 rounded-full bg-soft-blue/10 blur-3xl absolute -bottom-5 -left-10"></div>
         <div className="relative z-10">
@@ -241,149 +251,217 @@ const LoginPage = ({ onLogin, onGoToSignup }) => {
 };
 
 // --- ONBOARDING ---
-const onboardingScreens = [
-  {
-    lines: [
-      { text: "Que bom que voc\u00ea chegou.", style: "text-2xl font-bold text-gray-800 leading-tight" },
-      { text: "Aqui, voc\u00ea n\u00e3o precisa dar conta.", style: "text-lg text-gray-500 mt-3" },
-    ],
-    accent: "from-[#FF66C4]/20 to-[#B946FF]/20",
-  },
-  {
-    subtitle: "Se voc\u00ea chegou at\u00e9 aqui, talvez j\u00e1 tenha sentido:",
-    lines: [
-      { text: "Que maternar pode ser lindo...", style: "text-gray-700 font-medium" },
-      { text: "Mas tamb\u00e9m \u00e9 solit\u00e1rio.", style: "text-gray-400 italic" },
-      { text: "Que voc\u00ea \u00e9 forte...", style: "text-gray-700 font-medium mt-3" },
-      { text: "Mas \u00e0s vezes est\u00e1 exausta.", style: "text-gray-400 italic" },
-      { text: "Que ama profundamente...", style: "text-gray-700 font-medium mt-3" },
-      { text: "Mas que tamb\u00e9m quer voltar a se escutar.", style: "text-gray-400 italic" },
-    ],
-    accent: "from-soft-blue/10 to-[#06B6D4]/10",
-  },
-  {
-    lines: [
-      { text: "Aqui \u00e9 uma comunidade", style: "text-xl text-gray-800 font-bold" },
-      { text: "de apoio real.", style: "text-xl text-[#FF66C4] font-bold" },
-      { text: "Sem idealiza\u00e7\u00f5es.", style: "text-gray-500 mt-4" },
-      { text: "Sem M\u00e1scaras.", style: "text-gray-500" },
-      { text: "Sem competi\u00e7\u00e3o.", style: "text-gray-500" },
-    ],
-    accent: "from-[#FF66C4]/15 to-pink-100/30",
-  },
-  {
-    lines: [
-      { text: "N\u00f3s n\u00e3o oferecemos respostas prontas.", style: "text-lg text-gray-800 font-bold leading-snug" },
-      { text: "Oferecemos ferramentas.", style: "text-gray-600 mt-4 font-medium" },
-      { text: "Perguntas certas.", style: "text-gray-600 font-medium" },
-      { text: "Espa\u00e7os de escuta.", style: "text-gray-600 font-medium" },
-      { text: "Presen\u00e7a.", style: "text-[#FF66C4] font-bold text-lg" },
-    ],
-    accent: "from-emerald-100/40 to-teal-100/30",
-  },
-  {
-    lines: [
-      { text: "Porque transforma\u00e7\u00e3o n\u00e3o acontece sozinha.", style: "text-gray-700 font-medium" },
-      { text: "Empoderamento n\u00e3o nasce no isolamento.", style: "text-gray-700 font-medium mt-2" },
-      { text: "E autocuidado n\u00e3o \u00e9 luxo \u2013 \u00e9 base.", style: "text-gray-800 font-bold mt-2" },
-      { text: "Bem-vinda \u00e0 aldeia. \ud83d\udc99", style: "text-2xl font-bold text-soft-blue mt-8" },
-    ],
-    accent: "from-soft-blue/15 to-[#B946FF]/10",
-  },
+const onboardingAgreements = [
+  { title: "Confidencialidade", desc: "O que \u00e9 compartilhado aqui, fica aqui." },
+  { title: "Escuta sem julgamento", desc: "N\u00e3o corrigimos. N\u00e3o comparamos. N\u00e3o invalidamos." },
+  { title: "Respeito \u00e0s diferen\u00e7as", desc: "Cada maternidade tem seu contexto." },
+  { title: "Zero competi\u00e7\u00e3o", desc: "Aqui n\u00e3o existe \u201cm\u00e3e melhor\u201d." },
+  { title: "Cuidado com as palavras", desc: "Oferecemos ferramentas \u2014 n\u00e3o imposi\u00e7\u00f5es." },
 ];
 
-const OnboardingPage = ({ onComplete, userName }) => {
+const OnboardingPage = ({ onComplete }) => {
   const [step, setStep] = useState(0);
-  const screen = onboardingScreens[step];
-  const isLast = step === onboardingScreens.length - 1;
 
   return (
     <div className="min-h-screen bg-soft-bg max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
       {/* Progress dots */}
-      <div className="flex items-center justify-center gap-2 pt-10 pb-2 px-8">
-        {onboardingScreens.map((_, i) => (
+      <div className="flex items-center justify-center gap-3 pt-10 pb-2 px-8">
+        {[0, 1].map((i) => (
           <div
             key={i}
             className={`h-1.5 rounded-full transition-all duration-300 ${
-              i === step ? 'w-8 bg-[#FF66C4]' : i < step ? 'w-4 bg-[#FF66C4]/40' : 'w-4 bg-gray-200'
+              i === step ? 'w-10 bg-[#FF66C4]' : i < step ? 'w-6 bg-[#FF66C4]/40' : 'w-6 bg-gray-200'
             }`}
           />
         ))}
       </div>
 
-      {/* Skip */}
-      {!isLast && (
-        <div className="flex justify-end px-8 pt-4">
-          <button onClick={onComplete} className="text-xs text-gray-400 font-medium">
-            Pular
-          </button>
-        </div>
+      {step === 0 && (
+        <>
+          <div className="flex-1 flex flex-col justify-center px-10 pb-10">
+            <h2 className="text-2xl font-bold text-gray-800 leading-tight">
+              {"Aqui \u00e9 uma comunidade"}
+            </h2>
+            <h2 className="text-2xl font-bold text-[#FF66C4] leading-tight mb-6">
+              de apoio real.
+            </h2>
+
+            <div className="flex flex-col gap-1.5 mb-8">
+              <p className="text-gray-500">{"Sem idealiza\u00e7\u00f5es."}</p>
+              <p className="text-gray-500">{"Sem m\u00e1scaras."}</p>
+              <p className="text-gray-500">{"Sem competi\u00e7\u00e3o."}</p>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <p className="text-gray-700 font-medium">{"N\u00f3s n\u00e3o oferecemos respostas prontas."}</p>
+              <p className="text-gray-600">Oferecemos ferramentas.</p>
+              <p className="text-gray-600">Perguntas certas.</p>
+              <p className="text-gray-600">{"Espa\u00e7os de escuta."}</p>
+              <p className="text-[#FF66C4] font-bold text-lg mt-1">{"Presen\u00e7a."}</p>
+            </div>
+          </div>
+
+          <div className="px-8 pb-10">
+            <button
+              onClick={() => setStep(1)}
+              className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-white text-gray-700 border border-gray-200 shadow-sm font-bold text-sm transition-all active:scale-[0.97]"
+            >
+              Continuar
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        </>
       )}
 
-      {/* Content */}
-      <div className="flex-1 flex flex-col justify-center px-10 pb-10 relative">
-        {/* Decorative bg */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${screen.accent} rounded-3xl mx-6 my-10 opacity-50`}></div>
+      {step === 1 && (
+        <>
+          <div className="flex-1 flex flex-col px-10 pt-8 pb-10">
+            <h2 className="text-2xl font-bold text-gray-800 leading-tight mb-1">Nosso Acordo</h2>
+            <p className="text-sm text-gray-400 mb-6">{"Para que essa seja uma comunidade segura, combinamos:"}</p>
 
-        <div className="relative z-10 flex flex-col">
-          {step === 0 && userName && (
-            <p className="text-sm text-[#FF66C4] font-semibold mb-6">{userName},</p>
-          )}
+            <div className="flex flex-col gap-4">
+              {onboardingAgreements.map((item, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-[#FF66C4]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check size={14} className="text-[#FF66C4]" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-800 text-sm">{item.title}</p>
+                    <p className="text-xs text-gray-400 leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-          {screen.subtitle && (
-            <p className="text-sm text-gray-500 mb-6 leading-relaxed">{screen.subtitle}</p>
-          )}
+            <div className="mt-6 pt-6 border-t border-white">
+              <p className="text-sm text-gray-700 font-semibold leading-relaxed">{"Seguran\u00e7a emocional \u00e9 prioridade."}</p>
+              <p className="text-sm text-gray-700 font-semibold leading-relaxed">{"Pertencer come\u00e7a pelo respeito."}</p>
+            </div>
+          </div>
 
-          {screen.lines.map((line, i) => (
-            <p key={i} className={`${line.style} leading-relaxed`}>{line.text}</p>
-          ))}
-        </div>
-      </div>
-
-      {/* Bottom navigation */}
-      <div className="px-8 pb-10 flex items-center justify-between">
-        {step > 0 ? (
-          <button
-            onClick={() => setStep(step - 1)}
-            className="text-sm text-gray-400 font-medium"
-          >
-            Voltar
-          </button>
-        ) : (
-          <div />
-        )}
-
-        <button
-          onClick={() => isLast ? onComplete() : setStep(step + 1)}
-          className={`flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-sm transition-all active:scale-[0.97] ${
-            isLast
-              ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-lg'
-              : 'bg-white text-gray-700 border border-gray-200 shadow-sm'
-          }`}
-        >
-          {isLast ? 'ENTRAR NA ALDEIA' : 'Continuar'}
-          <ArrowRight size={16} />
-        </button>
-      </div>
+          <div className="px-8 pb-10 flex flex-col gap-3">
+            <button
+              onClick={onComplete}
+              className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-lg font-bold text-sm transition-all active:scale-[0.97]"
+            >
+              Aceitar
+            </button>
+            <button
+              onClick={() => setStep(0)}
+              className="text-sm text-gray-400 font-medium text-center"
+            >
+              Voltar
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
 // --- COMPONENTS ---
 
-const Header = ({ userName }) => (
-  <header className="p-6 pb-2 flex justify-between items-start bg-soft-bg">
-    <div>
-      <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
-      <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
-      <div className="mt-6">
-        <p className="text-lg text-soft-blue font-sans">{"Bem-vinda, "}{userName || "Mam\u00e3e"}{" \ud83d\udc97"}</p>
+const ComingSoonPopup = ({ onClose, isLoggedIn }) => {
+  const [notifyEmail, setNotifyEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleNotify = () => {
+    if (notifyEmail.trim() && notifyEmail.includes('@')) {
+      setSubmitted(true);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-10">
+      <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl">
+        <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
+          <Heart size={28} className="text-[#FF66C4]" />
+        </div>
+        <h3 className="font-bold text-gray-800 text-lg mb-2">Coming Soon</h3>
+        <p className="text-sm text-gray-500 leading-relaxed mb-5">
+          {"Estamos preparando algo especial para voc\u00ea. Em breve estar\u00e1 dispon\u00edvel!"}
+        </p>
+
+        {!isLoggedIn && !submitted && (
+          <div className="mb-4">
+            <p className="text-xs font-semibold text-gray-600 mb-2">{"Avise-me quando estiver dispon\u00edvel"}</p>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={notifyEmail}
+                onChange={(e) => setNotifyEmail(e.target.value)}
+                placeholder="seu@email.com"
+                className="flex-1 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
+              />
+              <button
+                onClick={handleNotify}
+                disabled={!notifyEmail.trim() || !notifyEmail.includes('@')}
+                className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all active:scale-[0.98] ${
+                  notifyEmail.trim() && notifyEmail.includes('@')
+                    ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white'
+                    : 'bg-gray-100 text-gray-300'
+                }`}
+              >
+                <Bell size={16} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!isLoggedIn && submitted && (
+          <div className="mb-4 bg-green-50 rounded-xl p-3 border border-green-200">
+            <p className="text-xs font-semibold text-green-700">{"Pronto! Vamos te avisar quando estiver dispon\u00edvel."}</p>
+          </div>
+        )}
+
+        <button
+          onClick={onClose}
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+        >
+          ENTENDI
+        </button>
       </div>
     </div>
-    <div className="text-soft-pink">
-      <MessageCircle size={24} />
+  );
+};
+
+const ReviewPendingPopup = ({ onClose, type }) => {
+  const isComment = type === 'comment' || type === 'reply';
+  return (
+    <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-10">
+      <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl">
+        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+          <Check size={28} className="text-green-600" />
+        </div>
+        <h3 className="font-bold text-gray-800 text-lg mb-2">
+          {isComment ? "Coment\u00e1rio enviado!" : "Post enviado!"}
+        </h3>
+        <p className="text-sm text-gray-500 leading-relaxed mb-5">
+          {isComment
+            ? "Seu coment\u00e1rio ser\u00e1 analisado e em algumas horas dever\u00e1 estar no ar."
+            : "Seu post ser\u00e1 analisado e em algumas horas dever\u00e1 estar no ar."}
+        </p>
+        <button
+          onClick={onClose}
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+        >
+          OK
+        </button>
+      </div>
     </div>
-  </header>
+  );
+};
+
+const Header = ({ userName }) => (
+  <>
+    <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
+      <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-7" />
+      <p className="text-xs text-soft-pink font-sans font-medium">Aldeia Digital</p>
+    </header>
+    <div className="px-6 pt-4 pb-2 bg-soft-bg">
+      <p className="text-lg text-soft-blue font-sans">{"Bem-vinda, "}{userName || "Mam\u00e3e"}{" \ud83d\udc97"}</p>
+    </div>
+  </>
 );
 
 const MoodCup = () => {
@@ -470,13 +548,17 @@ const MoodCup = () => {
   );
 };
 
-const ActionGrid = ({ onNavigate, onSendPost, onComingSoon }) => {
+const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequireLogin }) => {
   const [isPanicOpen, setIsPanicOpen] = useState(false);
   const [message, setMessage] = useState('');
 
   const handleSend = () => {
     if (message.trim()) {
-      onSendPost && onSendPost(message.trim());
+      if (isLoggedIn) {
+        onSendPost && onSendPost(message.trim());
+      } else {
+        onRequireLogin && onRequireLogin({ type: 'post', text: message.trim() });
+      }
       setMessage('');
       setIsPanicOpen(false);
     }
@@ -510,17 +592,16 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon }) => {
             <div className="flex flex-col gap-2 w-full">
               <button 
                 onClick={handleSend}
-                className="w-full py-3 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-full shadow-md text-sm active:scale-[0.98] transition-all"
+                disabled={!message.trim()}
+                className={`w-full py-3 font-bold rounded-full text-sm transition-all active:scale-[0.98] ${
+                  message.trim()
+                    ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-md'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
               >
                 Enviar para a Aldeia
               </button>
-              <button
-                onClick={() => { if (message.trim()) { onComingSoon && onComingSoon(); setIsPanicOpen(false); setMessage(''); } }}
-                className="w-full py-3 bg-amber-50 text-amber-700 font-bold rounded-full border border-amber-200 text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-              >
-                <PenLine size={16} />
-                Salvar no Journal
-              </button>
+
               <button 
                 onClick={() => { setIsPanicOpen(false); setMessage(''); }}
                 className="w-full py-2.5 text-gray-400 font-medium text-sm"
@@ -532,26 +613,25 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon }) => {
         </div>
       </section>
 
-      <div className="flex overflow-x-auto px-6 gap-4 pb-4 snap-x hide-scrollbar bg-soft-bg">
-        <button onClick={() => onNavigate && onNavigate('rodas')} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
-          <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
-            <Users size={24} />
+      <div className="grid grid-cols-2 gap-4 px-6 pb-4 bg-soft-bg">
+        <button onClick={() => {
+          if (isLoggedIn) {
+            onNavigate && onNavigate('rodas');
+          } else {
+            onRequireLogin && onRequireLogin({ type: 'rodas' });
+          }
+        }} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
+            <MessageCircle size={24} />
           </div>
-          <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de<br />Conversa</span>
+          <span className="font-semibold text-gray-700 text-sm text-center leading-tight">Rodas de Conversa</span>
         </button>
 
-        <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
-          <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-            <PenLine size={24} />
-          </div>
-          <span className="text-gray-700 font-sans font-medium text-sm text-center">Journal</span>
-        </button>
-
-        <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
-          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
+        <button onClick={onComingSoon} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
             <BookOpen size={24} />
           </div>
-          <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca<br />(O Espelho)</span>
+          <span className="font-semibold text-gray-700 text-sm text-center leading-tight">{"Biblioteca\n(O Espelho)"}</span>
         </button>
       </div>
     </>
@@ -559,7 +639,7 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon }) => {
 };
 
 const ContentSection = ({ title, items, badgeColor, cardWidth = "180px", onComingSoon }) => (
-  <section className="py-6 bg-soft-bg">
+  <section className="py-4 bg-soft-bg">
     <div className="px-6 mb-4 flex justify-between items-center">
       <h3 className="text-lg font-sans font-bold text-gray-800">{title}</h3>
       <button onClick={onComingSoon} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
@@ -695,6 +775,9 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
   // Filter and sort posts, keeping original index
   const getFilteredPosts = () => {
     let indexed = posts.map((post, idx) => ({ ...post, originalIdx: idx }));
+
+    // Hide non-active posts from feed
+    indexed = indexed.filter((p) => !p.status || p.status === 'active');
 
     // Category filters
     if (activeFilter !== "Destaques" && activeFilter !== "Recentes") {
@@ -851,7 +934,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
 };
 
 // --- ALDEIA PAGE ---
-const AldeiaPage = ({ onNavigate, posts, onComingSoon }) => {
+const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogin }) => {
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       {/* Header */}
@@ -864,28 +947,28 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon }) => {
       </header>
 
       {/* Quick Actions */}
-      <section className="px-6 py-4 flex flex-col gap-4">
+      <section className="px-6 py-4 grid grid-cols-2 gap-4">
         <button
-          onClick={() => onNavigate('rodas')}
-          className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow active:scale-[0.98]"
+          onClick={() => {
+            if (isLoggedIn) {
+              onNavigate('rodas');
+            } else {
+              onRequireLogin && onRequireLogin({ type: 'rodas' });
+            }
+          }}
+          className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all"
         >
-          <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink flex-shrink-0">
-            <Users size={24} />
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
+            <MessageCircle size={24} />
           </div>
-          <div className="text-left">
-            <h3 className="font-bold text-gray-800 text-sm">Rodas de Conversa</h3>
-            <p className="text-xs text-gray-400 mt-0.5">Desabafe, pergunte e acolha</p>
-          </div>
+          <h3 className="font-semibold text-gray-700 text-sm text-center leading-tight">Rodas de Conversa</h3>
         </button>
 
-        <button onClick={onComingSoon} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow active:scale-[0.98]">
-          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple flex-shrink-0">
+        <button onClick={onComingSoon} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
             <BookOpen size={24} />
           </div>
-          <div className="text-left">
-            <h3 className="font-bold text-gray-800 text-sm">Biblioteca (O Espelho)</h3>
-            <p className="text-xs text-gray-400 mt-0.5">{"Conteúdos que refletem você"}</p>
-          </div>
+          <h3 className="font-semibold text-gray-700 text-sm text-center leading-tight">{"Biblioteca\n(O Espelho)"}</h3>
         </button>
       </section>
 
@@ -893,10 +976,12 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon }) => {
       <section className="px-6 py-4">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-sans font-bold text-gray-800">Conversas Recentes</h3>
-          <button onClick={() => onNavigate('rodas')} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
+          <button onClick={() => {
+            if (isLoggedIn) { onNavigate('rodas'); } else { onRequireLogin && onRequireLogin({ type: 'rodas' }); }
+          }} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
         </div>
         <div className="flex flex-col gap-3">
-          {posts.slice(0, 2).map((post, idx) => (
+          {posts.filter((p) => !p.status || p.status === 'active').slice(0, 2).map((post, idx) => (
             <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-2">
                 <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
@@ -994,10 +1079,25 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
       {/* Full Post */}
       <div className="px-6 pb-4">
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
             <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
               {post.category}
             </span>
+            {post.status === 'pending' && (
+              <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-700">
+                {"Aguardando confirma\u00e7\u00e3o"}
+              </span>
+            )}
+            {post.status === 'inactive' && (
+              <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-gray-200 text-gray-600">
+                Inativo
+              </span>
+            )}
+            {post.status === 'rejected' && (
+              <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-red-100 text-red-700">
+                {"N\u00e3o aprovado"}
+              </span>
+            )}
             <span className="text-xs text-gray-400">{post.author}{" \u2022 "}{post.time}</span>
             {post.versions && post.versions.length > 0 && (
               <button
@@ -1138,10 +1238,10 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
       {/* Comments Section */}
       <div className="px-6">
         <h3 className="font-bold text-gray-800 mb-4">
-          {"Coment\u00e1rios"} ({post.commentsList?.length || 0})
+          {"Coment\u00e1rios"} ({post.commentsList?.filter((c) => !c.status || c.status === 'active').length || 0})
         </h3>
 
-        {(!post.commentsList || post.commentsList.length === 0) && (
+        {(!post.commentsList || post.commentsList.filter((c) => !c.status || c.status === 'active').length === 0) && (
           <div className="bg-white rounded-2xl p-6 border border-gray-100 text-center">
             <MessageCircle size={32} className="text-gray-200 mx-auto mb-2" />
             <p className="text-sm text-gray-400">{"Nenhum coment\u00e1rio ainda. Seja a primeira!"}</p>
@@ -1151,6 +1251,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
         <div className="flex flex-col gap-3">
           {post.commentsList
             ?.map((comment, idx) => ({ ...comment, originalIdx: idx }))
+            .filter((c) => !c.status || c.status === 'active')
             .sort((a, b) => ((b.likes || 0) + (b.replies?.length || 0)) - ((a.likes || 0) + (a.replies?.length || 0)))
             .map((comment) => (
             <div key={comment.originalIdx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
@@ -1160,6 +1261,15 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
                 </div>
                 <span className="text-sm font-semibold text-gray-700">{comment.author}</span>
                 <span className="text-xs text-gray-400">{" \u2022 "}{comment.time}</span>
+                {comment.status === 'pending' && (
+                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">{"Aguardando confirma\u00e7\u00e3o"}</span>
+                )}
+                {comment.status === 'inactive' && (
+                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-gray-200 text-gray-600">Inativo</span>
+                )}
+                {comment.status === 'rejected' && (
+                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700">{"N\u00e3o aprovado"}</span>
+                )}
               </div>
               <p className="text-sm text-gray-600 leading-relaxed pl-9">{comment.text}</p>
 
@@ -1204,9 +1314,9 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
               )}
 
               {/* Replies */}
-              {comment.replies && comment.replies.length > 0 && (
+              {comment.replies && comment.replies.filter((r) => !r.status || r.status === 'active').length > 0 && (
                 <div className="pl-9 mt-3 flex flex-col gap-2">
-                  {comment.replies.map((reply, rIdx) => (
+                  {comment.replies.filter((r) => !r.status || r.status === 'active').map((reply, rIdx) => (
                     <div key={rIdx} className="bg-gray-50 rounded-xl p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple flex-shrink-0">
@@ -1214,6 +1324,15 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
                         </div>
                         <span className="text-xs font-semibold text-gray-700">{reply.author}</span>
                         <span className="text-[10px] text-gray-400">{" \u2022 "}{reply.time}</span>
+                        {reply.status === 'pending' && (
+                          <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">{"Aguardando confirma\u00e7\u00e3o"}</span>
+                        )}
+                        {reply.status === 'inactive' && (
+                          <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-gray-200 text-gray-600">Inativo</span>
+                        )}
+                        {reply.status === 'rejected' && (
+                          <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-red-100 text-red-700">{"N\u00e3o aprovado"}</span>
+                        )}
                       </div>
                       <p className="text-xs text-gray-600 leading-relaxed pl-7">{reply.text}</p>
                       <div className="pl-7 mt-1.5">
@@ -1238,7 +1357,8 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
 };
 
 // --- PROFILE PAGE ---
-const ProfilePage = ({ userName, userEmail, posts, onLogout }) => {
+const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount }) => {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const myPosts = posts.filter((p) => p.author === "Eu");
   const totalLikes = myPosts.reduce((sum, p) => sum + (p.likes || 0), 0);
   const totalComments = myPosts.reduce((sum, p) => sum + (p.commentsList?.length || 0), 0);
@@ -1359,7 +1479,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout }) => {
       </div>
 
       {/* Logout */}
-      <div className="px-6 pb-6">
+      <div className="px-6 pb-3">
         <button
           onClick={onLogout}
           className="w-full flex items-center justify-center gap-2 py-4 bg-white rounded-2xl border border-red-100 text-red-400 font-semibold text-sm hover:bg-red-50 transition-colors shadow-sm"
@@ -1368,9 +1488,51 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout }) => {
           <span>Sair da conta</span>
         </button>
       </div>
+
+      {/* Delete Account */}
+      <div className="px-6 pb-6">
+        <button
+          onClick={() => setShowDeleteConfirm(true)}
+          className="w-full flex items-center justify-center gap-2 py-4 bg-white rounded-2xl border border-red-100 text-red-400 font-semibold text-sm hover:bg-red-50 transition-colors shadow-sm"
+        >
+          <X size={18} />
+          <span>Excluir conta</span>
+        </button>
+      </div>
+
+      {/* Delete Confirmation Popup */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-10">
+          <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl">
+            <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-4">
+              <Heart size={28} className="text-amber-400" />
+            </div>
+            <h3 className="font-bold text-gray-800 text-lg mb-2">Tem certeza que deseja sair?</h3>
+            <p className="text-sm text-gray-500 leading-relaxed mb-6">
+              {"A Aldeia continua aqui para voc\u00ea, sempre que quiser voltar. \ud83d\udc9b"}
+            </p>
+            <button
+              onClick={() => { setShowDeleteConfirm(false); onDeleteAccount && onDeleteAccount(); }}
+              className="w-full py-3 rounded-xl bg-red-500 text-white font-bold text-sm active:scale-[0.98] transition-all mb-3"
+            >
+              Sim, excluir minha conta
+            </button>
+            <button
+              onClick={() => setShowDeleteConfirm(false)}
+              className="w-full py-3 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-sm active:scale-[0.98] transition-all"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+// --- UTILITIES ---
+
+
 
 const getSavedUser = () => {
   try {
@@ -1381,14 +1543,53 @@ const getSavedUser = () => {
 };
 
 const App = () => {
-  const [savedUser] = useState(getSavedUser);
-  const [currentPage, setCurrentPage] = useState(savedUser ? 'inicio' : 'signup');
+  const [savedUser, setSavedUser] = useState(getSavedUser);
+  const [currentPage, setCurrentPage] = useState('inicio');
   const [pageHistory, setPageHistory] = useState([]);
   const [selectedPostIdx, setSelectedPostIdx] = useState(null);
   const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
   const [userName, setUserName] = useState(savedUser?.name || '');
   const [userEmail, setUserEmail] = useState(savedUser?.email || '');
   const [showComingSoon, setShowComingSoon] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
+  const [reviewPopupType, setReviewPopupType] = useState(null);
+  const [onboardingSeen, setOnboardingSeen] = useState(() => localStorage.getItem('dmd_onboarding_seen') === 'true');
+
+  const isLoggedIn = !!savedUser;
+
+  const completeOnboarding = () => {
+    setOnboardingSeen(true);
+    localStorage.setItem('dmd_onboarding_seen', 'true');
+  };
+
+  const goAfterAuth = () => {
+    if (onboardingSeen) {
+      resolvePendingAction();
+    } else {
+      setCurrentPage('onboarding');
+    }
+  };
+
+  const resolvePendingAction = () => {
+    if (pendingAction) {
+      if (pendingAction.type === 'post') {
+        handleSendPost(pendingAction.text, 'Desabafo', 'bg-[#FF66C4] text-white');
+        setReviewPopupType('post');
+        setPendingAction(null);
+      } else if (pendingAction.type === 'rodas') {
+        setPendingAction(null);
+        setCurrentPage('rodas');
+        window.scrollTo(0, 0);
+      } else {
+        setPendingAction(null);
+        setCurrentPage('inicio');
+        window.scrollTo(0, 0);
+      }
+    } else {
+      setCurrentPage('inicio');
+      window.scrollTo(0, 0);
+    }
+  };
 
   const navigateTo = (page) => {
     setPageHistory((prev) => [...prev, currentPage]);
@@ -1399,12 +1600,14 @@ const App = () => {
   const goBack = () => {
     setPageHistory((prev) => {
       const newHistory = [...prev];
-      const previousPage = newHistory.pop();
-      if (previousPage) {
-        setCurrentPage(previousPage);
-        setSelectedPostIdx(null);
-        window.scrollTo(0, 0);
+      let previousPage = newHistory.pop();
+      // Skip auth/onboarding pages in history
+      while (previousPage && ['onboarding', 'signup', 'login'].includes(previousPage)) {
+        previousPage = newHistory.pop();
       }
+      setCurrentPage(previousPage || 'inicio');
+      setSelectedPostIdx(null);
+      window.scrollTo(0, 0);
       return newHistory;
     });
   };
@@ -1420,9 +1623,11 @@ const App = () => {
       likes: 0,
       comments: 0,
       commentsList: [],
+      status: 'pending',
     };
     setRodasPosts([newPost, ...rodasPosts]);
     setSelectedPostIdx(0);
+    setReviewPopupType('post');
     navigateTo('postDetail');
   };
 
@@ -1451,9 +1656,11 @@ const App = () => {
     post.desc = desc;
     post.category = category;
     post.categoryColor = categoryColor;
+    post.status = 'pending';
 
     updated[selectedPostIdx] = post;
     setRodasPosts(updated);
+    setReviewPopupType('post');
   };
 
   const handleLikePost = () => {
@@ -1478,13 +1685,14 @@ const App = () => {
   const handleAddComment = (text) => {
     if (selectedPostIdx === null) return;
     const updated = [...rodasPosts];
-    const newComment = { author: "Eu", time: "Agora", text, likes: 0, liked: false, replies: [] };
+    const newComment = { author: "Eu", time: "Agora", text, likes: 0, liked: false, replies: [], status: 'pending' };
     updated[selectedPostIdx] = {
       ...updated[selectedPostIdx],
       commentsList: [...(updated[selectedPostIdx].commentsList || []), newComment],
       comments: (updated[selectedPostIdx].comments || 0) + 1,
     };
     setRodasPosts(updated);
+    setReviewPopupType('comment');
   };
 
   const handleLikeComment = (commentIdx) => {
@@ -1512,12 +1720,13 @@ const App = () => {
     const post = { ...updated[selectedPostIdx] };
     const comments = [...(post.commentsList || [])];
     const comment = { ...comments[commentIdx] };
-    const newReply = { author: "Eu", time: "Agora", text, likes: 0, liked: false };
+    const newReply = { author: "Eu", time: "Agora", text, likes: 0, liked: false, status: 'pending' };
     comment.replies = [...(comment.replies || []), newReply];
     comments[commentIdx] = comment;
     post.commentsList = comments;
     updated[selectedPostIdx] = post;
     setRodasPosts(updated);
+    setReviewPopupType('reply');
   };
 
   const handleLikeReply = (commentIdx, replyIdx) => {
@@ -1560,7 +1769,7 @@ const App = () => {
     },
     {
       title: "A Luz Vermelha da Raiva",
-      desc: "Entenda por que você explode e como lidar com a culpa.",
+      desc: "Entenda por que voc�� explode e como lidar com a culpa.",
       tag: "PSICOLOGIA",
       bgClass: "bg-gradient-to-br from-yellow-200 to-orange-100",
       image: "/images/luz-vermelha-raiva.jpeg"
@@ -1602,10 +1811,16 @@ const App = () => {
       bgClass: "bg-gradient-to-br from-[#d946ef] to-[#8b5cf6]" // Purple/Pink Gradient like screenshot
     },
     {
-      title: "Mães de Bebês",
-      desc: "Ninguém dorme aqui. Apoio para o puerpério imediato.",
+      title: "M\u00e3es de Beb\u00eas 0-12 Meses",
+      desc: "Ningu\u00e9m dorme aqui. Apoio para o puerp\u00e9rio imediato.",
       tag: "TRIBO",
-      bgClass: "bg-gradient-to-br from-blue-300 to-blue-500" // Blue Gradient
+      bgClass: "bg-gradient-to-br from-blue-300 to-blue-500"
+    },
+    {
+      title: "Mam\u00e3es Politizadas",
+      desc: "Maternidade tamb\u00e9m \u00e9 pol\u00edtica. Debates e a\u00e7\u00e3o coletiva.",
+      tag: "TRIBO",
+      bgClass: "bg-gradient-to-br from-emerald-400 to-teal-600"
     }
   ];
 
@@ -1613,12 +1828,14 @@ const App = () => {
   if (currentPage === 'login') {
     return (
       <LoginPage
+        onBack={pageHistory.length > 0 ? goBack : null}
         onLogin={({ email, username }) => {
           setUserName(username);
           setUserEmail(email);
-          localStorage.setItem('dmd_user', JSON.stringify({ name: username, email }));
-          setCurrentPage('inicio');
-          window.scrollTo(0, 0);
+          const userData = { name: username, email };
+          localStorage.setItem('dmd_user', JSON.stringify(userData));
+          setSavedUser(userData);
+          goAfterAuth();
         }}
         onGoToSignup={() => setCurrentPage('signup')}
       />
@@ -1629,29 +1846,74 @@ const App = () => {
   if (currentPage === 'signup') {
     return (
       <SignupPage
+        onBack={pageHistory.length > 0 ? goBack : null}
         onSignup={({ email, username }) => {
           setUserName(username);
           setUserEmail(email);
-          localStorage.setItem('dmd_user', JSON.stringify({ name: username, email }));
-          setCurrentPage('onboarding');
+          const userData = { name: username, email };
+          localStorage.setItem('dmd_user', JSON.stringify(userData));
+          setSavedUser(userData);
+          goAfterAuth();
         }}
         onGoToLogin={() => setCurrentPage('login')}
       />
     );
   }
 
-  // Render Onboarding
+  // Render Onboarding (only shown once)
   if (currentPage === 'onboarding') {
     return (
       <OnboardingPage
         userName={userName}
-        onComplete={() => { setCurrentPage('inicio'); window.scrollTo(0, 0); }}
+        onComplete={() => {
+          completeOnboarding();
+          resolvePendingAction();
+        }}
       />
     );
   }
 
   // Render Profile page
   if (currentPage === 'perfil') {
+    if (!isLoggedIn) {
+      return (
+        <>
+          <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col items-center justify-center px-8">
+            <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mb-6">
+              <User size={36} className="text-gray-400" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-800 mb-2 text-center">{"Voc\u00ea ainda n\u00e3o est\u00e1 conectada"}</h2>
+            <p className="text-sm text-gray-400 text-center mb-8 leading-relaxed">{"Crie sua conta ou fa\u00e7a login para acessar seu perfil e todas as funcionalidades."}</p>
+            <button
+              onClick={() => navigateTo('signup')}
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all mb-3"
+            >
+              Criar Conta
+            </button>
+            <button
+              onClick={() => navigateTo('login')}
+              className="w-full py-3.5 rounded-xl border-2 border-[#FF66C4] text-[#FF66C4] font-bold text-sm active:scale-[0.98] transition-all"
+            >
+              {"J\u00e1 tenho conta"}
+            </button>
+          </div>
+          <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+            <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+              <Heart size={20} />
+              <span>Inicio</span>
+            </button>
+            <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+              <AldeiaIcon size={20} />
+              <span>Aldeia</span>
+            </button>
+            <button className="flex flex-col items-center gap-1 text-gray-800">
+              <User size={20} fill="#374151" stroke="#374151" />
+              <span className="font-semibold">Perfil</span>
+            </button>
+          </nav>
+        </>
+      );
+    }
     return (
       <>
         <ProfilePage
@@ -1661,8 +1923,22 @@ const App = () => {
           onLogout={() => {
             setUserName('');
             setUserEmail('');
+            setSavedUser(null);
+            setOnboardingSeen(false);
             localStorage.removeItem('dmd_user');
-            setCurrentPage('login');
+            localStorage.removeItem('dmd_onboarding_seen');
+            setCurrentPage('inicio');
+            window.scrollTo(0, 0);
+          }}
+          onDeleteAccount={() => {
+            setUserName('');
+            setUserEmail('');
+            setSavedUser(null);
+            setOnboardingSeen(false);
+            localStorage.removeItem('dmd_user');
+            localStorage.removeItem('dmd_onboarding_seen');
+            setCurrentPage('inicio');
+            window.scrollTo(0, 0);
           }}
         />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
@@ -1674,14 +1950,8 @@ const App = () => {
             <AldeiaIcon size={20} />
             <span>Aldeia</span>
           </button>
-          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <PenLine size={20} />
-            <span>Journal</span>
-          </button>
-          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <CalendarDays size={20} />
-            <span>Eventos</span>
-          </button>
+
+
           <button className="flex flex-col items-center gap-1 text-gray-800">
             <User size={20} fill="#374151" stroke="#374151" />
             <span className="font-semibold">Perfil</span>
@@ -1705,6 +1975,9 @@ const App = () => {
           onLikeReply={handleLikeReply}
           onEditPost={handleEditPost}
         />
+        {reviewPopupType && (
+          <ReviewPendingPopup type={reviewPopupType} onClose={() => setReviewPopupType(null)} />
+        )}
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <Heart size={20} />
@@ -1714,14 +1987,8 @@ const App = () => {
             <AldeiaIcon size={20} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <PenLine size={20} />
-            <span>Journal</span>
-          </button>
-          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <CalendarDays size={20} />
-            <span>Eventos</span>
-          </button>
+
+
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={20} />
             <span>Perfil</span>
@@ -1731,8 +1998,24 @@ const App = () => {
     );
   }
 
-  // Render Rodas de Conversa page
+  // Render Rodas de Conversa page (requires login)
   if (currentPage === 'rodas') {
+    if (!isLoggedIn) {
+      return (
+        <SignupPage
+          onSignup={({ email, username }) => {
+            setUserName(username);
+            setUserEmail(email);
+            const userData = { name: username, email };
+            localStorage.setItem('dmd_user', JSON.stringify(userData));
+            setSavedUser(userData);
+            setPendingAction({ type: 'rodas' });
+            goAfterAuth();
+          }}
+          onGoToLogin={() => setCurrentPage('login')}
+        />
+      );
+    }
     return (
       <>
         <RodasDeConversa onBack={goBack} posts={rodasPosts} onOpenPost={handleOpenPost} onSendPost={handleSendPost} />
@@ -1745,10 +2028,7 @@ const App = () => {
             <AldeiaIcon size={22} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <PenLine size={22} />
-            <span>Journal</span>
-          </button>
+
           <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={22} />
             <span>Perfil</span>
@@ -1762,23 +2042,18 @@ const App = () => {
   if (currentPage === 'aldeia') {
     return (
       <>
-        <AldeiaPage onNavigate={(page) => navigateTo(page)} posts={rodasPosts} onComingSoon={() => setShowComingSoon(true)} />
+        <AldeiaPage
+          onNavigate={(page) => navigateTo(page)}
+          posts={rodasPosts}
+          onComingSoon={() => setShowComingSoon(true)}
+          isLoggedIn={isLoggedIn}
+          onRequireLogin={(action) => {
+            setPendingAction(action);
+            navigateTo('signup');
+          }}
+        />
         {showComingSoon && (
-          <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-10" onClick={() => setShowComingSoon(false)}>
-            <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
-              <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
-                <Heart size={28} className="text-[#FF66C4]" />
-              </div>
-              <h3 className="font-bold text-gray-800 text-lg mb-2">Coming Soon</h3>
-              <p className="text-sm text-gray-500 leading-relaxed mb-5">{"Estamos preparando algo especial para voc\u00ea. Em breve estar\u00e1 dispon\u00edvel!"}</p>
-              <button
-                onClick={() => setShowComingSoon(false)}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
-              >
-                ENTENDI
-              </button>
-            </div>
-          </div>
+          <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} />
         )}
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
@@ -1789,10 +2064,7 @@ const App = () => {
             <AldeiaIcon size={22} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <PenLine size={22} />
-            <span>Journal</span>
-          </button>
+
           <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={24} />
             <span>Perfil</span>
@@ -1806,10 +2078,22 @@ const App = () => {
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       <Header userName={userName} />
       <MoodCup />
-      <ActionGrid onNavigate={(page) => navigateTo(page)} onSendPost={handleSendPost} onComingSoon={() => setShowComingSoon(true)} />
+      <ActionGrid
+        onNavigate={(page) => navigateTo(page)}
+        onSendPost={handleSendPost}
+        onComingSoon={() => setShowComingSoon(true)}
+        isLoggedIn={isLoggedIn}
+        onRequireLogin={(action) => {
+          setPendingAction(action);
+          navigateTo('signup');
+        }}
+      />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" onComingSoon={() => setShowComingSoon(true)} />
+
+      <div className="mx-6 h-px bg-white" />
+
       {/* Os Guardioes do Cuidado */}
-      <section className="py-6 bg-soft-bg">
+      <section className="py-4 bg-soft-bg">
         <div className="px-6 mb-2">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-sans font-bold text-gray-800">Os Guardi&#245;es do Cuidado</h3>
@@ -1838,25 +2122,18 @@ const App = () => {
         </div>
       </section>
 
+      <div className="mx-6 h-px bg-white" />
+
       <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" cardWidth="280px" onComingSoon={() => setShowComingSoon(true)} />
       
       {/* Coming Soon Popup */}
       {showComingSoon && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-10" onClick={() => setShowComingSoon(false)}>
-          <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
-              <Heart size={28} className="text-[#FF66C4]" />
-            </div>
-            <h3 className="font-bold text-gray-800 text-lg mb-2">Coming Soon</h3>
-            <p className="text-sm text-gray-500 leading-relaxed mb-5">{"Estamos preparando algo especial para voc\u00ea. Em breve estar\u00e1 dispon\u00edvel!"}</p>
-            <button
-              onClick={() => setShowComingSoon(false)}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
-            >
-              ENTENDI
-            </button>
-          </div>
-        </div>
+        <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} />
+      )}
+
+      {/* Review Pending Popup */}
+      {reviewPopupType && (
+        <ReviewPendingPopup type={reviewPopupType} onClose={() => setReviewPopupType(null)} />
       )}
 
       {/* Footer Navigation - Floating */}
@@ -1868,10 +2145,6 @@ const App = () => {
         <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
           <AldeiaIcon size={22} />
           <span>Aldeia</span>
-        </button>
-        <button onClick={() => setShowComingSoon(true)} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-          <PenLine size={22} />
-          <span>Journal</span>
         </button>
         <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
           <User size={22} />
