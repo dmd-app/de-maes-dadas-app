@@ -446,7 +446,7 @@ const PostPendingPopup = ({ onClose }) => {
           onClick={onClose}
           className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
         >
-          ENTENDI
+          OK
         </button>
       </div>
     </div>
@@ -593,7 +593,12 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequir
             <div className="flex flex-col gap-2 w-full">
               <button 
                 onClick={handleSend}
-                className="w-full py-3 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-full shadow-md text-sm active:scale-[0.98] transition-all"
+                disabled={!message.trim()}
+                className={`w-full py-3 font-bold rounded-full text-sm transition-all active:scale-[0.98] ${
+                  message.trim()
+                    ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-md'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
               >
                 Enviar para a Aldeia
               </button>
@@ -1072,10 +1077,15 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
       {/* Full Post */}
       <div className="px-6 pb-4">
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
             <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
               {post.category}
             </span>
+            {post.status === 'inactive' && (
+              <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-700">
+                INATIVO
+              </span>
+            )}
             <span className="text-xs text-gray-400">{post.author}{" \u2022 "}{post.time}</span>
             {post.versions && post.versions.length > 0 && (
               <button
@@ -1508,9 +1518,11 @@ const App = () => {
       likes: 0,
       comments: 0,
       commentsList: [],
+      status: 'inactive',
     };
     setRodasPosts([newPost, ...rodasPosts]);
     setSelectedPostIdx(0);
+    setShowPostPendingPopup(true);
     navigateTo('postDetail');
   };
 
@@ -1539,9 +1551,11 @@ const App = () => {
     post.desc = desc;
     post.category = category;
     post.categoryColor = categoryColor;
+    post.status = 'inactive';
 
     updated[selectedPostIdx] = post;
     setRodasPosts(updated);
+    setShowPostPendingPopup(true);
   };
 
   const handleLikePost = () => {
@@ -1832,6 +1846,9 @@ const App = () => {
           onLikeReply={handleLikeReply}
           onEditPost={handleEditPost}
         />
+        {showPostPendingPopup && (
+          <PostPendingPopup onClose={() => setShowPostPendingPopup(false)} />
+        )}
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <Heart size={20} />
