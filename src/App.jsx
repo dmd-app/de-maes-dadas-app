@@ -782,8 +782,8 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
   const getFilteredPosts = () => {
     let indexed = posts.map((post, idx) => ({ ...post, originalIdx: idx }));
 
-    // Hide inactive posts from feed
-    indexed = indexed.filter((p) => p.status !== 'inactive');
+    // Hide non-active posts from feed
+    indexed = indexed.filter((p) => !p.status || p.status === 'active');
 
     // Category filters
     if (activeFilter !== "Destaques" && activeFilter !== "Recentes") {
@@ -987,7 +987,7 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogi
           }} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
         </div>
         <div className="flex flex-col gap-3">
-          {posts.filter((p) => p.status !== 'inactive').slice(0, 2).map((post, idx) => (
+          {posts.filter((p) => !p.status || p.status === 'active').slice(0, 2).map((post, idx) => (
             <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-2">
                 <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
@@ -1244,10 +1244,10 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
       {/* Comments Section */}
       <div className="px-6">
         <h3 className="font-bold text-gray-800 mb-4">
-          {"Coment\u00e1rios"} ({post.commentsList?.filter((c) => c.status !== 'inactive').length || 0})
+          {"Coment\u00e1rios"} ({post.commentsList?.filter((c) => !c.status || c.status === 'active').length || 0})
         </h3>
 
-        {(!post.commentsList || post.commentsList.filter((c) => c.status !== 'inactive').length === 0) && (
+        {(!post.commentsList || post.commentsList.filter((c) => !c.status || c.status === 'active').length === 0) && (
           <div className="bg-white rounded-2xl p-6 border border-gray-100 text-center">
             <MessageCircle size={32} className="text-gray-200 mx-auto mb-2" />
             <p className="text-sm text-gray-400">{"Nenhum coment\u00e1rio ainda. Seja a primeira!"}</p>
@@ -1257,7 +1257,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
         <div className="flex flex-col gap-3">
           {post.commentsList
             ?.map((comment, idx) => ({ ...comment, originalIdx: idx }))
-            .filter((c) => c.status !== 'inactive')
+            .filter((c) => !c.status || c.status === 'active')
             .sort((a, b) => ((b.likes || 0) + (b.replies?.length || 0)) - ((a.likes || 0) + (a.replies?.length || 0)))
             .map((comment) => (
             <div key={comment.originalIdx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
@@ -1311,9 +1311,9 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
               )}
 
               {/* Replies */}
-              {comment.replies && comment.replies.filter((r) => r.status !== 'inactive').length > 0 && (
+              {comment.replies && comment.replies.filter((r) => !r.status || r.status === 'active').length > 0 && (
                 <div className="pl-9 mt-3 flex flex-col gap-2">
-                  {comment.replies.filter((r) => r.status !== 'inactive').map((reply, rIdx) => (
+                  {comment.replies.filter((r) => !r.status || r.status === 'active').map((reply, rIdx) => (
                     <div key={rIdx} className="bg-gray-50 rounded-xl p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple flex-shrink-0">
@@ -1570,7 +1570,7 @@ const App = () => {
     post.desc = desc;
     post.category = category;
     post.categoryColor = categoryColor;
-    post.status = 'inactive';
+    post.status = 'pending';
 
     updated[selectedPostIdx] = post;
     setRodasPosts(updated);
@@ -1599,7 +1599,7 @@ const App = () => {
   const handleAddComment = (text) => {
     if (selectedPostIdx === null) return;
     const updated = [...rodasPosts];
-    const newComment = { author: "Eu", time: "Agora", text, likes: 0, liked: false, replies: [], status: 'inactive' };
+    const newComment = { author: "Eu", time: "Agora", text, likes: 0, liked: false, replies: [], status: 'pending' };
     updated[selectedPostIdx] = {
       ...updated[selectedPostIdx],
       commentsList: [...(updated[selectedPostIdx].commentsList || []), newComment],
@@ -1634,7 +1634,7 @@ const App = () => {
     const post = { ...updated[selectedPostIdx] };
     const comments = [...(post.commentsList || [])];
     const comment = { ...comments[commentIdx] };
-    const newReply = { author: "Eu", time: "Agora", text, likes: 0, liked: false, status: 'inactive' };
+    const newReply = { author: "Eu", time: "Agora", text, likes: 0, liked: false, status: 'pending' };
     comment.replies = [...(comment.replies || []), newReply];
     comments[commentIdx] = comment;
     post.commentsList = comments;
