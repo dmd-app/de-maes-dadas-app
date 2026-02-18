@@ -851,27 +851,27 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon }) => {
       </header>
 
       {/* Quick Actions */}
-      <section className="px-6 py-4 flex flex-col gap-4">
+      <section className="px-6 py-4 grid grid-cols-2 gap-4">
         <button
           onClick={() => onNavigate('rodas')}
-          className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow active:scale-[0.98]"
+          className="bg-white p-5 rounded-2xl border border-gray-100 flex flex-col items-center gap-3 active:scale-[0.98] transition-all"
         >
-          <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink flex-shrink-0">
-            <Users size={24} />
+          <div className="w-14 h-14 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
+            <Users size={26} />
           </div>
-          <div className="text-left">
-            <h3 className="font-bold text-gray-800 text-sm">Rodas de Conversa</h3>
-            <p className="text-xs text-gray-400 mt-0.5">Desabafe, pergunte e acolha</p>
+          <div className="text-center">
+            <h3 className="font-bold text-gray-800 text-sm leading-tight">Rodas de Conversa</h3>
+            <p className="text-[10px] text-gray-400 mt-1">Desabafe, pergunte e acolha</p>
           </div>
         </button>
 
-        <button onClick={onComingSoon} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow active:scale-[0.98]">
-          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple flex-shrink-0">
-            <BookOpen size={24} />
+        <button onClick={onComingSoon} className="bg-white p-5 rounded-2xl border border-gray-100 flex flex-col items-center gap-3 active:scale-[0.98] transition-all">
+          <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
+            <BookOpen size={26} />
           </div>
-          <div className="text-left">
-            <h3 className="font-bold text-gray-800 text-sm">Biblioteca (O Espelho)</h3>
-            <p className="text-xs text-gray-400 mt-0.5">{"Conteúdos que refletem você"}</p>
+          <div className="text-center">
+            <h3 className="font-bold text-gray-800 text-sm leading-tight">{"Biblioteca (O Espelho)"}</h3>
+            <p className="text-[10px] text-gray-400 mt-1">{"Conte\u00fados que refletem voc\u00ea"}</p>
           </div>
         </button>
       </section>
