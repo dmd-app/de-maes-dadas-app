@@ -1903,7 +1903,12 @@ const App = () => {
     if (!isLoggedIn) {
       return (
         <>
-          <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col items-center justify-center px-8">
+          <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
+            <header className="p-6 pb-2 bg-soft-bg">
+              <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
+              <p className="text-sm text-soft-pink font-sans font-medium">Perfil</p>
+            </header>
+            <div className="flex flex-col items-center justify-center flex-1 px-8">
             <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mb-6">
               <User size={36} className="text-gray-400" />
             </div>
@@ -1921,6 +1926,7 @@ const App = () => {
             >
               {"J\u00e1 tenho conta"}
             </button>
+            </div>
           </div>
           <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
             <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
