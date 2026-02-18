@@ -1374,9 +1374,9 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
 };
 
 // --- PROFILE PAGE ---
-const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount }) => {
+const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, onOpenPost }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const myPosts = posts.filter((p) => p.author === "Eu");
+  const myPosts = posts.map((p, idx) => ({ ...p, originalIdx: idx })).filter((p) => p.author === "Eu");
   const totalLikes = myPosts.reduce((sum, p) => sum + (p.likes || 0), 0);
   const totalComments = myPosts.reduce((sum, p) => sum + (p.commentsList?.length || 0), 0);
 
@@ -1448,12 +1448,36 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount }) 
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {myPosts.map((post, idx) => (
-              <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-2 mb-2">
+            {myPosts.map((post) => (
+              <div
+                key={post.originalIdx}
+                onClick={() => onOpenPost && onOpenPost(post.originalIdx)}
+                className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform"
+              >
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
                   <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
                     {post.category}
                   </span>
+                  {post.status === 'pending' && (
+                    <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-700">
+                      {"Aguardando confirma\u00e7\u00e3o"}
+                    </span>
+                  )}
+                  {post.status === 'inactive' && (
+                    <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-gray-200 text-gray-600">
+                      Inativo
+                    </span>
+                  )}
+                  {post.status === 'rejected' && (
+                    <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-red-100 text-red-700">
+                      {"N\u00e3o aprovado"}
+                    </span>
+                  )}
+                  {(!post.status || post.status === 'active') && (
+                    <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-green-100 text-green-700">
+                      Ativo
+                    </span>
+                  )}
                   <span className="text-xs text-gray-400">{post.time}</span>
                 </div>
                 <p className="text-sm font-semibold text-gray-700">{post.title}</p>
@@ -1951,6 +1975,7 @@ const App = () => {
           userName={userName}
           userEmail={userEmail}
           posts={rodasPosts}
+          onOpenPost={handleOpenPost}
           onLogout={() => {
             setUserName('');
             setUserEmail('');
