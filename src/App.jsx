@@ -941,7 +941,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
 };
 
 // --- ALDEIA PAGE ---
-const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogin }) => {
+const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogin, onOpenPost }) => {
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       {/* Header */}
@@ -988,8 +988,18 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogi
           }} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
         </div>
         <div className="flex flex-col gap-3">
-          {posts.filter((p) => !p.status || p.status === 'active').slice(0, 2).map((post, idx) => (
-            <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          {posts.map((post, idx) => ({ ...post, originalIdx: idx })).filter((p) => !p.status || p.status === 'active').slice(0, 2).map((post) => (
+            <div
+              key={post.originalIdx}
+              onClick={() => {
+                if (isLoggedIn) {
+                  onOpenPost && onOpenPost(post.originalIdx);
+                } else {
+                  onRequireLogin && onRequireLogin({ type: 'rodas' });
+                }
+              }}
+              className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform"
+            >
               <div className="flex items-center gap-2 mb-2">
                 <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
                   {post.category}
@@ -2066,6 +2076,7 @@ const App = () => {
             setPendingAction(action);
             navigateTo('signup');
           }}
+          onOpenPost={handleOpenPost}
         />
         {showComingSoon && (
           <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} />
