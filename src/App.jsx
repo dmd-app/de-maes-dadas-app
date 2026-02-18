@@ -2052,6 +2052,8 @@ const App = () => {
         </div>
       </section>
 
+      <div className="mx-6 h-px bg-white" />
+
       <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" cardWidth="280px" onComingSoon={() => setShowComingSoon(true)} />
       
       {/* Coming Soon Popup */}
