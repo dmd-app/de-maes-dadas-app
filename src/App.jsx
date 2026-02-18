@@ -527,13 +527,17 @@ const MoodCup = () => {
   );
 };
 
-const ActionGrid = ({ onNavigate, onSendPost, onComingSoon }) => {
+const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequireLogin }) => {
   const [isPanicOpen, setIsPanicOpen] = useState(false);
   const [message, setMessage] = useState('');
 
   const handleSend = () => {
     if (message.trim()) {
-      onSendPost && onSendPost(message.trim());
+      if (isLoggedIn) {
+        onSendPost && onSendPost(message.trim());
+      } else {
+        onRequireLogin && onRequireLogin({ type: 'post', text: message.trim() });
+      }
       setMessage('');
       setIsPanicOpen(false);
     }
@@ -584,7 +588,13 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon }) => {
       </section>
 
       <div className="grid grid-cols-2 gap-4 px-6 pb-4 bg-soft-bg">
-        <button onClick={() => onNavigate && onNavigate('rodas')} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
+        <button onClick={() => {
+          if (isLoggedIn) {
+            onNavigate && onNavigate('rodas');
+          } else {
+            onRequireLogin && onRequireLogin({ type: 'rodas' });
+          }
+        }} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
             <MessageCircle size={24} />
           </div>
@@ -1423,14 +1433,18 @@ const getSavedUser = () => {
 };
 
 const App = () => {
-  const [savedUser] = useState(getSavedUser);
-  const [currentPage, setCurrentPage] = useState(savedUser ? 'inicio' : 'signup');
+  const [savedUser, setSavedUser] = useState(getSavedUser);
+  const [currentPage, setCurrentPage] = useState('inicio');
   const [pageHistory, setPageHistory] = useState([]);
   const [selectedPostIdx, setSelectedPostIdx] = useState(null);
   const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
   const [userName, setUserName] = useState(savedUser?.name || '');
   const [userEmail, setUserEmail] = useState(savedUser?.email || '');
   const [showComingSoon, setShowComingSoon] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
+  const [showPostPendingPopup, setShowPostPendingPopup] = useState(false);
+
+  const isLoggedIn = !!savedUser;
 
 
   const navigateTo = (page) => {
@@ -1666,8 +1680,10 @@ const App = () => {
         onLogin={({ email, username }) => {
           setUserName(username);
           setUserEmail(email);
-          localStorage.setItem('dmd_user', JSON.stringify({ name: username, email }));
-          setCurrentPage('inicio');
+          const userData = { name: username, email };
+          localStorage.setItem('dmd_user', JSON.stringify(userData));
+          setSavedUser(userData);
+          setCurrentPage('onboarding');
           window.scrollTo(0, 0);
         }}
         onGoToSignup={() => setCurrentPage('signup')}
@@ -1682,7 +1698,9 @@ const App = () => {
         onSignup={({ email, username }) => {
           setUserName(username);
           setUserEmail(email);
-          localStorage.setItem('dmd_user', JSON.stringify({ name: username, email }));
+          const userData = { name: username, email };
+          localStorage.setItem('dmd_user', JSON.stringify(userData));
+          setSavedUser(userData);
           setCurrentPage('onboarding');
         }}
         onGoToLogin={() => setCurrentPage('login')}
@@ -1695,7 +1713,26 @@ const App = () => {
     return (
       <OnboardingPage
         userName={userName}
-        onComplete={() => { setCurrentPage('inicio'); window.scrollTo(0, 0); }}
+        onComplete={() => {
+          if (pendingAction) {
+            if (pendingAction.type === 'post') {
+              handleSendPost(pendingAction.text, 'Desabafo', 'bg-[#FF66C4] text-white');
+              setShowPostPendingPopup(true);
+              setPendingAction(null);
+            } else if (pendingAction.type === 'rodas') {
+              setPendingAction(null);
+              setCurrentPage('rodas');
+              window.scrollTo(0, 0);
+            } else {
+              setPendingAction(null);
+              setCurrentPage('inicio');
+              window.scrollTo(0, 0);
+            }
+          } else {
+            setCurrentPage('inicio');
+            window.scrollTo(0, 0);
+          }
+        }}
       />
     );
   }
@@ -1711,8 +1748,9 @@ const App = () => {
           onLogout={() => {
             setUserName('');
             setUserEmail('');
+            setSavedUser(null);
             localStorage.removeItem('dmd_user');
-            setCurrentPage('login');
+            setCurrentPage('inicio');
           }}
         />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
@@ -1824,7 +1862,16 @@ const App = () => {
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       <Header userName={userName} />
       <MoodCup />
-      <ActionGrid onNavigate={(page) => navigateTo(page)} onSendPost={handleSendPost} onComingSoon={() => setShowComingSoon(true)}  />
+      <ActionGrid
+        onNavigate={(page) => navigateTo(page)}
+        onSendPost={handleSendPost}
+        onComingSoon={() => setShowComingSoon(true)}
+        isLoggedIn={isLoggedIn}
+        onRequireLogin={(action) => {
+          setPendingAction(action);
+          navigateTo('signup');
+        }}
+      />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" onComingSoon={() => setShowComingSoon(true)} />
       {/* Os Guardioes do Cuidado */}
       <section className="py-6 bg-soft-bg">
