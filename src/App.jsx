@@ -2005,7 +2005,7 @@ const App = () => {
           onEditPost={handleEditPost}
         />
         {reviewPopupType && (
-          <ReviewPendingPopup type={reviewPopupType} onClose={() => setReviewPopupType(null)} />
+          <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
         )}
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
@@ -2165,7 +2165,7 @@ const App = () => {
 
       {/* Review Pending Popup */}
       {reviewPopupType && (
-        <ReviewPendingPopup type={reviewPopupType} onClose={() => setReviewPopupType(null)} />
+        <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
       )}
 
       {/* Footer Navigation - Floating */}
