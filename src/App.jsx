@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, PenLine, CalendarDays, Search } from 'lucide-react';
+import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, Search } from 'lucide-react';
 import './index.css';
 
 // --- ALDEIA ICON (3 circles in triangle) ---
@@ -468,7 +468,7 @@ const MoodCup = () => {
   );
 };
 
-const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, onSaveJournal }) => {
+const ActionGrid = ({ onNavigate, onSendPost, onComingSoon }) => {
   const [isPanicOpen, setIsPanicOpen] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -512,13 +512,7 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, onSaveJournal }) => 
               >
                 Enviar para a Aldeia
               </button>
-              <button
-                onClick={() => { if (message.trim()) { onSaveJournal && onSaveJournal(message.trim()); setIsPanicOpen(false); setMessage(''); } }}
-                className="w-full py-3 bg-amber-50 text-amber-700 font-bold rounded-full border border-amber-200 text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-              >
-                <PenLine size={16} />
-                Salvar no Journal
-              </button>
+
               <button 
                 onClick={() => { setIsPanicOpen(false); setMessage(''); }}
                 className="w-full py-2.5 text-gray-400 font-medium text-sm"
@@ -538,12 +532,7 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, onSaveJournal }) => 
           <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de<br />Conversa</span>
         </button>
 
-        <button onClick={() => onNavigate && onNavigate('journal')} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
-          <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-            <PenLine size={24} />
-          </div>
-          <span className="text-gray-700 font-sans font-medium text-sm text-center">Journal</span>
-        </button>
+
 
         <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
           <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
@@ -1371,342 +1360,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout }) => {
 };
 
 // --- JOURNAL PAGE ---
-const JournalPage = ({ onBack, entries, onAddEntry, editingEntryId, onUpdateEntry, onClearEditing }) => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [viewMonth, setViewMonth] = useState(new Date());
-  const [isWriting, setIsWriting] = useState(false);
-  const [journalText, setJournalText] = useState('');
-  const [editingId, setEditingId] = useState(null);
-  const [editText, setEditText] = useState('');
-  const [viewingEntry, setViewingEntry] = useState(() => {
-    if (editingEntryId) {
-      const entry = entries.find((e) => e.id === editingEntryId);
-      return entry || null;
-    }
-    return null;
-  });
-  const [detailEditing, setDetailEditing] = useState(false);
-  const [detailEditText, setDetailEditText] = useState('');
 
-  const monthNames = ["Janeiro", "Fevereiro", "Mar\u00e7o", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-  const dayNames = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "S\u00e1b"];
-
-  const getDaysInMonth = (date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-  const getFirstDayOfMonth = (date) => new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-
-  const isSameDay = (d1, d2) => d1.getDate() === d2.getDate() && d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear();
-
-  const entriesForDate = (date) => entries.filter((e) => isSameDay(new Date(e.date), date));
-  const hasEntries = (date) => entriesForDate(date).length > 0;
-
-  const daysInMonth = getDaysInMonth(viewMonth);
-  const firstDay = getFirstDayOfMonth(viewMonth);
-  const calendarDays = [];
-  for (let i = 0; i < firstDay; i++) calendarDays.push(null);
-  for (let d = 1; d <= daysInMonth; d++) calendarDays.push(d);
-
-  const selectedEntries = entriesForDate(selectedDate);
-
-  const prevMonth = () => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1));
-  const nextMonth = () => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1));
-
-  const handleSaveEntry = () => {
-    if (journalText.trim()) {
-      onAddEntry({
-        id: Date.now(),
-        text: journalText.trim(),
-        date: new Date().toISOString(),
-      });
-      setJournalText('');
-      setIsWriting(false);
-      setSelectedDate(new Date());
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
-      {/* Header */}
-      <header className="p-6 pb-4 flex items-center gap-4 bg-soft-bg sticky top-0 z-10">
-        <button onClick={onBack} className="text-gray-700">
-          <ArrowLeft size={24} />
-        </button>
-        <h1 className="text-xl font-bold text-gray-800 font-sans flex-1">Journal</h1>
-      </header>
-
-      {/* Calendar */}
-      <div className="px-6 pb-4">
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          {/* Month navigation */}
-          <div className="flex items-center justify-between mb-4">
-            <button onClick={prevMonth} className="text-gray-400 hover:text-gray-700 transition-colors p-1">
-              <ChevronLeft size={20} />
-            </button>
-            <h3 className="font-bold text-gray-800 text-sm">
-              {monthNames[viewMonth.getMonth()]} {viewMonth.getFullYear()}
-            </h3>
-            <button onClick={nextMonth} className="text-gray-400 hover:text-gray-700 transition-colors p-1">
-              <ChevronRight size={20} />
-            </button>
-          </div>
-
-          {/* Day headers */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {dayNames.map((d) => (
-              <div key={d} className="text-center text-[10px] font-semibold text-gray-400 uppercase">{d}</div>
-            ))}
-          </div>
-
-          {/* Calendar grid */}
-          <div className="grid grid-cols-7 gap-1">
-            {calendarDays.map((day, idx) => {
-              if (day === null) return <div key={`empty-${idx}`} />;
-              const date = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), day);
-              const isSelected = isSameDay(date, selectedDate);
-              const isToday = isSameDay(date, new Date());
-              const has = hasEntries(date);
-              return (
-                <button
-                  key={day}
-                  onClick={() => setSelectedDate(date)}
-                  className={`relative flex flex-col items-center justify-center py-2 rounded-xl transition-all text-sm ${
-                    isSelected
-                      ? 'bg-[#FF66C4] text-white font-bold'
-                      : isToday
-                      ? 'bg-pink-50 text-[#FF66C4] font-semibold'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  {day}
-                  {has && (
-                    <span className={`absolute bottom-0.5 w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-[#FF66C4]'}`} />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Entries for selected date */}
-      <div className="px-6 pb-4">
-        <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm font-bold text-gray-700">
-            {isSameDay(selectedDate, new Date()) ? 'Hoje' : `${selectedDate.getDate()} ${monthNames[selectedDate.getMonth()]}`}
-          </h4>
-          <span className="text-[10px] text-gray-400">{selectedEntries.length} {selectedEntries.length === 1 ? 'entrada' : 'entradas'}</span>
-        </div>
-
-        {selectedEntries.length === 0 ? (
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
-            <PenLine size={28} className="text-gray-200 mx-auto mb-2" />
-            <p className="text-sm text-gray-400">{"Nenhuma entrada neste dia."}</p>
-            <p className="text-xs text-gray-300 mt-1">{"Que tal come\u00e7ar a escrever?"}</p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {selectedEntries.map((entry) => {
-              const entryDate = new Date(entry.date);
-              const isEditing = editingId === entry.id;
-              return (
-                <div key={entry.id} className={`bg-white rounded-2xl p-4 shadow-sm border ${isEditing ? 'border-[#FF66C4]' : 'border-gray-100'}`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-semibold text-[#FF66C4]">
-                      {entryDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-
-                  </div>
-                  {isEditing ? (
-                    <div>
-                      <textarea
-                        value={editText}
-                        onChange={(e) => setEditText(e.target.value)}
-                        className="w-full min-h-[100px] text-sm text-gray-700 outline-none p-3 bg-gray-50 rounded-xl border border-gray-200 resize-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
-                        autoFocus
-                      />
-                      <div className="flex gap-3 mt-3">
-                        <button
-                          onClick={() => { setEditingId(null); setEditText(''); onClearEditing && onClearEditing(); }}
-                          className="flex-1 py-2 text-gray-400 font-medium rounded-xl border border-gray-200 text-xs"
-                        >
-                          Cancelar
-                        </button>
-                        <button
-                          onClick={() => { if (editText.trim()) { onUpdateEntry(entry.id, editText.trim()); setEditingId(null); setEditText(''); } }}
-                          disabled={!editText.trim()}
-                          className={`flex-1 py-2 rounded-xl font-bold text-xs transition-all active:scale-[0.98] ${
-                            editText.trim()
-                              ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-md'
-                              : 'bg-gray-100 text-gray-300'
-                          }`}
-                        >
-                          Salvar
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <button onClick={() => { setViewingEntry(entry); setDetailEditing(false); setDetailEditText(entry.text); }} className="text-left w-full">
-                      <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{entry.text}</p>
-                      {entry.history && entry.history.length > 0 && (
-                        <span className="text-[10px] text-gray-300 mt-2 block">{"Editado " + entry.history.length + (entry.history.length === 1 ? " vez" : " vezes")}</span>
-                      )}
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Start Journaling Button */}
-      {!isWriting && (
-        <div className="px-6 pb-4">
-          <button
-            onClick={() => setIsWriting(true)}
-            className="w-full py-3.5 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-          >
-            <PenLine size={18} />
-            {"Come\u00e7ar Journaling"}
-          </button>
-        </div>
-      )}
-
-      {/* Writing Area */}
-      {isWriting && (
-        <div className="px-6 pb-4">
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-            <h4 className="font-bold text-gray-800 text-sm mb-3">{"O que voc\u00ea quer registrar?"}</h4>
-            <textarea
-              value={journalText}
-              onChange={(e) => setJournalText(e.target.value)}
-              className="w-full min-h-[120px] text-sm text-gray-700 placeholder-gray-400 outline-none p-3 bg-gray-50 rounded-xl border border-gray-200 resize-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
-              placeholder="Escreva seus pensamentos, sentimentos..."
-              autoFocus
-            />
-            <div className="flex gap-3 mt-3">
-              <button
-                onClick={() => { setIsWriting(false); setJournalText(''); }}
-                className="flex-1 py-2.5 text-gray-400 font-medium rounded-xl border border-gray-200 text-sm"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleSaveEntry}
-                disabled={!journalText.trim()}
-                className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-[0.98] ${
-                  journalText.trim()
-                    ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-md'
-                    : 'bg-gray-100 text-gray-300'
-                }`}
-              >
-                Salvar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Full-page entry detail view */}
-      {viewingEntry && (() => {
-        const liveEntry = entries.find((e) => e.id === viewingEntry.id) || viewingEntry;
-        const entryDate = new Date(liveEntry.date);
-        return (
-          <div className="fixed inset-0 z-50 bg-soft-bg overflow-y-auto">
-            <div className="max-w-md mx-auto min-h-screen flex flex-col">
-              {/* Detail Header */}
-              <header className="p-6 pb-4 flex items-center gap-4 bg-soft-bg sticky top-0 z-10">
-                <button onClick={() => { setViewingEntry(null); setDetailEditing(false); }} className="text-gray-700">
-                  <ArrowLeft size={24} />
-                </button>
-                <div className="flex-1">
-                  <h1 className="text-lg font-bold text-gray-800">Entrada do Journal</h1>
-                  <p className="text-xs text-gray-400">
-                    {entryDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
-                    {" \u00e0s "}
-                    {entryDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </div>
-                {!detailEditing && (
-                  <button
-                    onClick={() => { setDetailEditing(true); setDetailEditText(liveEntry.text); }}
-                    className="p-2 rounded-xl bg-pink-50 text-[#FF66C4]"
-                  >
-                    <Edit3 size={18} />
-                  </button>
-                )}
-              </header>
-
-              {/* Detail Content */}
-              <div className="px-6 flex-1">
-                {detailEditing ? (
-                  <div className="bg-white rounded-2xl p-5 shadow-sm border border-[#FF66C4]">
-                    <textarea
-                      value={detailEditText}
-                      onChange={(e) => setDetailEditText(e.target.value)}
-                      className="w-full min-h-[200px] text-sm text-gray-700 outline-none p-3 bg-gray-50 rounded-xl border border-gray-200 resize-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
-                      autoFocus
-                    />
-                    <div className="flex gap-3 mt-4">
-                      <button
-                        onClick={() => setDetailEditing(false)}
-                        className="flex-1 py-3 text-gray-400 font-medium rounded-xl border border-gray-200 text-sm"
-                      >
-                        Cancelar
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (detailEditText.trim()) {
-                            onUpdateEntry(liveEntry.id, detailEditText.trim());
-                            setDetailEditing(false);
-                            setViewingEntry({ ...liveEntry, text: detailEditText.trim() });
-                          }
-                        }}
-                        disabled={!detailEditText.trim()}
-                        className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] ${
-                          detailEditText.trim()
-                            ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-md'
-                            : 'bg-gray-100 text-gray-300'
-                        }`}
-                      >
-                        Salvar
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{liveEntry.text}</p>
-                  </div>
-                )}
-
-                {/* Edit History */}
-                {liveEntry.history && liveEntry.history.length > 0 && !detailEditing && (
-                  <div className="mt-6">
-                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{"Vers\u00f5es anteriores"}</h4>
-                    <div className="flex flex-col gap-3">
-                      {[...liveEntry.history].reverse().map((h, idx) => {
-                        const editDate = new Date(h.editedAt);
-                        return (
-                          <div key={idx} className="bg-white/60 rounded-xl p-4 border border-gray-100">
-                            <span className="text-[10px] font-semibold text-gray-300 block mb-2">
-                              {editDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
-                              {" \u00e0s "}
-                              {editDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                            <p className="text-xs text-gray-400 leading-relaxed whitespace-pre-wrap">{h.text}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-      })()}
-    </div>
-  );
-};
 
 // --- MOCK CONTACTS & MESSAGES ---
 const mockContacts = [
@@ -1923,8 +1577,6 @@ const App = () => {
   const [userName, setUserName] = useState(savedUser?.name || '');
   const [userEmail, setUserEmail] = useState(savedUser?.email || '');
   const [showComingSoon, setShowComingSoon] = useState(false);
-  const [journalEntries, setJournalEntries] = useState([]);
-  const [editingEntryId, setEditingEntryId] = useState(null);
   const [chatMessages, setChatMessages] = useState(initialMessages);
   const [currentChat, setCurrentChat] = useState(null);
 
@@ -1939,27 +1591,6 @@ const App = () => {
         { id: Date.now(), from: 'me', text, time: timeStr }
       ]
     }));
-  };
-
-  const handleSaveJournal = (text) => {
-    const newId = Date.now();
-    setJournalEntries((prev) => [{
-      id: newId,
-      text,
-      date: new Date().toISOString(),
-    }, ...prev]);
-    setEditingEntryId(newId);
-    navigateTo('journal');
-  };
-
-  const handleUpdateJournalEntry = (id, newText) => {
-    setJournalEntries((prev) => prev.map((e) => {
-      if (e.id !== id) return e;
-      const history = e.history || [];
-      history.push({ text: e.text, editedAt: new Date().toISOString() });
-      return { ...e, text: newText, history };
-    }));
-    setEditingEntryId(null);
   };
 
   const navigateTo = (page) => {
@@ -2217,10 +1848,7 @@ const App = () => {
             <AldeiaIcon size={20} />
             <span>Aldeia</span>
           </button>
-          <button onClick={() => navigateTo('journal')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <PenLine size={20} />
-            <span>Journal</span>
-          </button>
+
 
           <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={20} />
@@ -2296,10 +1924,7 @@ const App = () => {
             <AldeiaIcon size={20} />
             <span>Aldeia</span>
           </button>
-          <button onClick={() => navigateTo('journal')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <PenLine size={20} />
-            <span>Journal</span>
-          </button>
+
 
           <button className="flex flex-col items-center gap-1 text-gray-800">
             <User size={20} fill="#374151" stroke="#374151" />
@@ -2333,47 +1958,9 @@ const App = () => {
             <AldeiaIcon size={20} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => { setSelectedPostIdx(null); navigateTo('journal'); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <PenLine size={20} />
-            <span>Journal</span>
-          </button>
+
 
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <User size={20} />
-            <span>Perfil</span>
-          </button>
-        </nav>
-      </>
-    );
-  }
-
-  // Render Journal page
-  if (currentPage === 'journal') {
-    return (
-      <>
-        <JournalPage
-          onBack={goBack}
-          entries={journalEntries}
-          onAddEntry={(entry) => setJournalEntries((prev) => [entry, ...prev])}
-          editingEntryId={editingEntryId}
-          onUpdateEntry={handleUpdateJournalEntry}
-          onClearEditing={() => setEditingEntryId(null)}
-        />
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-          <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={20} />
-            <span>Inicio</span>
-          </button>
-          <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <AldeiaIcon size={20} />
-            <span>Aldeia</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-gray-800">
-            <PenLine size={20} />
-            <span className="font-semibold">Journal</span>
-          </button>
-
-          <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={20} />
             <span>Perfil</span>
           </button>
@@ -2396,10 +1983,7 @@ const App = () => {
             <AldeiaIcon size={22} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => navigateTo('journal')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <PenLine size={22} />
-            <span>Journal</span>
-          </button>
+
           <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={22} />
             <span>Perfil</span>
@@ -2440,10 +2024,7 @@ const App = () => {
             <AldeiaIcon size={22} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-          <button onClick={() => navigateTo('journal')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <PenLine size={22} />
-            <span>Journal</span>
-          </button>
+
           <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <User size={24} />
             <span>Perfil</span>
@@ -2457,7 +2038,7 @@ const App = () => {
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       <Header userName={userName} onMessageClick={() => navigateTo('mensagens')} />
       <MoodCup />
-      <ActionGrid onNavigate={(page) => navigateTo(page)} onSendPost={handleSendPost} onComingSoon={() => setShowComingSoon(true)} onSaveJournal={handleSaveJournal} />
+      <ActionGrid onNavigate={(page) => navigateTo(page)} onSendPost={handleSendPost} onComingSoon={() => setShowComingSoon(true)}  />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" onComingSoon={() => setShowComingSoon(true)} />
       {/* Os Guardioes do Cuidado */}
       <section className="py-6 bg-soft-bg">
@@ -2519,10 +2100,6 @@ const App = () => {
         <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
           <AldeiaIcon size={22} />
           <span>Aldeia</span>
-        </button>
-        <button onClick={() => navigateTo('journal')} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-          <PenLine size={22} />
-          <span>Journal</span>
         </button>
         <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
           <User size={22} />
