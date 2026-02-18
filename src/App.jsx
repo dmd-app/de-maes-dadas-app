@@ -367,6 +367,70 @@ const OnboardingPage = ({ onComplete, userName }) => {
 
 // --- COMPONENTS ---
 
+const ComingSoonPopup = ({ onClose, isLoggedIn }) => {
+  const [notifyEmail, setNotifyEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleNotify = () => {
+    if (notifyEmail.trim() && notifyEmail.includes('@')) {
+      setSubmitted(true);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-10">
+      <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl">
+        <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
+          <Heart size={28} className="text-[#FF66C4]" />
+        </div>
+        <h3 className="font-bold text-gray-800 text-lg mb-2">Coming Soon</h3>
+        <p className="text-sm text-gray-500 leading-relaxed mb-5">
+          {"Estamos preparando algo especial para voc\u00ea. Em breve estar\u00e1 dispon\u00edvel!"}
+        </p>
+
+        {!isLoggedIn && !submitted && (
+          <div className="mb-4">
+            <p className="text-xs font-semibold text-gray-600 mb-2">{"Avise-me quando estiver dispon\u00edvel"}</p>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={notifyEmail}
+                onChange={(e) => setNotifyEmail(e.target.value)}
+                placeholder="seu@email.com"
+                className="flex-1 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
+              />
+              <button
+                onClick={handleNotify}
+                disabled={!notifyEmail.trim() || !notifyEmail.includes('@')}
+                className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all active:scale-[0.98] ${
+                  notifyEmail.trim() && notifyEmail.includes('@')
+                    ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white'
+                    : 'bg-gray-100 text-gray-300'
+                }`}
+              >
+                <Bell size={16} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!isLoggedIn && submitted && (
+          <div className="mb-4 bg-green-50 rounded-xl p-3 border border-green-200">
+            <p className="text-xs font-semibold text-green-700">{"Pronto! Vamos te avisar quando estiver dispon\u00edvel."}</p>
+          </div>
+        )}
+
+        <button
+          onClick={onClose}
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+        >
+          ENTENDI
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const Header = ({ userName, onMessageClick }) => (
   <>
     <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 flex justify-between items-center border-b border-pink-100/50">
@@ -1756,7 +1820,7 @@ const App = () => {
     },
     {
       title: "A Luz Vermelha da Raiva",
-      desc: "Entenda por que você explode e como lidar com a culpa.",
+      desc: "Entenda por que voc�� explode e como lidar com a culpa.",
       tag: "PSICOLOGIA",
       bgClass: "bg-gradient-to-br from-yellow-200 to-orange-100",
       image: "/images/luz-vermelha-raiva.jpeg"
@@ -1991,21 +2055,7 @@ const App = () => {
       <>
         <AldeiaPage onNavigate={(page) => navigateTo(page)} posts={rodasPosts} onComingSoon={() => setShowComingSoon(true)} />
         {showComingSoon && (
-          <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-10">
-            <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl">
-              <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
-                <Heart size={28} className="text-[#FF66C4]" />
-              </div>
-              <h3 className="font-bold text-gray-800 text-lg mb-2">Coming Soon</h3>
-              <p className="text-sm text-gray-500 leading-relaxed mb-5">{"Estamos preparando algo especial para voc\u00ea. Em breve estar\u00e1 dispon\u00edvel!"}</p>
-              <button
-                onClick={() => setShowComingSoon(false)}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
-              >
-                ENTENDI
-              </button>
-            </div>
-          </div>
+          <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={!!savedUser} />
         )}
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
@@ -2066,21 +2116,7 @@ const App = () => {
       
       {/* Coming Soon Popup */}
       {showComingSoon && (
-        <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-10">
-          <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl">
-            <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
-              <Heart size={28} className="text-[#FF66C4]" />
-            </div>
-            <h3 className="font-bold text-gray-800 text-lg mb-2">Coming Soon</h3>
-            <p className="text-sm text-gray-500 leading-relaxed mb-5">{"Estamos preparando algo especial para voc\u00ea. Em breve estar\u00e1 dispon\u00edvel!"}</p>
-            <button
-              onClick={() => setShowComingSoon(false)}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
-            >
-              ENTENDI
-            </button>
-          </div>
-        </div>
+        <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={!!savedUser} />
       )}
 
       {/* Footer Navigation - Floating */}
