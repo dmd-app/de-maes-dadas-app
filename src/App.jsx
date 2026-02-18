@@ -1377,7 +1377,8 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
 };
 
 // --- PROFILE PAGE ---
-const ProfilePage = ({ userName, userEmail, posts, onLogout }) => {
+const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount }) => {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const myPosts = posts.filter((p) => p.author === "Eu");
   const totalLikes = myPosts.reduce((sum, p) => sum + (p.likes || 0), 0);
   const totalComments = myPosts.reduce((sum, p) => sum + (p.commentsList?.length || 0), 0);
@@ -1498,7 +1499,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout }) => {
       </div>
 
       {/* Logout */}
-      <div className="px-6 pb-6">
+      <div className="px-6 pb-3">
         <button
           onClick={onLogout}
           className="w-full flex items-center justify-center gap-2 py-4 bg-white rounded-2xl border border-red-100 text-red-400 font-semibold text-sm hover:bg-red-50 transition-colors shadow-sm"
@@ -1507,6 +1508,44 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout }) => {
           <span>Sair da conta</span>
         </button>
       </div>
+
+      {/* Delete Account */}
+      <div className="px-6 pb-6">
+        <button
+          onClick={() => setShowDeleteConfirm(true)}
+          className="w-full flex items-center justify-center gap-2 py-4 bg-white rounded-2xl border border-red-200 text-red-500 font-semibold text-sm hover:bg-red-50 transition-colors shadow-sm"
+        >
+          <X size={18} />
+          <span>Excluir conta</span>
+        </button>
+      </div>
+
+      {/* Delete Confirmation Popup */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-10">
+          <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl">
+            <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-4">
+              <Heart size={28} className="text-amber-400" />
+            </div>
+            <h3 className="font-bold text-gray-800 text-lg mb-2">Tem certeza que deseja sair?</h3>
+            <p className="text-sm text-gray-500 leading-relaxed mb-6">
+              {"A Aldeia continua aqui para voc\u00ea, sempre que quiser voltar. \ud83d\udc9b"}
+            </p>
+            <button
+              onClick={() => { setShowDeleteConfirm(false); onDeleteAccount && onDeleteAccount(); }}
+              className="w-full py-3 rounded-xl bg-red-500 text-white font-bold text-sm active:scale-[0.98] transition-all mb-3"
+            >
+              Sim, excluir minha conta
+            </button>
+            <button
+              onClick={() => setShowDeleteConfirm(false)}
+              className="w-full py-3 rounded-xl border-2 border-gray-200 text-gray-500 font-bold text-sm active:scale-[0.98] transition-all"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -1902,6 +1941,15 @@ const App = () => {
           userEmail={userEmail}
           posts={rodasPosts}
           onLogout={() => {
+            setUserName('');
+            setUserEmail('');
+            setSavedUser(null);
+            setOnboardingSeen(false);
+            localStorage.removeItem('dmd_user');
+            localStorage.removeItem('dmd_onboarding_seen');
+            setCurrentPage('inicio');
+          }}
+          onDeleteAccount={() => {
             setUserName('');
             setUserEmail('');
             setSavedUser(null);
