@@ -1513,7 +1513,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount }) 
       <div className="px-6 pb-6">
         <button
           onClick={() => setShowDeleteConfirm(true)}
-          className="w-full flex items-center justify-center gap-2 py-4 bg-white rounded-2xl border border-red-200 text-red-500 font-semibold text-sm hover:bg-red-50 transition-colors shadow-sm"
+          className="w-full flex items-center justify-center gap-2 py-4 bg-white rounded-2xl border border-red-100 text-red-400 font-semibold text-sm hover:bg-red-50 transition-colors shadow-sm"
         >
           <X size={18} />
           <span>Excluir conta</span>
