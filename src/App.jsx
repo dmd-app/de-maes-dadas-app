@@ -1906,7 +1906,7 @@ const App = () => {
           <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
             <header className="p-6 pb-2 bg-soft-bg">
               <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
-              <p className="text-sm text-soft-pink font-sans font-medium">Perfil</p>
+              <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
             </header>
             <div className="flex flex-col items-center justify-center flex-1 px-8">
             <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mb-6">
