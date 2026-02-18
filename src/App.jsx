@@ -1089,9 +1089,19 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
             <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
               {post.category}
             </span>
-            {post.status === 'inactive' && (
+            {post.status === 'pending' && (
               <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-700">
-                INATIVO
+                {"Aguardando confirma\u00e7\u00e3o"}
+              </span>
+            )}
+            {post.status === 'inactive' && (
+              <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-gray-200 text-gray-600">
+                Inativo
+              </span>
+            )}
+            {post.status === 'rejected' && (
+              <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-red-100 text-red-700">
+                {"N\u00e3o aprovado"}
               </span>
             )}
             <span className="text-xs text-gray-400">{post.author}{" \u2022 "}{post.time}</span>
@@ -1527,7 +1537,7 @@ const App = () => {
       likes: 0,
       comments: 0,
       commentsList: [],
-      status: 'inactive',
+      status: 'pending',
     };
     setRodasPosts([newPost, ...rodasPosts]);
     setSelectedPostIdx(0);
