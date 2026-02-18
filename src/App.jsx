@@ -1928,17 +1928,17 @@ const App = () => {
             </button>
             </div>
           </div>
-          <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+          <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
             <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-              <Heart size={20} />
+              <Heart size={22} />
               <span>Inicio</span>
             </button>
             <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-              <AldeiaIcon size={20} />
+              <AldeiaIcon size={22} />
               <span>Aldeia</span>
             </button>
             <button className="flex flex-col items-center gap-1 text-gray-800">
-              <User size={20} fill="#374151" stroke="#374151" />
+              <User size={22} fill="#374151" stroke="#374151" />
               <span className="font-semibold">Perfil</span>
             </button>
           </nav>
@@ -1972,19 +1972,17 @@ const App = () => {
             window.scrollTo(0, 0);
           }}
         />
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={20} />
+            <Heart size={22} />
             <span>Inicio</span>
           </button>
           <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <AldeiaIcon size={20} />
+            <AldeiaIcon size={22} />
             <span>Aldeia</span>
           </button>
-
-
           <button className="flex flex-col items-center gap-1 text-gray-800">
-            <User size={20} fill="#374151" stroke="#374151" />
+            <User size={22} fill="#374151" stroke="#374151" />
             <span className="font-semibold">Perfil</span>
           </button>
         </nav>
@@ -2009,19 +2007,17 @@ const App = () => {
         {reviewPopupType && (
           <ReviewPendingPopup type={reviewPopupType} onClose={() => setReviewPopupType(null)} />
         )}
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={20} />
+            <Heart size={22} />
             <span>Inicio</span>
           </button>
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 text-gray-800">
-            <AldeiaIcon size={20} filled color="#374151" />
+            <AldeiaIcon size={22} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-
-
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <User size={20} />
+            <User size={22} />
             <span>Perfil</span>
           </button>
         </nav>
@@ -2098,7 +2094,7 @@ const App = () => {
           </button>
 
           <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <User size={24} />
+            <User size={22} />
             <span>Perfil</span>
           </button>
         </nav>
