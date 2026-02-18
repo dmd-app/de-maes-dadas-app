@@ -431,6 +431,28 @@ const ComingSoonPopup = ({ onClose, isLoggedIn }) => {
   );
 };
 
+const PostPendingPopup = ({ onClose }) => {
+  return (
+    <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-10">
+      <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl">
+        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+          <Check size={28} className="text-green-600" />
+        </div>
+        <h3 className="font-bold text-gray-800 text-lg mb-2">{"Post enviado!"}</h3>
+        <p className="text-sm text-gray-500 leading-relaxed mb-5">
+          {"Seu post ser\u00e1 analisado e em algumas horas dever\u00e1 estar no ar."}
+        </p>
+        <button
+          onClick={onClose}
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+        >
+          ENTENDI
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const Header = ({ userName }) => (
   <>
     <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
@@ -905,7 +927,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
 };
 
 // --- ALDEIA PAGE ---
-const AldeiaPage = ({ onNavigate, posts, onComingSoon }) => {
+const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogin }) => {
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       {/* Header */}
@@ -920,7 +942,13 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon }) => {
       {/* Quick Actions */}
       <section className="px-6 py-4 grid grid-cols-2 gap-4">
         <button
-          onClick={() => onNavigate('rodas')}
+          onClick={() => {
+            if (isLoggedIn) {
+              onNavigate('rodas');
+            } else {
+              onRequireLogin && onRequireLogin({ type: 'rodas' });
+            }
+          }}
           className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all"
         >
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
@@ -941,7 +969,9 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon }) => {
       <section className="px-6 py-4">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-sans font-bold text-gray-800">Conversas Recentes</h3>
-          <button onClick={() => onNavigate('rodas')} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
+          <button onClick={() => {
+            if (isLoggedIn) { onNavigate('rodas'); } else { onRequireLogin && onRequireLogin({ type: 'rodas' }); }
+          }} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
         </div>
         <div className="flex flex-col gap-3">
           {posts.slice(0, 2).map((post, idx) => (
@@ -1739,6 +1769,21 @@ const App = () => {
 
   // Render Profile page
   if (currentPage === 'perfil') {
+    if (!isLoggedIn) {
+      return (
+        <SignupPage
+          onSignup={({ email, username }) => {
+            setUserName(username);
+            setUserEmail(email);
+            const userData = { name: username, email };
+            localStorage.setItem('dmd_user', JSON.stringify(userData));
+            setSavedUser(userData);
+            setCurrentPage('onboarding');
+          }}
+          onGoToLogin={() => setCurrentPage('login')}
+        />
+      );
+    }
     return (
       <>
         <ProfilePage
@@ -1807,8 +1852,24 @@ const App = () => {
     );
   }
 
-  // Render Rodas de Conversa page
+  // Render Rodas de Conversa page (requires login)
   if (currentPage === 'rodas') {
+    if (!isLoggedIn) {
+      return (
+        <SignupPage
+          onSignup={({ email, username }) => {
+            setUserName(username);
+            setUserEmail(email);
+            const userData = { name: username, email };
+            localStorage.setItem('dmd_user', JSON.stringify(userData));
+            setSavedUser(userData);
+            setPendingAction({ type: 'rodas' });
+            setCurrentPage('onboarding');
+          }}
+          onGoToLogin={() => setCurrentPage('login')}
+        />
+      );
+    }
     return (
       <>
         <RodasDeConversa onBack={goBack} posts={rodasPosts} onOpenPost={handleOpenPost} onSendPost={handleSendPost} />
@@ -1835,9 +1896,18 @@ const App = () => {
   if (currentPage === 'aldeia') {
     return (
       <>
-        <AldeiaPage onNavigate={(page) => navigateTo(page)} posts={rodasPosts} onComingSoon={() => setShowComingSoon(true)} />
+        <AldeiaPage
+          onNavigate={(page) => navigateTo(page)}
+          posts={rodasPosts}
+          onComingSoon={() => setShowComingSoon(true)}
+          isLoggedIn={isLoggedIn}
+          onRequireLogin={(action) => {
+            setPendingAction(action);
+            navigateTo('signup');
+          }}
+        />
         {showComingSoon && (
-          <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={!!savedUser} />
+          <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} />
         )}
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
@@ -1907,7 +1977,12 @@ const App = () => {
       
       {/* Coming Soon Popup */}
       {showComingSoon && (
-        <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={!!savedUser} />
+        <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} />
+      )}
+
+      {/* Post Pending Popup */}
+      {showPostPendingPopup && (
+        <PostPendingPopup onClose={() => setShowPostPendingPopup(false)} />
       )}
 
       {/* Footer Navigation - Floating */}
