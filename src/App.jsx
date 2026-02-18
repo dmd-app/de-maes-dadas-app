@@ -524,21 +524,19 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon }) => {
         </div>
       </section>
 
-      <div className="flex overflow-x-auto px-6 gap-4 pb-4 snap-x hide-scrollbar bg-soft-bg">
-        <button onClick={() => onNavigate && onNavigate('rodas')} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
-          <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink">
-            <Users size={24} />
+      <div className="grid grid-cols-2 gap-4 px-6 pb-4 bg-soft-bg">
+        <button onClick={() => onNavigate && onNavigate('rodas')} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
+            <MessageCircle size={24} />
           </div>
-          <span className="text-gray-700 font-sans font-medium text-sm text-center">Rodas de<br />Conversa</span>
+          <span className="font-semibold text-gray-700 text-sm text-center leading-tight">Rodas de Conversa</span>
         </button>
 
-
-
-        <button onClick={onComingSoon} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center gap-3 hover:shadow-md transition-shadow flex-shrink-0 snap-center" style={{ minWidth: "140px" }}>
-          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple">
+        <button onClick={onComingSoon} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
             <BookOpen size={24} />
           </div>
-          <span className="text-gray-700 font-sans font-medium text-sm text-center">Biblioteca<br />(O Espelho)</span>
+          <span className="font-semibold text-gray-700 text-sm text-center leading-tight">{"Biblioteca\n(O Espelho)"}</span>
         </button>
       </div>
     </>
