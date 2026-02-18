@@ -1860,7 +1860,7 @@ const App = () => {
           const userData = { name: username, email };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
-          goAfterAuth();
+          resolvePendingAction();
         }}
         onGoToSignup={() => setCurrentPage('signup')}
       />
