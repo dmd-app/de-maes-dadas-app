@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus } from 'lucide-react';
 import './index.css';
 
@@ -548,19 +548,26 @@ const MoodCup = () => {
   );
 };
 
-const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequireLogin }) => {
-  const [isPanicOpen, setIsPanicOpen] = useState(false);
-  const [message, setMessage] = useState('');
+const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequireLogin, draftMessage, setDraftMessage, isPanicOpen, setIsPanicOpen }) => {
+  const panicPanelRef = useRef(null);
+
+  useEffect(() => {
+    if (isPanicOpen && draftMessage && panicPanelRef.current) {
+      setTimeout(() => {
+        panicPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, []);
 
   const handleSend = () => {
-    if (message.trim()) {
+    if (draftMessage.trim()) {
       if (isLoggedIn) {
-        onSendPost && onSendPost(message.trim());
+        onSendPost && onSendPost(draftMessage.trim());
+        setDraftMessage('');
+        setIsPanicOpen(false);
       } else {
-        onRequireLogin && onRequireLogin({ type: 'post', text: message.trim() });
+        onRequireLogin && onRequireLogin({ type: 'post', text: draftMessage.trim() });
       }
-      setMessage('');
-      setIsPanicOpen(false);
     }
   };
 
@@ -576,15 +583,15 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequir
         </button>
 
         {/* Inline expand below button */}
-        <div className={`col-span-2 overflow-hidden transition-all duration-300 ease-in-out ${isPanicOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div ref={panicPanelRef} className={`col-span-2 overflow-hidden transition-all duration-300 ease-in-out ${isPanicOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
             <Heart size={36} className="text-[#FF66C4] mb-3 fill-[#FF66C4]" />
             <h4 className="text-gray-800 font-bold mb-1">{"O que está pesando aí dentro?"}</h4>
             <p className="text-gray-400 text-sm mb-4">Desabafe...</p>
             
             <textarea 
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              value={draftMessage}
+              onChange={(e) => setDraftMessage(e.target.value)}
               className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF66C4] focus:outline-none text-gray-700 resize-none h-28 mb-4 text-sm"
               placeholder="Escreva aqui seus sentimentos..."
             ></textarea>
@@ -592,9 +599,9 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequir
             <div className="flex flex-col gap-2 w-full">
               <button 
                 onClick={handleSend}
-                disabled={!message.trim()}
+                disabled={!draftMessage.trim()}
                 className={`w-full py-3 font-bold rounded-full text-sm transition-all active:scale-[0.98] ${
-                  message.trim()
+                  draftMessage.trim()
                     ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-md'
                     : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
@@ -603,7 +610,7 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequir
               </button>
 
               <button 
-                onClick={() => { setIsPanicOpen(false); setMessage(''); }}
+                onClick={() => { setIsPanicOpen(false); setDraftMessage(''); }}
                 className="w-full py-2.5 text-gray-400 font-medium text-sm"
               >
                 Cancelar
@@ -1553,6 +1560,8 @@ const App = () => {
   const [showComingSoon, setShowComingSoon] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
   const [reviewPopupType, setReviewPopupType] = useState(null);
+  const [draftMessage, setDraftMessage] = useState('');
+  const [isPanicOpen, setIsPanicOpen] = useState(false);
   const [onboardingSeen, setOnboardingSeen] = useState(() => localStorage.getItem('dmd_onboarding_seen') === 'true');
 
   const isLoggedIn = !!savedUser;
@@ -1576,6 +1585,8 @@ const App = () => {
         handleSendPost(pendingAction.text, 'Desabafo', 'bg-[#FF66C4] text-white');
         setReviewPopupType('post');
         setPendingAction(null);
+        setDraftMessage('');
+        setIsPanicOpen(false);
       } else if (pendingAction.type === 'rodas') {
         setPendingAction(null);
         setCurrentPage('rodas');
@@ -1605,9 +1616,13 @@ const App = () => {
       while (previousPage && ['onboarding', 'signup', 'login'].includes(previousPage)) {
         previousPage = newHistory.pop();
       }
-      setCurrentPage(previousPage || 'inicio');
+      const destination = previousPage || 'inicio';
+      setCurrentPage(destination);
       setSelectedPostIdx(null);
-      window.scrollTo(0, 0);
+      // Don't scroll to top if returning to inicio with draft open - ActionGrid will scroll to the panel
+      if (!(destination === 'inicio' && isPanicOpen && draftMessage)) {
+        window.scrollTo(0, 0);
+      }
       return newHistory;
     });
   };
@@ -2087,6 +2102,10 @@ const App = () => {
           setPendingAction(action);
           navigateTo('signup');
         }}
+        draftMessage={draftMessage}
+        setDraftMessage={setDraftMessage}
+        isPanicOpen={isPanicOpen}
+        setIsPanicOpen={setIsPanicOpen}
       />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" onComingSoon={() => setShowComingSoon(true)} />
 
