@@ -31,7 +31,7 @@ export default async function handler(req, res) {
             SOURCE: 'app_demaesdadas',
             ...attributes,
           },
-          listIds: listIds || [2],
+          listIds: listIds || [5],
           updateEnabled: true,
         }),
       });
