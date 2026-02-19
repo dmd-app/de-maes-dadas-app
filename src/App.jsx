@@ -1686,6 +1686,7 @@ const App = () => {
     setSelectedPostIdx(0);
     setReviewPopupType('post');
     navigateTo('postDetail');
+    setTimeout(() => window.scrollTo(0, 0), 50);
   };
 
   const handleOpenPost = (idx) => {
@@ -1826,7 +1827,7 @@ const App = () => {
     },
     {
       title: "A Luz Vermelha da Raiva",
-      desc: "Entenda por que voc���� explode e como lidar com a culpa.",
+      desc: "Entenda por que voc������ explode e como lidar com a culpa.",
       tag: "PSICOLOGIA",
       bgClass: "bg-gradient-to-br from-yellow-200 to-orange-100",
       image: "/images/luz-vermelha-raiva.jpeg"
