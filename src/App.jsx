@@ -2167,6 +2167,8 @@ const App = () => {
         <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
       )}
 
+      <MoodCup />
+
       <ActionGrid
         onNavigate={(page) => navigateTo(page)}
         onSendPost={handleSendPost}
