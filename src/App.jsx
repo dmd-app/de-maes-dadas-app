@@ -2112,8 +2112,29 @@ const App = () => {
           onOpenPost={handleOpenPost}
         />
         {showComingSoon && (
-  <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} />
-  )}
+          <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} />
+        )}
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+          <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <Heart size={22} />
+            <span>Inicio</span>
+          </button>
+          <button className="flex flex-col items-center gap-1 text-gray-800">
+            <AldeiaIcon size={22} filled color="#374151" />
+            <span className="font-semibold">Aldeia</span>
+          </button>
+          <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
+            <User size={22} />
+            <span>Perfil</span>
+          </button>
+        </nav>
+      </>
+    );
+  }
+
+  // Render Inicio (default)
+  return (
+    <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
 
       {/* Account Deleted Popup */}
       {showAccountDeleted && (
@@ -2122,7 +2143,7 @@ const App = () => {
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
               <Check size={28} className="text-green-600" />
             </div>
-            <h3 className="font-bold text-gray-800 text-lg mb-2">Conta exclu&iacute;da</h3>
+            <h3 className="font-bold text-gray-800 text-lg mb-2">{"Conta exclu\u00edda"}</h3>
             <p className="text-sm text-gray-500 leading-relaxed mb-5">
               {"Sua conta foi exclu\u00edda com sucesso. Sentiremos sua falta na Aldeia."}
             </p>
