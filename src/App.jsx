@@ -560,7 +560,7 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequir
   }, []);
 
   const handleSend = () => {
-    if (draftMessage.trim()) {
+  if (draftMessage.trim()) {
       if (isLoggedIn) {
         onSendPost && onSendPost(draftMessage.trim());
         setDraftMessage('');
