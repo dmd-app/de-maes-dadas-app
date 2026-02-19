@@ -575,7 +575,15 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequir
     <>
       <section className="px-6 py-4 grid grid-cols-2 gap-4 bg-soft-bg">
         <button 
-          onClick={() => setIsPanicOpen(!isPanicOpen)}
+          onClick={() => {
+            const willOpen = !isPanicOpen;
+            setIsPanicOpen(willOpen);
+            if (willOpen) {
+              setTimeout(() => {
+                panicPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }, 350);
+            }
+          }}
           className="col-span-2 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white p-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all"
         >
           <Heart fill="white" size={20} />
