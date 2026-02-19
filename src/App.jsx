@@ -1573,8 +1573,6 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
 // --- UTILITIES ---
 
 
-
-
 const getSavedUser = () => {
   try {
     return JSON.parse(localStorage.getItem('dmd_user') || 'null');
