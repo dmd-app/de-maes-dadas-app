@@ -1286,15 +1286,6 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
                 </div>
                 <span className="text-sm font-semibold text-gray-700">{comment.author}</span>
                 <span className="text-xs text-gray-400">{" \u2022 "}{comment.time}</span>
-                {comment.status === 'pending' && (
-                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">{"Aguardando confirma\u00e7\u00e3o"}</span>
-                )}
-                {comment.status === 'inactive' && (
-                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-gray-200 text-gray-600">Inativo</span>
-                )}
-                {comment.status === 'rejected' && (
-                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700">{"N\u00e3o aprovado"}</span>
-                )}
               </div>
               <p className="text-sm text-gray-600 leading-relaxed pl-9">{comment.text}</p>
 
