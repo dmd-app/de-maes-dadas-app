@@ -1884,9 +1884,13 @@ const App = () => {
           const userData = { name: username, email };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
-          setPendingAction(null);
-          setCurrentPage('inicio');
-          window.scrollTo(0, 0);
+          if (pendingAction && pendingAction.type === 'post') {
+            resolvePendingAction();
+          } else {
+            setPendingAction(null);
+            setCurrentPage('inicio');
+            window.scrollTo(0, 0);
+          }
         }}
         onGoToSignup={() => setCurrentPage('signup')}
       />
