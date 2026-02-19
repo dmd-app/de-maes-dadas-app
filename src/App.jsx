@@ -1826,7 +1826,7 @@ const App = () => {
     },
     {
       title: "A Luz Vermelha da Raiva",
-      desc: "Entenda por que voc�� explode e como lidar com a culpa.",
+      desc: "Entenda por que voc���� explode e como lidar com a culpa.",
       tag: "PSICOLOGIA",
       bgClass: "bg-gradient-to-br from-yellow-200 to-orange-100",
       image: "/images/luz-vermelha-raiva.jpeg"
@@ -1849,13 +1849,13 @@ const App = () => {
     {
       title: "Corpo, Emoção e Sono",
       desc: "Temas que atravessam a maternidade real, sem filtro.",
-      tag: "TEMA",
+      tag: "EVENTO",
       bgClass: "bg-gradient-to-br from-sky-200 to-blue-300"
     },
     {
       title: "Espiritualidade e Cuidado",
       desc: "O sagrado no cotidiano de quem cuida.",
-      tag: "TEMA",
+      tag: "EVENTO",
       bgClass: "bg-gradient-to-br from-purple-200 to-violet-300"
     }
   ];
