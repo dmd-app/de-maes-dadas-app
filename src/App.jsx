@@ -1,6 +1,25 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus } from 'lucide-react';
 import './index.css';
+
+// --- BREVO CRM HELPER ---
+const sendToBrevo = async (action, data) => {
+  try {
+    const response = await fetch('/api/brevo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, ...data }),
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      console.error('Brevo error:', result.error);
+    }
+    return result;
+  } catch (err) {
+    console.error('Brevo connection error:', err);
+    return { error: err.message };
+  }
+};
 
 // --- ALDEIA ICON (3 circles in triangle) ---
 const AldeiaIcon = ({ size = 24, filled = false, color = "currentColor" }) => (
@@ -316,7 +335,7 @@ const OnboardingPage = ({ onComplete }) => {
       {step === 1 && (
         <>
           <div className="flex-1 flex flex-col px-10 pt-8 pb-10">
-            <h2 className="text-2xl font-bold text-gray-800 leading-tight mb-1">Nosso Acordo</h2>
+            <h2 className="text-2xl font-bold text-gray-800 leading-tight mb-1 text-center">Nosso Acordo</h2>
             <p className="text-sm text-gray-400 mb-6">{"Para que essa seja uma comunidade segura, combinamos:"}</p>
 
             <div className="flex flex-col gap-4">
@@ -366,14 +385,15 @@ const ComingSoonPopup = ({ onClose, isLoggedIn }) => {
   const [submitted, setSubmitted] = useState(false);
 
   const handleNotify = () => {
-    if (notifyEmail.trim() && notifyEmail.includes('@')) {
-      setSubmitted(true);
-    }
+  if (notifyEmail.trim() && notifyEmail.includes('@')) {
+  sendToBrevo('notify_coming_soon', { email: notifyEmail.trim() });
+  setSubmitted(true);
+  }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-10">
-      <div className="bg-white rounded-3xl p-8 max-w-xs w-full text-center shadow-2xl">
+    <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-6">
+      <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl">
         <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
           <Heart size={28} className="text-[#FF66C4]" />
         </div>
@@ -391,12 +411,12 @@ const ComingSoonPopup = ({ onClose, isLoggedIn }) => {
                 value={notifyEmail}
                 onChange={(e) => setNotifyEmail(e.target.value)}
                 placeholder="seu@email.com"
-                className="flex-1 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
+                className="flex-1 min-w-0 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
               />
               <button
                 onClick={handleNotify}
                 disabled={!notifyEmail.trim() || !notifyEmail.includes('@')}
-                className={`px-4 py-2.5 rounded-xl font-bold text-xs transition-all active:scale-[0.98] ${
+                className={`shrink-0 px-4 py-2.5 rounded-xl font-bold text-xs transition-all active:scale-[0.98] ${
                   notifyEmail.trim() && notifyEmail.includes('@')
                     ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white'
                     : 'bg-gray-100 text-gray-300'
@@ -548,19 +568,26 @@ const MoodCup = () => {
   );
 };
 
-const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequireLogin }) => {
-  const [isPanicOpen, setIsPanicOpen] = useState(false);
-  const [message, setMessage] = useState('');
+const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequireLogin, draftMessage, setDraftMessage, isPanicOpen, setIsPanicOpen }) => {
+  const panicPanelRef = useRef(null);
+
+  useEffect(() => {
+    if (isPanicOpen && draftMessage && panicPanelRef.current) {
+      setTimeout(() => {
+        panicPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, []);
 
   const handleSend = () => {
-    if (message.trim()) {
+  if (draftMessage.trim()) {
       if (isLoggedIn) {
-        onSendPost && onSendPost(message.trim());
+        onSendPost && onSendPost(draftMessage.trim());
+        setDraftMessage('');
+        setIsPanicOpen(false);
       } else {
-        onRequireLogin && onRequireLogin({ type: 'post', text: message.trim() });
+        onRequireLogin && onRequireLogin({ type: 'post', text: draftMessage.trim() });
       }
-      setMessage('');
-      setIsPanicOpen(false);
     }
   };
 
@@ -568,7 +595,15 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequir
     <>
       <section className="px-6 py-4 grid grid-cols-2 gap-4 bg-soft-bg">
         <button 
-          onClick={() => setIsPanicOpen(!isPanicOpen)}
+          onClick={() => {
+            const willOpen = !isPanicOpen;
+            setIsPanicOpen(willOpen);
+            if (willOpen) {
+              setTimeout(() => {
+                panicPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }, 350);
+            }
+          }}
           className="col-span-2 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white p-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all"
         >
           <Heart fill="white" size={20} />
@@ -576,15 +611,15 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequir
         </button>
 
         {/* Inline expand below button */}
-        <div className={`col-span-2 overflow-hidden transition-all duration-300 ease-in-out ${isPanicOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div ref={panicPanelRef} className={`col-span-2 overflow-hidden transition-all duration-300 ease-in-out ${isPanicOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
             <Heart size={36} className="text-[#FF66C4] mb-3 fill-[#FF66C4]" />
             <h4 className="text-gray-800 font-bold mb-1">{"O que está pesando aí dentro?"}</h4>
             <p className="text-gray-400 text-sm mb-4">Desabafe...</p>
             
             <textarea 
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              value={draftMessage}
+              onChange={(e) => setDraftMessage(e.target.value)}
               className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF66C4] focus:outline-none text-gray-700 resize-none h-28 mb-4 text-sm"
               placeholder="Escreva aqui seus sentimentos..."
             ></textarea>
@@ -592,18 +627,18 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequir
             <div className="flex flex-col gap-2 w-full">
               <button 
                 onClick={handleSend}
-                disabled={!message.trim()}
+                disabled={!draftMessage.trim()}
                 className={`w-full py-3 font-bold rounded-full text-sm transition-all active:scale-[0.98] ${
-                  message.trim()
+                  draftMessage.trim()
                     ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-md'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-400'
                 }`}
               >
                 Enviar para a Aldeia
               </button>
 
               <button 
-                onClick={() => { setIsPanicOpen(false); setMessage(''); }}
+                onClick={() => { setIsPanicOpen(false); setDraftMessage(''); }}
                 className="w-full py-2.5 text-gray-400 font-medium text-sm"
               >
                 Cancelar
@@ -934,7 +969,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
 };
 
 // --- ALDEIA PAGE ---
-const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogin }) => {
+const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogin, onOpenPost }) => {
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       {/* Header */}
@@ -981,8 +1016,18 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogi
           }} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
         </div>
         <div className="flex flex-col gap-3">
-          {posts.filter((p) => !p.status || p.status === 'active').slice(0, 2).map((post, idx) => (
-            <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          {posts.map((post, idx) => ({ ...post, originalIdx: idx })).filter((p) => !p.status || p.status === 'active').slice(0, 2).map((post) => (
+            <div
+              key={post.originalIdx}
+              onClick={() => {
+                if (isLoggedIn) {
+                  onOpenPost && onOpenPost(post.originalIdx);
+                } else {
+                  onRequireLogin && onRequireLogin({ type: 'rodas' });
+                }
+              }}
+              className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform"
+            >
               <div className="flex items-center gap-2 mb-2">
                 <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
                   {post.category}
@@ -1261,15 +1306,6 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
                 </div>
                 <span className="text-sm font-semibold text-gray-700">{comment.author}</span>
                 <span className="text-xs text-gray-400">{" \u2022 "}{comment.time}</span>
-                {comment.status === 'pending' && (
-                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">{"Aguardando confirma\u00e7\u00e3o"}</span>
-                )}
-                {comment.status === 'inactive' && (
-                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-gray-200 text-gray-600">Inativo</span>
-                )}
-                {comment.status === 'rejected' && (
-                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700">{"N\u00e3o aprovado"}</span>
-                )}
               </div>
               <p className="text-sm text-gray-600 leading-relaxed pl-9">{comment.text}</p>
 
@@ -1357,9 +1393,9 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
 };
 
 // --- PROFILE PAGE ---
-const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount }) => {
+const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, onOpenPost }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const myPosts = posts.filter((p) => p.author === "Eu");
+  const myPosts = posts.map((p, idx) => ({ ...p, originalIdx: idx })).filter((p) => p.author === "Eu");
   const totalLikes = myPosts.reduce((sum, p) => sum + (p.likes || 0), 0);
   const totalComments = myPosts.reduce((sum, p) => sum + (p.commentsList?.length || 0), 0);
 
@@ -1431,12 +1467,36 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount }) 
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {myPosts.map((post, idx) => (
-              <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-2 mb-2">
+            {myPosts.map((post) => (
+              <div
+                key={post.originalIdx}
+                onClick={() => onOpenPost && onOpenPost(post.originalIdx)}
+                className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform"
+              >
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
                   <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
                     {post.category}
                   </span>
+                  {post.status === 'pending' && (
+                    <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-700">
+                      {"Aguardando confirma\u00e7\u00e3o"}
+                    </span>
+                  )}
+                  {post.status === 'inactive' && (
+                    <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-gray-200 text-gray-600">
+                      Inativo
+                    </span>
+                  )}
+                  {post.status === 'rejected' && (
+                    <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-red-100 text-red-700">
+                      {"N\u00e3o aprovado"}
+                    </span>
+                  )}
+                  {(!post.status || post.status === 'active') && (
+                    <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-green-100 text-green-700">
+                      Ativo
+                    </span>
+                  )}
                   <span className="text-xs text-gray-400">{post.time}</span>
                 </div>
                 <p className="text-sm font-semibold text-gray-700">{post.title}</p>
@@ -1533,7 +1593,6 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount }) 
 // --- UTILITIES ---
 
 
-
 const getSavedUser = () => {
   try {
     return JSON.parse(localStorage.getItem('dmd_user') || 'null');
@@ -1551,8 +1610,11 @@ const App = () => {
   const [userName, setUserName] = useState(savedUser?.name || '');
   const [userEmail, setUserEmail] = useState(savedUser?.email || '');
   const [showComingSoon, setShowComingSoon] = useState(false);
+  const [showAccountDeleted, setShowAccountDeleted] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
   const [reviewPopupType, setReviewPopupType] = useState(null);
+  const [draftMessage, setDraftMessage] = useState('');
+  const [isPanicOpen, setIsPanicOpen] = useState(false);
   const [onboardingSeen, setOnboardingSeen] = useState(() => localStorage.getItem('dmd_onboarding_seen') === 'true');
 
   const isLoggedIn = !!savedUser;
@@ -1576,18 +1638,18 @@ const App = () => {
         handleSendPost(pendingAction.text, 'Desabafo', 'bg-[#FF66C4] text-white');
         setReviewPopupType('post');
         setPendingAction(null);
+        setDraftMessage('');
+        setIsPanicOpen(false);
       } else if (pendingAction.type === 'rodas') {
         setPendingAction(null);
         setCurrentPage('rodas');
         window.scrollTo(0, 0);
       } else {
         setPendingAction(null);
-        setCurrentPage('inicio');
-        window.scrollTo(0, 0);
+        goBack();
       }
     } else {
-      setCurrentPage('inicio');
-      window.scrollTo(0, 0);
+      goBack();
     }
   };
 
@@ -1605,9 +1667,13 @@ const App = () => {
       while (previousPage && ['onboarding', 'signup', 'login'].includes(previousPage)) {
         previousPage = newHistory.pop();
       }
-      setCurrentPage(previousPage || 'inicio');
+      const destination = previousPage || 'inicio';
+      setCurrentPage(destination);
       setSelectedPostIdx(null);
-      window.scrollTo(0, 0);
+      // Don't scroll to top if returning to inicio with draft open - ActionGrid will scroll to the panel
+      if (!(destination === 'inicio' && isPanicOpen && draftMessage)) {
+        window.scrollTo(0, 0);
+      }
       return newHistory;
     });
   };
@@ -1629,6 +1695,10 @@ const App = () => {
     setSelectedPostIdx(0);
     setReviewPopupType('post');
     navigateTo('postDetail');
+    setTimeout(() => window.scrollTo(0, 0), 50);
+    if (userEmail) {
+      sendToBrevo('send_event', { email: userEmail, attributes: { LAST_POST_DATE: new Date().toISOString().split('T')[0], HAS_POSTED: true } });
+    }
   };
 
   const handleOpenPost = (idx) => {
@@ -1769,7 +1839,7 @@ const App = () => {
     },
     {
       title: "A Luz Vermelha da Raiva",
-      desc: "Entenda por que voc�� explode e como lidar com a culpa.",
+      desc: "Entenda por que voc\u00ea explode e como lidar com a culpa.",
       tag: "PSICOLOGIA",
       bgClass: "bg-gradient-to-br from-yellow-200 to-orange-100",
       image: "/images/luz-vermelha-raiva.jpeg"
@@ -1792,13 +1862,13 @@ const App = () => {
     {
       title: "Corpo, Emoção e Sono",
       desc: "Temas que atravessam a maternidade real, sem filtro.",
-      tag: "TEMA",
+      tag: "EVENTO",
       bgClass: "bg-gradient-to-br from-sky-200 to-blue-300"
     },
     {
       title: "Espiritualidade e Cuidado",
       desc: "O sagrado no cotidiano de quem cuida.",
-      tag: "TEMA",
+      tag: "EVENTO",
       bgClass: "bg-gradient-to-br from-purple-200 to-violet-300"
     }
   ];
@@ -1835,7 +1905,13 @@ const App = () => {
           const userData = { name: username, email };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
-          goAfterAuth();
+          sendToBrevo('create_contact', { email, name: username, attributes: { LAST_LOGIN: new Date().toISOString().split('T')[0] } });
+          if (pendingAction && pendingAction.type === 'post') {
+            resolvePendingAction();
+          } else {
+            setPendingAction(null);
+            goBack();
+          }
         }}
         onGoToSignup={() => setCurrentPage('signup')}
       />
@@ -1853,6 +1929,7 @@ const App = () => {
           const userData = { name: username, email };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
+          sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
           goAfterAuth();
         }}
         onGoToLogin={() => setCurrentPage('login')}
@@ -1878,7 +1955,12 @@ const App = () => {
     if (!isLoggedIn) {
       return (
         <>
-          <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col items-center justify-center px-8">
+          <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
+            <header className="p-6 pb-2 bg-soft-bg">
+              <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
+              <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
+            </header>
+            <div className="flex flex-col items-center justify-center flex-1 px-8">
             <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mb-6">
               <User size={36} className="text-gray-400" />
             </div>
@@ -1896,18 +1978,19 @@ const App = () => {
             >
               {"J\u00e1 tenho conta"}
             </button>
+            </div>
           </div>
-          <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+          <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
             <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-              <Heart size={20} />
+              <Heart size={22} />
               <span>Inicio</span>
             </button>
             <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-              <AldeiaIcon size={20} />
+              <AldeiaIcon size={22} />
               <span>Aldeia</span>
             </button>
             <button className="flex flex-col items-center gap-1 text-gray-800">
-              <User size={20} fill="#374151" stroke="#374151" />
+              <User size={22} fill="#374151" stroke="#374151" />
               <span className="font-semibold">Perfil</span>
             </button>
           </nav>
@@ -1920,6 +2003,7 @@ const App = () => {
           userName={userName}
           userEmail={userEmail}
           posts={rodasPosts}
+          onOpenPost={handleOpenPost}
           onLogout={() => {
             setUserName('');
             setUserEmail('');
@@ -1938,22 +2022,22 @@ const App = () => {
             localStorage.removeItem('dmd_user');
             localStorage.removeItem('dmd_onboarding_seen');
             setCurrentPage('inicio');
+            setPageHistory([]);
             window.scrollTo(0, 0);
+            setShowAccountDeleted(true);
           }}
         />
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={20} />
+            <Heart size={22} />
             <span>Inicio</span>
           </button>
           <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <AldeiaIcon size={20} />
+            <AldeiaIcon size={22} />
             <span>Aldeia</span>
           </button>
-
-
           <button className="flex flex-col items-center gap-1 text-gray-800">
-            <User size={20} fill="#374151" stroke="#374151" />
+            <User size={22} fill="#374151" stroke="#374151" />
             <span className="font-semibold">Perfil</span>
           </button>
         </nav>
@@ -1976,21 +2060,19 @@ const App = () => {
           onEditPost={handleEditPost}
         />
         {reviewPopupType && (
-          <ReviewPendingPopup type={reviewPopupType} onClose={() => setReviewPopupType(null)} />
+          <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
         )}
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-[10px] font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={20} />
+            <Heart size={22} />
             <span>Inicio</span>
           </button>
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 text-gray-800">
-            <AldeiaIcon size={20} filled color="#374151" />
+            <AldeiaIcon size={22} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-
-
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <User size={20} />
+            <User size={22} />
             <span>Perfil</span>
           </button>
         </nav>
@@ -2003,15 +2085,16 @@ const App = () => {
     if (!isLoggedIn) {
       return (
         <SignupPage
-          onSignup={({ email, username }) => {
-            setUserName(username);
-            setUserEmail(email);
-            const userData = { name: username, email };
-            localStorage.setItem('dmd_user', JSON.stringify(userData));
-            setSavedUser(userData);
-            setPendingAction({ type: 'rodas' });
-            goAfterAuth();
-          }}
+        onSignup={({ email, username }) => {
+          setUserName(username);
+          setUserEmail(email);
+          const userData = { name: username, email };
+          localStorage.setItem('dmd_user', JSON.stringify(userData));
+          setSavedUser(userData);
+          sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
+          setPendingAction({ type: 'rodas' });
+          goAfterAuth();
+        }}
           onGoToLogin={() => setCurrentPage('login')}
         />
       );
@@ -2051,6 +2134,7 @@ const App = () => {
             setPendingAction(action);
             navigateTo('signup');
           }}
+          onOpenPost={handleOpenPost}
         />
         {showComingSoon && (
           <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} />
@@ -2064,9 +2148,8 @@ const App = () => {
             <AldeiaIcon size={22} filled color="#374151" />
             <span className="font-semibold">Aldeia</span>
           </button>
-
           <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <User size={24} />
+            <User size={22} />
             <span>Perfil</span>
           </button>
         </nav>
@@ -2074,10 +2157,44 @@ const App = () => {
     );
   }
 
+  // Render Inicio (default)
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
-      <Header userName={userName} />
+
+      {/* Header */}
+      <header className="p-6 pb-2 bg-soft-bg">
+        <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
+        <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
+      </header>
+
+      {/* Account Deleted Popup */}
+      {showAccountDeleted && (
+        <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-6">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+              <Check size={28} className="text-green-600" />
+            </div>
+            <h3 className="font-bold text-gray-800 text-lg mb-2">{"Conta exclu\u00edda"}</h3>
+            <p className="text-sm text-gray-500 leading-relaxed mb-5">
+              {"Sua conta foi exclu\u00edda com sucesso. Sentiremos sua falta na Aldeia."}
+            </p>
+            <button
+              onClick={() => setShowAccountDeleted(false)}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+            >
+              Entendi
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Review Pending Popup */}
+      {reviewPopupType && (
+        <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
+      )}
+
       <MoodCup />
+
       <ActionGrid
         onNavigate={(page) => navigateTo(page)}
         onSendPost={handleSendPost}
@@ -2087,6 +2204,10 @@ const App = () => {
           setPendingAction(action);
           navigateTo('signup');
         }}
+        draftMessage={draftMessage}
+        setDraftMessage={setDraftMessage}
+        isPanicOpen={isPanicOpen}
+        setIsPanicOpen={setIsPanicOpen}
       />
       <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" onComingSoon={() => setShowComingSoon(true)} />
 
@@ -2133,7 +2254,7 @@ const App = () => {
 
       {/* Review Pending Popup */}
       {reviewPopupType && (
-        <ReviewPendingPopup type={reviewPopupType} onClose={() => setReviewPopupType(null)} />
+        <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
       )}
 
       {/* Footer Navigation - Floating */}
