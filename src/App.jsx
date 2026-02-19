@@ -1626,12 +1626,10 @@ const App = () => {
         window.scrollTo(0, 0);
       } else {
         setPendingAction(null);
-        setCurrentPage('inicio');
-        window.scrollTo(0, 0);
+        goBack();
       }
     } else {
-      setCurrentPage('inicio');
-      window.scrollTo(0, 0);
+      goBack();
     }
   };
 
@@ -1888,8 +1886,7 @@ const App = () => {
             resolvePendingAction();
           } else {
             setPendingAction(null);
-            setCurrentPage('inicio');
-            window.scrollTo(0, 0);
+            goBack();
           }
         }}
         onGoToSignup={() => setCurrentPage('signup')}
