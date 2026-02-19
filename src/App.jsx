@@ -316,7 +316,7 @@ const OnboardingPage = ({ onComplete }) => {
       {step === 1 && (
         <>
           <div className="flex-1 flex flex-col px-10 pt-8 pb-10">
-            <h2 className="text-2xl font-bold text-gray-800 leading-tight mb-1">Nosso Acordo</h2>
+            <h2 className="text-2xl font-bold text-gray-800 leading-tight mb-1 text-center">Nosso Acordo</h2>
             <p className="text-sm text-gray-400 mb-6">{"Para que essa seja uma comunidade segura, combinamos:"}</p>
 
             <div className="flex flex-col gap-4">
