@@ -3,20 +3,79 @@ import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2
 import './index.css';
 
 // --- BREVO CRM HELPER ---
+const BREVO_API_KEY = import.meta.env.VITE_BREVO_API_KEY || '';
+const BREVO_LIST_SIGNUP = 5;
+
 const sendToBrevo = async (action, data) => {
+  if (!BREVO_API_KEY) {
+    console.warn('[v0] VITE_BREVO_API_KEY not set, skipping Brevo call');
+    return { error: 'No API key' };
+  }
   try {
-    const response = await fetch('/api/brevo', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, ...data }),
-    });
-    const result = await response.json();
-    if (!response.ok) {
-      console.error('Brevo error:', result.error);
+    if (action === 'create_contact') {
+      const response = await fetch('https://api.brevo.com/v3/contacts', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'content-type': 'application/json',
+          'api-key': BREVO_API_KEY,
+        },
+        body: JSON.stringify({
+          email: data.email,
+          attributes: { FIRSTNAME: data.name, ...(data.attributes || {}) },
+          listIds: [BREVO_LIST_SIGNUP],
+          updateEnabled: true,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok && result.code !== 'duplicate_parameter') {
+        console.error('[v0] Brevo create_contact error:', result);
+      } else {
+        console.log('[v0] Brevo contact created/updated:', data.email);
+      }
+      return result;
     }
-    return result;
+
+    if (action === 'notify_coming_soon') {
+      const response = await fetch('https://api.brevo.com/v3/contacts', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'content-type': 'application/json',
+          'api-key': BREVO_API_KEY,
+        },
+        body: JSON.stringify({
+          email: data.email,
+          attributes: { COMING_SOON_INTEREST: true },
+          listIds: [BREVO_LIST_SIGNUP],
+          updateEnabled: true,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      console.log('[v0] Brevo notify_coming_soon:', data.email, result);
+      return result;
+    }
+
+    if (action === 'send_event') {
+      const response = await fetch(`https://api.brevo.com/v3/contacts/${encodeURIComponent(data.email)}`, {
+        method: 'PUT',
+        headers: {
+          'accept': 'application/json',
+          'content-type': 'application/json',
+          'api-key': BREVO_API_KEY,
+        },
+        body: JSON.stringify({
+          attributes: data.attributes || {},
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      console.log('[v0] Brevo send_event:', data.email, result);
+      return result;
+    }
+
+    return { error: 'Unknown action' };
   } catch (err) {
-    console.error('Brevo connection error:', err);
+    console.error('[v0] Brevo connection error:', err);
     return { error: err.message };
   }
 };
