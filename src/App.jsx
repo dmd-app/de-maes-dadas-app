@@ -1591,6 +1591,7 @@ const App = () => {
   const [userName, setUserName] = useState(savedUser?.name || '');
   const [userEmail, setUserEmail] = useState(savedUser?.email || '');
   const [showComingSoon, setShowComingSoon] = useState(false);
+  const [showAccountDeleted, setShowAccountDeleted] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
   const [reviewPopupType, setReviewPopupType] = useState(null);
   const [draftMessage, setDraftMessage] = useState('');
@@ -1997,7 +1998,9 @@ const App = () => {
             localStorage.removeItem('dmd_user');
             localStorage.removeItem('dmd_onboarding_seen');
             setCurrentPage('inicio');
+            setPageHistory([]);
             window.scrollTo(0, 0);
+            setShowAccountDeleted(true);
           }}
         />
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
@@ -2109,31 +2112,35 @@ const App = () => {
           onOpenPost={handleOpenPost}
         />
         {showComingSoon && (
-          <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} />
-        )}
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-          <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={22} />
-            <span>Inicio</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-gray-800">
-            <AldeiaIcon size={22} filled color="#374151" />
-            <span className="font-semibold">Aldeia</span>
-          </button>
+  <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} />
+  )}
 
-          <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <User size={22} />
-            <span>Perfil</span>
-          </button>
-        </nav>
-      </>
-    );
-  }
+      {/* Account Deleted Popup */}
+      {showAccountDeleted && (
+        <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-6">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+              <Check size={28} className="text-green-600" />
+            </div>
+            <h3 className="font-bold text-gray-800 text-lg mb-2">Conta exclu&iacute;da</h3>
+            <p className="text-sm text-gray-500 leading-relaxed mb-5">
+              {"Sua conta foi exclu\u00edda com sucesso. Sentiremos sua falta na Aldeia."}
+            </p>
+            <button
+              onClick={() => setShowAccountDeleted(false)}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+            >
+              Entendi
+            </button>
+          </div>
+        </div>
+      )}
 
-  return (
-    <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
-      <Header userName={userName} />
-      <MoodCup />
+      {/* Review Pending Popup */}
+      {reviewPopupType && (
+        <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
+      )}
+
       <ActionGrid
         onNavigate={(page) => navigateTo(page)}
         onSendPost={handleSendPost}
