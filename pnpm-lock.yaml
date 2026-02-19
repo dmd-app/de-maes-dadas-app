@@ -55,7 +55,7 @@ importers:
         specifier: ^3.4.17
         version: 3.4.19
       vite:
-        specifier: 6.3.5
+        specifier: ^6.0.0
         version: 6.3.5(jiti@1.21.7)
 
 packages:
