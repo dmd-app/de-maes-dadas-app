@@ -2137,6 +2137,12 @@ const App = () => {
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
 
+      {/* Header */}
+      <header className="p-6 pb-2 bg-soft-bg">
+        <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
+        <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
+      </header>
+
       {/* Account Deleted Popup */}
       {showAccountDeleted && (
         <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-6">
