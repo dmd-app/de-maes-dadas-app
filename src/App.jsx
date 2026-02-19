@@ -2,6 +2,25 @@ import { useState, useRef, useEffect } from 'react';
 import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus } from 'lucide-react';
 import './index.css';
 
+// --- BREVO CRM HELPER ---
+const sendToBrevo = async (action, data) => {
+  try {
+    const response = await fetch('/api/brevo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, ...data }),
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      console.error('Brevo error:', result.error);
+    }
+    return result;
+  } catch (err) {
+    console.error('Brevo connection error:', err);
+    return { error: err.message };
+  }
+};
+
 // --- ALDEIA ICON (3 circles in triangle) ---
 const AldeiaIcon = ({ size = 24, filled = false, color = "currentColor" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -366,9 +385,10 @@ const ComingSoonPopup = ({ onClose, isLoggedIn }) => {
   const [submitted, setSubmitted] = useState(false);
 
   const handleNotify = () => {
-    if (notifyEmail.trim() && notifyEmail.includes('@')) {
-      setSubmitted(true);
-    }
+  if (notifyEmail.trim() && notifyEmail.includes('@')) {
+  sendToBrevo('notify_coming_soon', { email: notifyEmail.trim() });
+  setSubmitted(true);
+  }
   };
 
   return (
@@ -1676,6 +1696,9 @@ const App = () => {
     setReviewPopupType('post');
     navigateTo('postDetail');
     setTimeout(() => window.scrollTo(0, 0), 50);
+    if (userEmail) {
+      sendToBrevo('send_event', { email: userEmail, attributes: { LAST_POST_DATE: new Date().toISOString().split('T')[0], HAS_POSTED: true } });
+    }
   };
 
   const handleOpenPost = (idx) => {
@@ -1882,6 +1905,7 @@ const App = () => {
           const userData = { name: username, email };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
+          sendToBrevo('create_contact', { email, name: username, attributes: { LAST_LOGIN: new Date().toISOString().split('T')[0] } });
           if (pendingAction && pendingAction.type === 'post') {
             resolvePendingAction();
           } else {
@@ -1905,6 +1929,7 @@ const App = () => {
           const userData = { name: username, email };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
+          sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
           goAfterAuth();
         }}
         onGoToLogin={() => setCurrentPage('login')}
@@ -2060,15 +2085,16 @@ const App = () => {
     if (!isLoggedIn) {
       return (
         <SignupPage
-          onSignup={({ email, username }) => {
-            setUserName(username);
-            setUserEmail(email);
-            const userData = { name: username, email };
-            localStorage.setItem('dmd_user', JSON.stringify(userData));
-            setSavedUser(userData);
-            setPendingAction({ type: 'rodas' });
-            goAfterAuth();
-          }}
+        onSignup={({ email, username }) => {
+          setUserName(username);
+          setUserEmail(email);
+          const userData = { name: username, email };
+          localStorage.setItem('dmd_user', JSON.stringify(userData));
+          setSavedUser(userData);
+          sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
+          setPendingAction({ type: 'rodas' });
+          goAfterAuth();
+        }}
           onGoToLogin={() => setCurrentPage('login')}
         />
       );
