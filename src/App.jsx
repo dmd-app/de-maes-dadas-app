@@ -1408,8 +1408,14 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
 
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
-      {/* Header */}
-      <header className="relative overflow-hidden pt-12 pb-8 px-6">
+      {/* Standard Header */}
+      <header className="p-6 pb-2 bg-soft-bg">
+        <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
+        <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
+      </header>
+
+      {/* Profile Section */}
+      <div className="relative overflow-hidden pt-4 pb-8 px-6">
         <div className="w-48 h-48 rounded-full bg-[#FF66C4]/10 blur-3xl absolute -top-16 -right-16"></div>
         <div className="w-36 h-36 rounded-full bg-soft-blue/10 blur-3xl absolute -bottom-10 -left-10"></div>
         <div className="relative z-10">
@@ -1436,7 +1442,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Stats */}
       <div className="px-6 pb-6">
