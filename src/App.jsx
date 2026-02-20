@@ -38,6 +38,7 @@ const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const validate = () => {
     const newErrors = {};
@@ -50,11 +51,18 @@ const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
     return newErrors;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = validate();
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
-      onSignup({ email, username });
+      setLoading(true);
+      try {
+        await onSignup({ email, username, password });
+      } catch (err) {
+        setErrors({ general: err.message || 'Erro ao criar conta' });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -146,12 +154,18 @@ const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
           </p>
         </div>
         {errors.terms && <p className="text-xs text-red-400 -mt-2">{errors.terms}</p>}
+        {errors.general && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3 mt-1">
+            <p className="text-xs text-red-600 font-medium">{errors.general}</p>
+          </div>
+        )}
 
         <button
           onClick={handleSubmit}
-          className="w-full mt-4 py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide"
+          disabled={loading}
+          className={`w-full mt-4 py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading ? 'opacity-70' : ''}`}
         >
-          CRIAR CONTA
+          {loading ? 'CRIANDO CONTA...' : 'CRIAR CONTA'}
         </button>
 
         <p className="text-center text-xs text-gray-400 mt-2">
@@ -164,28 +178,33 @@ const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
 };
 
 // --- LOGIN PAGE (Entrar) ---
-const LoginPage = ({ onLogin, onGoToSignup, onBack }) => {
+const LoginPage = ({ onLogin, onGoToSignup, onBack, onForgotPassword }) => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const validate = () => {
     const newErrors = {};
-    if (!identifier.trim()) newErrors.identifier = 'Email ou nome de usu\u00e1rio obrigat\u00f3rio';
+    if (!identifier.trim()) newErrors.identifier = 'Email obrigat\u00f3rio';
+    else if (!/\S+@\S+\.\S+/.test(identifier)) newErrors.identifier = 'Insira um email v\u00e1lido';
     if (!password.trim()) newErrors.password = 'Senha obrigat\u00f3ria';
     return newErrors;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = validate();
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
-      const isEmail = identifier.includes('@');
-      onLogin({
-        email: isEmail ? identifier : '',
-        username: isEmail ? identifier.split('@')[0] : identifier,
-      });
+      setLoading(true);
+      try {
+        await onLogin({ email: identifier.trim(), password });
+      } catch (err) {
+        setErrors({ general: err.message || 'Erro ao entrar' });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -214,16 +233,16 @@ const LoginPage = ({ onLogin, onGoToSignup, onBack }) => {
       </div>
 
       <div className="flex-1 px-8 pb-10 flex flex-col gap-4">
-        {/* Email or Username */}
+        {/* Email */}
         <div>
-          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">{"Email ou nome de usu\u00e1rio"}</label>
+          <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Email</label>
           <div className={`flex items-center gap-3 bg-white rounded-xl border ${errors.identifier ? 'border-red-300' : 'border-gray-200'} px-4 py-3 focus-within:ring-2 focus-within:ring-soft-blue/30 transition-all`}>
             <Mail size={18} className="text-gray-400 flex-shrink-0" />
             <input
-              type="text"
+              type="email"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder={"seu@email.com ou nome de usu\u00e1rio"}
+              placeholder="seu@email.com"
               className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
           </div>
@@ -234,7 +253,7 @@ const LoginPage = ({ onLogin, onGoToSignup, onBack }) => {
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-xs font-semibold text-gray-600">Senha</label>
-            <button className="text-xs text-[#FF66C4] font-semibold">Esqueci minha senha</button>
+            <button onClick={() => onForgotPassword && onForgotPassword()} className="text-xs text-[#FF66C4] font-semibold">Esqueci minha senha</button>
           </div>
           <div className={`flex items-center gap-3 bg-white rounded-xl border ${errors.password ? 'border-red-300' : 'border-gray-200'} px-4 py-3 focus-within:ring-2 focus-within:ring-soft-blue/30 transition-all`}>
             <Lock size={18} className="text-gray-400 flex-shrink-0" />
@@ -253,11 +272,18 @@ const LoginPage = ({ onLogin, onGoToSignup, onBack }) => {
           {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password}</p>}
         </div>
 
+        {errors.general && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3 mt-1">
+            <p className="text-xs text-red-600 font-medium">{errors.general}</p>
+          </div>
+        )}
+
         <button
           onClick={handleSubmit}
-          className="w-full mt-4 py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide"
+          disabled={loading}
+          className={`w-full mt-4 py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading ? 'opacity-70' : ''}`}
         >
-          ENTRAR
+          {loading ? 'ENTRANDO...' : 'ENTRAR'}
         </button>
 
         <p className="text-center text-xs text-gray-400 mt-2">
@@ -1809,6 +1835,328 @@ const EmailConfirmRequiredPopup = ({ onClose, onResend }) => {
   );
 };
 
+// --- FORGOT PASSWORD PAGE ---
+const ForgotPasswordPage = ({ onBack, onCodeSent }) => {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) {
+      setError('Insira um email v\u00e1lido');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      // Request reset code from server
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'request_reset', email: email.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erro ao enviar');
+
+      // If server returned a code, send it via Brevo email
+      if (data.resetCode) {
+        await sendToBrevo('send_reset_code_email', {
+          email: email.trim(),
+          resetCode: data.resetCode,
+          userName: data.userName,
+        });
+      }
+
+      setSent(true);
+      // Navigate to code entry page
+      setTimeout(() => {
+        onCodeSent && onCodeSent(email.trim());
+      }, 1500);
+    } catch (err) {
+      setError(err.message || 'Erro ao enviar email');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-soft-bg max-w-md mx-auto font-sans text-gray-800 flex flex-col">
+      <div className="px-6 pt-6">
+        <button onClick={onBack} className="text-gray-500 active:scale-95 transition-transform">
+          <ArrowLeft size={22} />
+        </button>
+      </div>
+      <div className="flex-1 flex flex-col items-center justify-center px-8 pb-10">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center mx-auto mb-6">
+          <Lock size={36} className="text-white" />
+        </div>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2 text-center text-balance">{"Recuperar senha"}</h1>
+        <p className="text-sm text-gray-500 leading-relaxed text-center mb-6">
+          {"Insira o seu email e enviaremos um c\u00f3digo de 6 d\u00edgitos para redefinir a sua senha."}
+        </p>
+
+        {sent ? (
+          <div className="w-full bg-green-50 border border-green-200 rounded-2xl p-5 text-center">
+            <MailCheck size={32} className="text-green-600 mx-auto mb-3" />
+            <p className="text-sm font-semibold text-green-800">{"Email enviado!"}</p>
+            <p className="text-xs text-green-600 mt-1">{"Verifique a sua caixa de entrada e spam."}</p>
+          </div>
+        ) : (
+          <div className="w-full flex flex-col gap-4">
+            <div>
+              <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Email</label>
+              <div className={`flex items-center gap-3 bg-white rounded-xl border ${error ? 'border-red-300' : 'border-gray-200'} px-4 py-3 focus-within:ring-2 focus-within:ring-soft-blue/30 transition-all`}>
+                <Mail size={18} className="text-gray-400 flex-shrink-0" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); setError(''); }}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                  placeholder="seu@email.com"
+                  className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+                />
+              </div>
+              {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+            </div>
+
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className={`w-full py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading ? 'opacity-70' : ''}`}
+            >
+              {loading ? 'ENVIANDO...' : 'ENVIAR C\u00d3DIGO'}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// --- RESET PASSWORD PAGE (enter code + new password) ---
+const ResetPasswordPage = ({ email, onBack, onSuccess }) => {
+  const [code, setCode] = useState(['', '', '', '', '', '']);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [step, setStep] = useState('code'); // 'code' | 'password'
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const inputRefs = useRef([]);
+
+  const handleCodeChange = (index, value) => {
+    if (value.length > 1) value = value.slice(-1);
+    if (!/^\d*$/.test(value)) return;
+    const newCode = [...code];
+    newCode[index] = value;
+    setCode(newCode);
+    setError('');
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleCodeKeyDown = (index, e) => {
+    if (e.key === 'Backspace' && !code[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleCodePaste = (e) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    if (pasted.length === 6) {
+      setCode(pasted.split(''));
+      inputRefs.current[5]?.focus();
+    }
+  };
+
+  const fullCode = code.join('');
+
+  const handleVerifyCode = async () => {
+    if (fullCode.length !== 6) {
+      setError('Insira o c\u00f3digo completo');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'verify_reset_code', email, code: fullCode }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'C\u00f3digo inv\u00e1lido');
+      setStep('password');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!newPassword.trim()) {
+      setError('Insira a nova senha');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setError('M\u00ednimo 6 caracteres');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError('As senhas n\u00e3o coincidem');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reset_password', email, code: fullCode, newPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erro ao redefinir senha');
+      onSuccess && onSuccess();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-soft-bg max-w-md mx-auto font-sans text-gray-800 flex flex-col">
+      <div className="px-6 pt-6">
+        <button onClick={onBack} className="text-gray-500 active:scale-95 transition-transform">
+          <ArrowLeft size={22} />
+        </button>
+      </div>
+      <div className="flex-1 flex flex-col items-center justify-center px-8 pb-10">
+        {step === 'code' ? (
+          <>
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center mx-auto mb-6">
+              <Shield size={36} className="text-white" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2 text-center">{"Insira o c\u00f3digo"}</h1>
+            <p className="text-sm text-gray-500 leading-relaxed text-center mb-2">
+              {"Enviamos um c\u00f3digo de 6 d\u00edgitos para:"}
+            </p>
+            <p className="text-sm font-bold text-gray-700 mb-6">{email}</p>
+
+            <div className="flex gap-2 mb-4" onPaste={handleCodePaste}>
+              {code.map((digit, i) => (
+                <input
+                  key={i}
+                  ref={(el) => (inputRefs.current[i] = el)}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => handleCodeChange(i, e.target.value)}
+                  onKeyDown={(e) => handleCodeKeyDown(i, e)}
+                  className={`w-12 h-14 text-center text-xl font-bold bg-white rounded-xl border ${error ? 'border-red-300' : 'border-gray-200'} focus:ring-2 focus:ring-[#FF66C4]/30 focus:border-[#FF66C4] outline-none transition-all`}
+                />
+              ))}
+            </div>
+
+            {error && <p className="text-xs text-red-400 mb-3">{error}</p>}
+
+            <button
+              onClick={handleVerifyCode}
+              disabled={loading || fullCode.length !== 6}
+              className={`w-full py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading || fullCode.length !== 6 ? 'opacity-70' : ''}`}
+            >
+              {loading ? 'VERIFICANDO...' : 'VERIFICAR C\u00d3DIGO'}
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+              <Lock size={36} className="text-green-600" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2 text-center">{"Nova senha"}</h1>
+            <p className="text-sm text-gray-500 leading-relaxed text-center mb-6">
+              {"Escolha uma nova senha para a sua conta."}
+            </p>
+
+            <div className="w-full flex flex-col gap-4">
+              <div>
+                <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Nova senha</label>
+                <div className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3 focus-within:ring-2 focus-within:ring-soft-blue/30 transition-all">
+                  <Lock size={18} className="text-gray-400 flex-shrink-0" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => { setNewPassword(e.target.value); setError(''); }}
+                    placeholder={"M\u00ednimo 6 caracteres"}
+                    className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+                  />
+                  <button onClick={() => setShowPassword(!showPassword)} className="text-gray-400">
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Confirmar senha</label>
+                <div className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3 focus-within:ring-2 focus-within:ring-soft-blue/30 transition-all">
+                  <Lock size={18} className="text-gray-400 flex-shrink-0" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => { setConfirmPassword(e.target.value); setError(''); }}
+                    placeholder="Repita a nova senha"
+                    className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+                  <p className="text-xs text-red-600 font-medium">{error}</p>
+                </div>
+              )}
+
+              <button
+                onClick={handleResetPassword}
+                disabled={loading}
+                className={`w-full py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading ? 'opacity-70' : ''}`}
+              >
+                {loading ? 'REDEFININDO...' : 'REDEFINIR SENHA'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// --- PASSWORD RESET SUCCESS PAGE ---
+const PasswordResetSuccessPage = ({ onGoToLogin }) => (
+  <div className="min-h-screen bg-soft-bg flex flex-col items-center justify-center px-6 max-w-md mx-auto font-sans text-gray-800">
+    <div className="w-full text-center">
+      <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+        <Check size={36} className="text-green-600" />
+      </div>
+      <h1 className="text-2xl font-bold text-gray-800 mb-2">{"Senha redefinida!"}</h1>
+      <p className="text-sm text-gray-500 leading-relaxed mb-6">
+        {"A sua senha foi alterada com sucesso. Pode agora entrar com a nova senha."}
+      </p>
+      <button
+        onClick={onGoToLogin}
+        className="w-full py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide"
+      >
+        IR PARA LOGIN
+      </button>
+    </div>
+  </div>
+);
+
 // --- UTILITIES ---
 
 
@@ -1836,6 +2184,7 @@ const App = () => {
   const [isPanicOpen, setIsPanicOpen] = useState(false);
   const [onboardingSeen, setOnboardingSeen] = useState(() => localStorage.getItem('dmd_onboarding_seen') === 'true');
   const [showEmailConfirmRequired, setShowEmailConfirmRequired] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
 
   const isLoggedIn = !!savedUser;
   const isEmailConfirmed = !!savedUser?.emailConfirmed;
@@ -1871,12 +2220,20 @@ const App = () => {
 
       const user = getSavedUser();
       if (user && user.confirmToken === token && user.email === email && !user.emailConfirmed) {
-        // Mark as confirmed
+        // Mark as confirmed locally
         const updatedUser = { ...user, emailConfirmed: true };
         localStorage.setItem('dmd_user', JSON.stringify(updatedUser));
         setSavedUser(updatedUser);
         setUserName(updatedUser.name);
         setUserEmail(updatedUser.email);
+        // Also confirm on server (Supabase)
+        if (user.id) {
+          fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'confirm_email', userId: user.id }),
+          }).catch(() => {});
+        }
         setCurrentPage('emailConfirmed');
       } else if (user && user.emailConfirmed && user.email === email) {
         // Already confirmed
@@ -1932,7 +2289,7 @@ const App = () => {
       const newHistory = [...prev];
       let previousPage = newHistory.pop();
       // Skip auth/onboarding/email pages in history
-      while (previousPage && ['onboarding', 'signup', 'login', 'emailPending', 'emailConfirmed', 'emailConfirmFailed'].includes(previousPage)) {
+      while (previousPage && ['onboarding', 'signup', 'login', 'emailPending', 'emailConfirmed', 'emailConfirmFailed', 'forgotPassword', 'resetPassword', 'passwordResetSuccess'].includes(previousPage)) {
         previousPage = newHistory.pop();
       }
       const destination = previousPage || 'inicio';
@@ -2179,10 +2536,22 @@ const App = () => {
     return (
       <LoginPage
         onBack={pageHistory.length > 0 ? goBack : null}
-        onLogin={({ email, username }) => {
+        onLogin={async ({ email, password }) => {
+          const res = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'login', email, password }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Erro ao entrar');
+
+          const username = data.user.username || email.split('@')[0];
           setUserName(username);
           setUserEmail(email);
-          const userData = { name: username, email };
+          const userData = { id: data.user.id, name: username, email, emailConfirmed: !!data.user.emailConfirmed };
+          if (data.session) {
+            userData.accessToken = data.session.access_token;
+          }
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
           sendToBrevo('create_contact', { email, name: username, attributes: { LAST_LOGIN: new Date().toISOString().split('T')[0] } });
@@ -2194,6 +2563,7 @@ const App = () => {
           }
         }}
         onGoToSignup={() => setCurrentPage('signup')}
+        onForgotPassword={() => setCurrentPage('forgotPassword')}
       />
     );
   }
@@ -2203,11 +2573,19 @@ const App = () => {
     return (
       <SignupPage
         onBack={pageHistory.length > 0 ? goBack : null}
-        onSignup={({ email, username }) => {
+        onSignup={async ({ email, username, password }) => {
+          const res = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'signup', email, password, username }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
+
           setUserName(username);
           setUserEmail(email);
           const confirmToken = crypto.randomUUID();
-          const userData = { name: username, email, emailConfirmed: false, confirmToken };
+          const userData = { id: data.user.id, name: username, email, emailConfirmed: false, confirmToken };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
           sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
@@ -2255,6 +2633,42 @@ const App = () => {
           setCurrentPage('inicio');
           setPageHistory([]);
           window.scrollTo(0, 0);
+        }}
+      />
+    );
+  }
+
+  // Render Forgot Password page
+  if (currentPage === 'forgotPassword') {
+    return (
+      <ForgotPasswordPage
+        onBack={() => setCurrentPage('login')}
+        onCodeSent={(email) => {
+          setResetEmail(email);
+          setCurrentPage('resetPassword');
+        }}
+      />
+    );
+  }
+
+  // Render Reset Password page (enter code + new password)
+  if (currentPage === 'resetPassword') {
+    return (
+      <ResetPasswordPage
+        email={resetEmail}
+        onBack={() => setCurrentPage('forgotPassword')}
+        onSuccess={() => setCurrentPage('passwordResetSuccess')}
+      />
+    );
+  }
+
+  // Render Password Reset Success page
+  if (currentPage === 'passwordResetSuccess') {
+    return (
+      <PasswordResetSuccessPage
+        onGoToLogin={() => {
+          setCurrentPage('login');
+          setResetEmail('');
         }}
       />
     );
@@ -2416,11 +2830,19 @@ const App = () => {
     if (!isLoggedIn) {
       return (
         <SignupPage
-        onSignup={({ email, username }) => {
+        onSignup={async ({ email, username, password }) => {
+          const res = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'signup', email, password, username }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
+
           setUserName(username);
           setUserEmail(email);
           const confirmToken = crypto.randomUUID();
-          const userData = { name: username, email, emailConfirmed: false, confirmToken };
+          const userData = { id: data.user.id, name: username, email, emailConfirmed: false, confirmToken };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
           sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
