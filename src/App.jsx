@@ -406,15 +406,15 @@ const OnboardingPage = ({ onComplete }) => {
 
 // --- COMPONENTS ---
 
-const ComingSoonPopup = ({ onClose, isLoggedIn }) => {
-  const [notifyEmail, setNotifyEmail] = useState('');
+const ComingSoonPopup = ({ onClose, isLoggedIn, userEmail }) => {
+  const [notifyEmail, setNotifyEmail] = useState(isLoggedIn && userEmail ? userEmail : '');
   const [submitted, setSubmitted] = useState(false);
 
   const handleNotify = () => {
-  if (notifyEmail.trim() && notifyEmail.includes('@')) {
-  sendToBrevo('notify_coming_soon', { email: notifyEmail.trim() });
-  setSubmitted(true);
-  }
+    if (notifyEmail.trim() && notifyEmail.includes('@')) {
+      sendToBrevo('notify_coming_soon', { email: notifyEmail.trim() });
+      setSubmitted(true);
+    }
   };
 
   return (
@@ -428,7 +428,7 @@ const ComingSoonPopup = ({ onClose, isLoggedIn }) => {
           {"Estamos preparando algo especial para voc\u00ea. Em breve estar\u00e1 dispon\u00edvel!"}
         </p>
 
-        {!isLoggedIn && !submitted && (
+        {!submitted && (
           <div className="mb-4">
             <p className="text-xs font-semibold text-gray-600 mb-2">{"Avise-me quando estiver dispon\u00edvel"}</p>
             <div className="flex gap-2">
@@ -454,7 +454,7 @@ const ComingSoonPopup = ({ onClose, isLoggedIn }) => {
           </div>
         )}
 
-        {!isLoggedIn && submitted && (
+        {submitted && (
           <div className="mb-4 bg-green-50 rounded-xl p-3 border border-green-200">
             <p className="text-xs font-semibold text-green-700">{"Pronto! Vamos te avisar quando estiver dispon\u00edvel."}</p>
           </div>
@@ -2892,7 +2892,7 @@ const App = () => {
           onOpenPost={handleOpenPost}
         />
         {showComingSoon && (
-          <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} />
+          <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} userEmail={userEmail} />
         )}
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
@@ -3019,7 +3019,7 @@ const App = () => {
       
       {/* Coming Soon Popup */}
       {showComingSoon && (
-        <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} />
+        <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} userEmail={userEmail} />
       )}
 
       {/* Review Pending Popup */}
