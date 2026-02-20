@@ -1,3 +1,12 @@
+import { createClient } from '@supabase/supabase-js';
+
+const getSupabase = () => {
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ysyevqmpzrixfbezpams.supabase.co';
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) return null;
+  return createClient(url, serviceKey);
+};
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -78,7 +87,22 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true });
 
     } else if (action === 'notify_coming_soon') {
-      // Add contact interested in "coming soon" features to a specific list
+      const { feature, userId } = req.body;
+
+      // 1. Save to Supabase database
+      const supabase = getSupabase();
+      if (supabase) {
+        const insertData = { email, feature: feature || 'general' };
+        if (userId) insertData.user_id = userId;
+        const { error: dbError } = await supabase
+          .from('coming_soon_notifications')
+          .upsert(insertData, { onConflict: 'email,feature' });
+        if (dbError) {
+          console.error('Supabase insert error:', dbError);
+        }
+      }
+
+      // 2. Add contact to Brevo CRM list
       const response = await fetch('https://api.brevo.com/v3/contacts', {
         method: 'POST',
         headers: {
@@ -91,6 +115,7 @@ export default async function handler(req, res) {
           attributes: {
             SOURCE: 'coming_soon_notify',
             COMING_SOON_INTEREST: true,
+            COMING_SOON_FEATURE: feature || 'general',
           },
           listIds: listIds || [3],
           updateEnabled: true,
