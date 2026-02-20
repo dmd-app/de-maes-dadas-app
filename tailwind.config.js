@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        'soft-bg': '#FFF5F9',       // Fundo Rosa Bebê
+        'soft-bg': '#F0F4FF',       // Fundo Azul Bebê
         'soft-blue': '#1E3A8A',     // Azul do Logo
         'soft-purple': '#A855F7',   // Roxo dos Botões
         'soft-pink': '#EC4899',     // Rosa dos Detalhes

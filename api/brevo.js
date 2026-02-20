@@ -221,7 +221,7 @@ export default async function handler(req, res) {
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background-color:#FFF5F9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<body style="margin:0;padding:0;background-color:#F0F4FF;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <div style="max-width:480px;margin:0 auto;padding:40px 24px;">
     <div style="text-align:center;margin-bottom:32px;">
       <h2 style="color:#FF66C4;font-size:22px;margin:0;">De M\u00e3es Dadas</h2>
@@ -306,7 +306,7 @@ export default async function handler(req, res) {
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background-color:#FFF5F9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<body style="margin:0;padding:0;background-color:#F0F4FF;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <div style="max-width:480px;margin:0 auto;padding:40px 24px;">
     <div style="text-align:center;margin-bottom:32px;">
       <h2 style="color:#FF66C4;font-size:22px;margin:0;">De M\u00e3es Dadas</h2>
@@ -320,7 +320,7 @@ export default async function handler(req, res) {
       <p style="color:#6b7280;font-size:14px;line-height:1.6;margin:0 0 24px;">
         Ol\u00e1, ${displayName}! Use o c\u00f3digo abaixo para redefinir a sua senha. O c\u00f3digo expira em 30 minutos.
       </p>
-      <div style="background:#FFF5F9;border:2px dashed #FF66C4;border-radius:16px;padding:20px;margin:0 auto 24px;">
+      <div style="background:#F0F4FF;border:2px dashed #FF66C4;border-radius:16px;padding:20px;margin:0 auto 24px;">
         <span style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#1f2937;">${resetCode}</span>
       </div>
       <p style="color:#9ca3af;font-size:12px;line-height:1.5;margin:0;">

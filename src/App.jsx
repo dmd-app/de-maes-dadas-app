@@ -430,7 +430,7 @@ const ComingSoonPopup = ({ onClose, isLoggedIn, userEmail, userId, feature }) =>
   return (
     <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-6">
       <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl">
-        <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
           <Heart size={28} className="text-[#FF66C4]" />
         </div>
         <h3 className="font-bold text-gray-800 text-lg mb-2">{featureName !== 'general' ? featureName : 'Coming Soon'}</h3>
@@ -510,7 +510,7 @@ const ReviewPendingPopup = ({ onClose, type }) => {
 
 const Header = ({ userName }) => (
   <>
-    <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
+    <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-blue-100/50">
       <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-7" />
       <p className="text-xs text-soft-pink font-sans font-medium">Aldeia Digital</p>
     </header>
@@ -1301,7 +1301,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
             .map((comment) => (
             <div key={comment.originalIdx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink flex-shrink-0">
+                <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-soft-pink flex-shrink-0">
                   <User size={14} />
                 </div>
                 <span className="text-sm font-semibold text-gray-700">{comment.author}</span>
@@ -2250,7 +2250,7 @@ const AdminPage = ({ adminEmail, onBack }) => {
 
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
-      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
+      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-blue-100/50">
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="text-gray-500 hover:text-gray-700">
             <ArrowLeft size={20} />
@@ -2412,7 +2412,7 @@ const NotificationsPage = ({ notifications, onMarkAllRead, onBack, onNavigateToP
 
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
-      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
+      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-blue-100/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button onClick={onBack} className="text-gray-500 hover:text-gray-700">
@@ -2444,7 +2444,7 @@ const NotificationsPage = ({ notifications, onMarkAllRead, onBack, onNavigateToP
               <button
                 key={n.id}
                 onClick={() => n.post_id && onNavigateToPost && onNavigateToPost(n.post_id)}
-                className={`w-full flex items-start gap-3 p-3 rounded-xl text-left transition-colors ${n.read ? 'bg-transparent' : 'bg-white shadow-sm border border-pink-100/50'}`}
+                className={`w-full flex items-start gap-3 p-3 rounded-xl text-left transition-colors ${n.read ? 'bg-transparent' : 'bg-white shadow-sm border border-blue-100/50'}`}
               >
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getIconBg(n.type)}`}>
                   <Icon size={18} />
@@ -3443,7 +3443,7 @@ const App = () => {
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
 
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
+      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-blue-100/50">
         <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-7" />
         <p className="text-xs text-soft-pink font-sans font-medium">Aldeia Digital</p>
       </header>
