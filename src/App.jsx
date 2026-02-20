@@ -2732,6 +2732,7 @@ const App = () => {
     setPageHistory((prev) => [...prev, currentPage]);
     setCurrentPage(page);
     window.scrollTo(0, 0);
+    try { window.history.pushState({ page }, '', '/'); } catch (e) { /* ignore */ }
   };
 
   // NavBar tab handler (resets history for main tabs)
@@ -2740,12 +2741,14 @@ const App = () => {
     setSelectedPostIdx(null);
     setCurrentPage(tab);
     window.scrollTo(0, 0);
+    try { window.history.replaceState({ page: tab }, '', '/'); } catch (e) { /* ignore */ }
     if (tab === 'notificacoes' && savedUser?.id) {
       fetchNotifications();
     }
   };
 
-  const goBack = () => {
+  // Internal goBack logic (used by both in-app back buttons and browser popstate)
+  const goBackInternal = () => {
     setPageHistory((prev) => {
       const newHistory = [...prev];
       let previousPage = newHistory.pop();
@@ -2763,6 +2766,20 @@ const App = () => {
       return newHistory;
     });
   };
+
+  // In-app back button: trigger browser history.back() which fires popstate
+  const goBack = () => {
+    try { window.history.back(); } catch (e) { goBackInternal(); }
+  };
+
+  // Listen for browser back/forward button
+  useEffect(() => {
+    const handlePopState = () => {
+      goBackInternal();
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const handleSendPost = async (text, category, categoryColor) => {
     if (isLoggedIn && !isEmailConfirmed) {
