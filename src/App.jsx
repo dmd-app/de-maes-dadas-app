@@ -2803,10 +2803,8 @@ const App = () => {
       const data = await res.json();
       if (data.post) {
         setRodasPosts([data.post, ...rodasPosts]);
-        setSelectedPostIdx(0);
         setReviewPopupType('post');
-        navigateTo('postDetail');
-        setTimeout(() => window.scrollTo(0, 0), 50);
+        window.scrollTo(0, 0);
       }
     } catch (e) {
       console.error('Failed to create post:', e);
