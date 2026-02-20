@@ -1061,6 +1061,15 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
   const [editCategory, setEditCategory] = useState('');
   const [showVersions, setShowVersions] = useState(false);
 
+  if (!post) {
+    return (
+      <div className="min-h-screen bg-soft-bg flex flex-col items-center justify-center px-6">
+        <p className="text-gray-500 text-sm mb-4">Carregando conversa...</p>
+        {onBack && <button onClick={onBack} className="text-soft-pink font-semibold text-sm">Voltar</button>}
+      </div>
+    );
+  }
+
   const isMyPost = post.author === "Eu";
 
   const categoryOptions = [
@@ -3404,9 +3413,9 @@ const App = () => {
   // Render Post Detail page
   if (currentPage === 'postDetail') {
     const post = selectedPostIdx !== null ? rodasPosts[selectedPostIdx] : null;
-    if (post) {
-      return (
-        <>
+    return (
+      <>
+        {post ? (
           <PostDetail
             post={post}
             onBack={goBack}
@@ -3417,13 +3426,15 @@ const App = () => {
             onLikeReply={handleLikeReply}
             onEditPost={handleEditPost}
           />
-          <NavBar currentPage="postDetail" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
-        </>
-      );
-    }
-    // Post not found at index, go back
-    goBack();
-    return null;
+        ) : (
+          <div className="min-h-screen bg-soft-bg flex flex-col items-center justify-center px-6">
+            <p className="text-gray-500 text-sm mb-4">Conversa nao encontrada.</p>
+            <button onClick={goBack} className="text-soft-pink font-semibold text-sm">Voltar</button>
+          </div>
+        )}
+        <NavBar currentPage="postDetail" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
+      </>
+    );
   }
 
   // Render Rodas de Conversa page (requires login)
