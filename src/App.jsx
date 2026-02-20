@@ -3433,7 +3433,7 @@ const App = () => {
         {showComingSoon && (
           <ComingSoonPopup onClose={() => setShowComingSoon(null)} isLoggedIn={isLoggedIn} userEmail={userEmail} userId={savedUser?.id} feature={showComingSoon} />
         )}
-          <NavBar currentPage="perfil" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
+          <NavBar currentPage="aldeia" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
       </>
     );
   }
