@@ -1392,10 +1392,13 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
 };
 
 // --- PROFILE PAGE ---
-const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, onOpenPost, isEmailConfirmed, onResendConfirmation, notifPrefs, onToggleNotifPref }) => {
+const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAccount, onOpenPost, isEmailConfirmed, onResendConfirmation, notifPrefs, onToggleNotifPref }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showNotifSettings, setShowNotifSettings] = useState(false);
-  const myPosts = posts.map((p, idx) => ({ ...p, originalIdx: idx })).filter((p) => p.author === "Eu" || p.user_id);
+  const myPosts = posts
+    .map((p, idx) => ({ ...p, originalIdx: idx }))
+    .filter((p) => p.userId === userId || p.user_id === userId)
+    .filter((p) => !p.isWelcome);
   const totalLikes = myPosts.reduce((sum, p) => sum + (p.likes || 0), 0);
   const totalComments = myPosts.reduce((sum, p) => sum + (p.commentsList?.length || 0), 0);
 
@@ -3344,6 +3347,7 @@ const App = () => {
         <ProfilePage
           userName={userName}
           userEmail={userEmail}
+          userId={savedUser?.id}
           posts={rodasPosts}
           onOpenPost={handleOpenPost}
           isEmailConfirmed={isEmailConfirmed}
