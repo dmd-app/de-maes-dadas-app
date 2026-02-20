@@ -25,10 +25,9 @@ const sendToBrevo = async (action, data) => {
 // --- ALDEIA ICON (3 circles in triangle) ---
 const AldeiaIcon = ({ size = 24, filled = false, color = "currentColor" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="7.5" cy="7.5" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
-    <circle cx="16.5" cy="7.5" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
-    <circle cx="7.5" cy="16.5" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
-    <circle cx="16.5" cy="16.5" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
+    <circle cx="12" cy="6" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
+    <circle cx="6" cy="16" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
+    <circle cx="18" cy="16" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
   </svg>
 );
 
