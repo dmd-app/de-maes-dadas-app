@@ -14,10 +14,12 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) {
+    console.error('[brevo] BREVO_API_KEY is not configured');
     return res.status(500).json({ error: 'Brevo API key not configured' });
   }
 
   const { action, email, name, attributes, listIds } = req.body;
+  console.log('[brevo] Received action:', action, 'email:', email);
 
   if (!email) {
     return res.status(400).json({ error: 'Email is required' });
@@ -25,6 +27,7 @@ export default async function handler(req, res) {
 
   try {
     if (action === 'create_contact') {
+      console.log('[brevo] create_contact - email:', email, 'name:', name, 'attributes:', JSON.stringify(attributes));
       // Create or update a contact in Brevo
       const response = await fetch('https://api.brevo.com/v3/contacts', {
         method: 'POST',
@@ -49,12 +52,14 @@ export default async function handler(req, res) {
         const errorData = await response.json().catch(() => ({}));
         // "duplicate_parameter" means contact already exists, which is fine with updateEnabled
         if (errorData.code === 'duplicate_parameter') {
+          console.log('[brevo] Contact already exists (updated):', email);
           return res.status(200).json({ success: true, message: 'Contact already exists' });
         }
-        console.error('Brevo API error:', errorData);
+        console.error('[brevo] create_contact API error:', JSON.stringify(errorData));
         return res.status(response.status).json({ error: errorData.message || 'Brevo API error' });
       }
 
+      console.log('[brevo] Contact created successfully:', email);
       return res.status(200).json({ success: true });
 
     } else if (action === 'send_event') {
@@ -135,8 +140,30 @@ export default async function handler(req, res) {
 
     } else if (action === 'send_confirmation_email') {
       const { confirmToken, userName, baseUrl } = req.body;
+      console.log('[brevo] send_confirmation_email - email:', email, 'userName:', userName, 'baseUrl:', baseUrl, 'hasToken:', !!confirmToken);
       if (!confirmToken || !baseUrl) {
         return res.status(400).json({ error: 'confirmToken and baseUrl are required' });
+      }
+
+      // Fetch verified sender from Brevo
+      let senderEmail = 'noreply@demaesdadas.com';
+      let senderName = 'De Maes Dadas';
+      try {
+        const sendersRes = await fetch('https://api.brevo.com/v3/senders', {
+          headers: { 'accept': 'application/json', 'api-key': apiKey },
+        });
+        if (sendersRes.ok) {
+          const sendersData = await sendersRes.json();
+          console.log('[brevo] Available senders:', JSON.stringify(sendersData.senders?.map(s => ({ name: s.name, email: s.email, active: s.active }))));
+          const activeSender = sendersData.senders?.find(s => s.active);
+          if (activeSender) {
+            senderEmail = activeSender.email;
+            senderName = activeSender.name || 'De Maes Dadas';
+            console.log('[brevo] Using verified sender:', senderEmail);
+          }
+        }
+      } catch (e) {
+        console.error('[brevo] Failed to fetch senders:', e.message);
       }
 
       const confirmLink = `${baseUrl}/confirm?token=${encodeURIComponent(confirmToken)}&email=${encodeURIComponent(email)}`;
@@ -183,7 +210,7 @@ export default async function handler(req, res) {
           'api-key': apiKey,
         },
         body: JSON.stringify({
-          sender: { name: 'De Maes Dadas', email: 'noreply@demaesdadas.com' },
+          sender: { name: senderName, email: senderEmail },
           to: [{ email, name: displayName }],
           subject: 'Confirme o seu email - De M\u00e3es Dadas',
           htmlContent,
@@ -192,16 +219,37 @@ export default async function handler(req, res) {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Brevo SMTP API error:', errorData);
+        console.error('[brevo] SMTP send_confirmation_email error:', JSON.stringify(errorData));
         return res.status(response.status).json({ error: errorData.message || 'Failed to send confirmation email' });
       }
 
+      console.log('[brevo] Confirmation email sent successfully to:', email);
       return res.status(200).json({ success: true });
 
     } else if (action === 'send_reset_code_email') {
       const { resetCode, userName } = req.body;
+      console.log('[brevo] send_reset_code_email - email:', email, 'hasCode:', !!resetCode);
       if (!resetCode) {
         return res.status(400).json({ error: 'resetCode is required' });
+      }
+
+      // Fetch verified sender from Brevo
+      let senderEmail = 'noreply@demaesdadas.com';
+      let senderName = 'De Maes Dadas';
+      try {
+        const sendersRes = await fetch('https://api.brevo.com/v3/senders', {
+          headers: { 'accept': 'application/json', 'api-key': apiKey },
+        });
+        if (sendersRes.ok) {
+          const sendersData = await sendersRes.json();
+          const activeSender = sendersData.senders?.find(s => s.active);
+          if (activeSender) {
+            senderEmail = activeSender.email;
+            senderName = activeSender.name || 'De Maes Dadas';
+          }
+        }
+      } catch (e) {
+        console.error('[brevo] Failed to fetch senders:', e.message);
       }
 
       const displayName = userName || 'Mami';
@@ -246,7 +294,7 @@ export default async function handler(req, res) {
           'api-key': apiKey,
         },
         body: JSON.stringify({
-          sender: { name: 'De Maes Dadas', email: 'noreply@demaesdadas.com' },
+          sender: { name: senderName, email: senderEmail },
           to: [{ email, name: displayName }],
           subject: 'C\u00f3digo de recupera\u00e7\u00e3o - De M\u00e3es Dadas',
           htmlContent,

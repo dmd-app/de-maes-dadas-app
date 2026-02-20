@@ -23,6 +23,7 @@ export default async function handler(req, res) {
     // --- SIGNUP ---
     if (action === 'signup') {
       const { email, password, username } = req.body;
+      console.log('[auth] Signup attempt - email:', email, 'username:', username);
       if (!email || !password || !username) {
         return res.status(400).json({ error: 'email, password e username obrigatórios' });
       }
