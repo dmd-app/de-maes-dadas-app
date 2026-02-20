@@ -168,9 +168,26 @@ export default async function handler(req, res) {
         // Clean up used token
         await supabase.from('email_confirm_tokens').delete().eq('email', confirmEmail);
 
+        // Generate a magic link to auto-login the user after confirmation
+        const { data: linkData } = await supabase.auth.admin.generateLink({
+          type: 'magiclink',
+          email: confirmEmail,
+        });
+        
+        // Fetch profile for username
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', targetUserId)
+          .single();
+
         return res.status(200).json({ 
           success: true, 
-          user: { id: userData.user.id, email: userData.user.email, username: userData.user.user_metadata?.username } 
+          user: { 
+            id: userData.user.id, 
+            email: userData.user.email, 
+            username: profile?.username || userData.user.user_metadata?.username,
+          },
         });
       }
 
