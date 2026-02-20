@@ -282,6 +282,17 @@ export default async function handler(req, res) {
         }),
       }).catch(e => console.error('[posts] notify_admin comment failed:', e));
 
+      // Fire-and-forget: email the post author that someone replied
+      fetch(`${req.headers.origin || ''}/api/notify-reply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          postId,
+          commentText: comment.body,
+          commenterName: comment.author_name,
+        }),
+      }).catch(e => console.error('[posts] notify-reply failed:', e));
+
       return res.status(200).json({
         success: true,
         comment: {
