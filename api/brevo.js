@@ -131,9 +131,13 @@ export default async function handler(req, res) {
         }
       }
 
-      // 3. Add contact to Brevo CRM (simple - no custom attributes that may not exist)
+      // 3. Add contact to Brevo CRM with attributes
       const contactPayload = {
         email,
+        attributes: {
+          COMING_SOON_INTEREST: true,
+          COMING_SOON_FEATURE: feature || 'general',
+        },
         updateEnabled: true,
       };
       if (targetListIds.length > 0) {
