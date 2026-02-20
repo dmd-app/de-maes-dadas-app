@@ -38,6 +38,8 @@ const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState('');
 
   const validate = () => {
     const newErrors = {};
@@ -50,11 +52,19 @@ const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
     return newErrors;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = validate();
     setErrors(newErrors);
+    setApiError('');
     if (Object.keys(newErrors).length === 0) {
-      onSignup({ email, username });
+      setLoading(true);
+      try {
+        await onSignup({ email, username, password });
+      } catch (err) {
+        setApiError(err.message || 'Erro ao criar conta. Tente novamente.');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -147,11 +157,18 @@ const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
         </div>
         {errors.terms && <p className="text-xs text-red-400 -mt-2">{errors.terms}</p>}
 
+        {apiError && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mt-1">
+            <p className="text-xs text-red-600">{apiError}</p>
+          </div>
+        )}
+
         <button
           onClick={handleSubmit}
-          className="w-full mt-4 py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide"
+          disabled={loading}
+          className="w-full mt-4 py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide disabled:opacity-60 disabled:active:scale-100"
         >
-          CRIAR CONTA
+          {loading ? 'CRIANDO CONTA...' : 'CRIAR CONTA'}
         </button>
 
         <p className="text-center text-xs text-gray-400 mt-2">
@@ -169,6 +186,8 @@ const LoginPage = ({ onLogin, onGoToSignup, onBack }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState('');
 
   const validate = () => {
     const newErrors = {};
@@ -177,15 +196,19 @@ const LoginPage = ({ onLogin, onGoToSignup, onBack }) => {
     return newErrors;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = validate();
     setErrors(newErrors);
+    setApiError('');
     if (Object.keys(newErrors).length === 0) {
-      const isEmail = identifier.includes('@');
-      onLogin({
-        email: isEmail ? identifier : '',
-        username: isEmail ? identifier.split('@')[0] : identifier,
-      });
+      setLoading(true);
+      try {
+        await onLogin({ identifier: identifier.trim(), password });
+      } catch (err) {
+        setApiError(err.message || 'Erro ao entrar. Tente novamente.');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -253,11 +276,18 @@ const LoginPage = ({ onLogin, onGoToSignup, onBack }) => {
           {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password}</p>}
         </div>
 
+        {apiError && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mt-1">
+            <p className="text-xs text-red-600">{apiError}</p>
+          </div>
+        )}
+
         <button
           onClick={handleSubmit}
-          className="w-full mt-4 py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide"
+          disabled={loading}
+          className="w-full mt-4 py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide disabled:opacity-60 disabled:active:scale-100"
         >
-          ENTRAR
+          {loading ? 'ENTRANDO...' : 'ENTRAR'}
         </button>
 
         <p className="text-center text-xs text-gray-400 mt-2">
@@ -1905,13 +1935,22 @@ const App = () => {
     return (
       <LoginPage
         onBack={pageHistory.length > 0 ? goBack : null}
-        onLogin={({ email, username }) => {
-          setUserName(username);
-          setUserEmail(email);
-          const userData = { name: username, email };
+        onLogin={async ({ identifier, password }) => {
+          const res = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'login', email: identifier, password }),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error || 'Erro ao entrar');
+          }
+          const userData = { id: data.user.id, name: data.user.name, email: data.user.email };
+          setUserName(userData.name);
+          setUserEmail(userData.email);
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
-          sendToBrevo('create_contact', { email, name: username, attributes: { LAST_LOGIN: new Date().toISOString().split('T')[0] } });
+          sendToBrevo('create_contact', { email: userData.email, name: userData.name, attributes: { LAST_LOGIN: new Date().toISOString().split('T')[0] } });
           if (pendingAction && pendingAction.type === 'post') {
             resolvePendingAction();
           } else {
@@ -1929,13 +1968,22 @@ const App = () => {
     return (
       <SignupPage
         onBack={pageHistory.length > 0 ? goBack : null}
-        onSignup={({ email, username }) => {
-          setUserName(username);
-          setUserEmail(email);
-          const userData = { name: username, email };
+        onSignup={async ({ email, username, password }) => {
+          const res = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'signup', email, username, password }),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error || 'Erro ao criar conta');
+          }
+          const userData = { id: data.user.id, name: data.user.name, email: data.user.email };
+          setUserName(userData.name);
+          setUserEmail(userData.email);
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
-          sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
+          sendToBrevo('create_contact', { email: userData.email, name: userData.name, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
           goAfterAuth();
         }}
         onGoToLogin={() => setCurrentPage('login')}
