@@ -172,6 +172,32 @@ export default async function handler(req, res) {
 
       return res.status(200).json({ success: true });
 
+    // --- CHECK EMAIL STATUS (polling from pending page) ---
+    } else if (action === 'check_email_status') {
+      const { email: checkEmail } = req.body;
+      if (!checkEmail) {
+        return res.status(400).json({ error: 'email obrigatorio' });
+      }
+
+      const { data: users, error: listError } = await supabase.auth.admin.listUsers();
+      if (listError) {
+        return res.status(500).json({ error: 'Erro interno' });
+      }
+
+      const user = users.users.find(u => u.email === checkEmail);
+      if (!user) {
+        return res.status(404).json({ error: 'Utilizador nao encontrado' });
+      }
+
+      return res.status(200).json({
+        confirmed: !!user.email_confirmed_at,
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.user_metadata?.username,
+        },
+      });
+
     // --- SAVE CONFIRM TOKEN (for resend) ---
     } else if (action === 'save_confirm_token') {
       const { email: tokenEmail, token } = req.body;

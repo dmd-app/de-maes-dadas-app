@@ -1651,7 +1651,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
 
 // --- EMAIL CONFIRMATION COMPONENTS ---
 
-const EmailPendingPage = ({ email, userName, confirmToken, onContinue, onResend }) => {
+const EmailPendingPage = ({ email, userName, confirmToken, onContinue, onResend, onConfirmed }) => {
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resent, setResent] = useState(false);
 
@@ -1661,6 +1661,26 @@ const EmailPendingPage = ({ email, userName, confirmToken, onContinue, onResend 
       return () => clearTimeout(timer);
     }
   }, [resendCooldown]);
+
+  // Poll server every 5s to check if email was confirmed on another device
+  useEffect(() => {
+    if (!email) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'check_email_status', email }),
+        });
+        const data = await res.json();
+        if (data.confirmed) {
+          clearInterval(interval);
+          onConfirmed && onConfirmed();
+        }
+      } catch {}
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [email, onConfirmed]);
 
   const handleResend = () => {
     if (resendCooldown > 0) return;
@@ -2182,8 +2202,8 @@ const App = () => {
   const [pageHistory, setPageHistory] = useState([]);
   const [selectedPostIdx, setSelectedPostIdx] = useState(null);
   const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
-  const [userName, setUserName] = useState(savedUser?.name || '');
-  const [userEmail, setUserEmail] = useState(savedUser?.email || '');
+  const [userName, setUserName] = useState(() => getSavedUser()?.name || '');
+  const [userEmail, setUserEmail] = useState(() => getSavedUser()?.email || '');
   const [showComingSoon, setShowComingSoon] = useState(null); // null = hidden, string = feature name
   const [showAccountDeleted, setShowAccountDeleted] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
@@ -2634,6 +2654,15 @@ const App = () => {
         confirmToken={savedUser?.confirmToken}
         onContinue={goAfterAuth}
         onResend={resendConfirmationEmail}
+        onConfirmed={() => {
+          // Email was confirmed on another device - update local state
+          if (savedUser) {
+            const updatedUser = { ...savedUser, emailConfirmed: true };
+            localStorage.setItem('dmd_user', JSON.stringify(updatedUser));
+            setSavedUser(updatedUser);
+          }
+          setCurrentPage('emailConfirmed');
+        }}
       />
     );
   }
@@ -2948,10 +2977,14 @@ const App = () => {
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
 
       {/* Header */}
-      <header className="p-6 pb-2 bg-soft-bg">
-        <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
-        <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
+      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
+        <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-7" />
+        <p className="text-xs text-soft-pink font-sans font-medium">Aldeia Digital</p>
       </header>
+      <div className="px-6 pt-5 pb-3">
+        <h2 className="text-xl font-bold text-gray-800">{"Bem-vinda, "}<span className="text-soft-pink">{userName || "Mam\u00e3e"}</span>{" \ud83d\udc97"}</h2>
+        <p className="text-sm text-gray-400 mt-1">{"Sua aldeia digital de apoio"}</p>
+      </div>
 
       {/* Email Confirm Banner */}
       {isLoggedIn && !isEmailConfirmed && (
