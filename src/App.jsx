@@ -1523,7 +1523,7 @@ const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAcc
                   )}
                   <span className="text-xs text-gray-400">{post.time}</span>
                 </div>
-                <p className="text-sm font-semibold text-gray-700">{post.title}</p>
+                <p className="text-sm text-gray-600 line-clamp-2">{post.body || post.title || ''}</p>
                 <div className="flex items-center gap-4 mt-2">
                   <span className="flex items-center gap-1 text-xs text-gray-400">
                     <Heart size={14} />
