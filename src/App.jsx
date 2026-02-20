@@ -2977,10 +2977,13 @@ const App = () => {
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
 
       {/* Header */}
-      <header className="p-6 pb-2 bg-soft-bg">
-        <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
-        <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
+      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
+        <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-7" />
+        <p className="text-xs text-soft-pink font-sans font-medium">Aldeia Digital</p>
       </header>
+      <div className="px-6 pt-4 pb-2 bg-soft-bg">
+        <p className="text-lg text-soft-blue font-sans">{"Bem-vinda, "}{userName || "Mam\u00e3e"}{" \ud83d\udc97"}</p>
+      </div>
 
       {/* Email Confirm Banner */}
       {isLoggedIn && !isEmailConfirmed && (
