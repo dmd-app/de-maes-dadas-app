@@ -97,6 +97,7 @@ const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
+              autoComplete="off"
               className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
           </div>
@@ -113,6 +114,7 @@ const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Como quer ser chamada?"
+              autoComplete="off"
               className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
           </div>
@@ -129,6 +131,7 @@ const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={"M\u00ednimo 6 caracteres"}
+              autoComplete="new-password"
               className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
             <button onClick={() => setShowPassword(!showPassword)} className="text-gray-400">
@@ -243,6 +246,7 @@ const LoginPage = ({ onLogin, onGoToSignup, onBack, onForgotPassword }) => {
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               placeholder="seu@email.com"
+              autoComplete="email"
               className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
           </div>
@@ -263,6 +267,7 @@ const LoginPage = ({ onLogin, onGoToSignup, onBack, onForgotPassword }) => {
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
               placeholder="Sua senha"
+              autoComplete="current-password"
               className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
             <button onClick={() => setShowPassword(!showPassword)} className="text-gray-400">
