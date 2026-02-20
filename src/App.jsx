@@ -1651,7 +1651,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
 
 // --- EMAIL CONFIRMATION COMPONENTS ---
 
-const EmailPendingPage = ({ email, userName, confirmToken, onContinue, onResend }) => {
+const EmailPendingPage = ({ email, userName, confirmToken, onContinue, onResend, onConfirmed }) => {
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resent, setResent] = useState(false);
 
@@ -1661,6 +1661,26 @@ const EmailPendingPage = ({ email, userName, confirmToken, onContinue, onResend 
       return () => clearTimeout(timer);
     }
   }, [resendCooldown]);
+
+  // Poll server every 5s to check if email was confirmed on another device
+  useEffect(() => {
+    if (!email) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'check_email_status', email }),
+        });
+        const data = await res.json();
+        if (data.confirmed) {
+          clearInterval(interval);
+          onConfirmed && onConfirmed();
+        }
+      } catch {}
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [email, onConfirmed]);
 
   const handleResend = () => {
     if (resendCooldown > 0) return;
@@ -2634,6 +2654,15 @@ const App = () => {
         confirmToken={savedUser?.confirmToken}
         onContinue={goAfterAuth}
         onResend={resendConfirmationEmail}
+        onConfirmed={() => {
+          // Email was confirmed on another device - update local state
+          if (savedUser) {
+            const updatedUser = { ...savedUser, emailConfirmed: true };
+            localStorage.setItem('dmd_user', JSON.stringify(updatedUser));
+            setSavedUser(updatedUser);
+          }
+          setCurrentPage('emailConfirmed');
+        }}
       />
     );
   }
