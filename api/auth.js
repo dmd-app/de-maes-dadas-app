@@ -31,7 +31,7 @@ export default async function handler(req, res) {
       const { data, error } = await supabase.auth.admin.createUser({
         email,
         password,
-        user_metadata: { username, confirm_token: confirmToken || null },
+        user_metadata: { username },
         email_confirm: false,
       });
 
@@ -41,6 +41,16 @@ export default async function handler(req, res) {
         }
         console.error('Signup error:', error);
         return res.status(400).json({ error: error.message });
+      }
+
+      // Save confirmation token to dedicated table
+      if (confirmToken) {
+        const { error: tokenError } = await supabase
+          .from('email_confirm_tokens')
+          .upsert({ email, token: confirmToken, user_id: data.user.id }, { onConflict: 'email' });
+        if (tokenError) {
+          console.error('[auth] Failed to save confirm token:', tokenError);
+        }
       }
 
       return res.status(200).json({
@@ -86,48 +96,69 @@ export default async function handler(req, res) {
         },
       });
 
-    // --- CONFIRM EMAIL (verify token server-side) ---
+    // --- CONFIRM EMAIL (verify token server-side via DB table) ---
     } else if (action === 'confirm_email') {
       const { userId, email: confirmEmail, token } = req.body;
 
-      // If token + email provided, verify server-side (works cross-device)
+      // Token + email: verify via email_confirm_tokens table (works cross-device)
       if (token && confirmEmail) {
-        const { data: users, error: listError } = await supabase.auth.admin.listUsers();
-        if (listError) {
-          console.error('List users error:', listError);
+        // Look up token in dedicated table
+        const { data: tokenRow, error: tokenError } = await supabase
+          .from('email_confirm_tokens')
+          .select('*')
+          .eq('email', confirmEmail)
+          .eq('token', token)
+          .single();
+
+        if (tokenError || !tokenRow) {
+          console.error('[auth] Token lookup failed:', tokenError?.message || 'no match');
+          return res.status(400).json({ error: 'Link de confirmacao invalido ou expirado.' });
+        }
+
+        // Token is valid - confirm the user's email in Supabase Auth
+        const targetUserId = tokenRow.user_id;
+        if (!targetUserId) {
+          return res.status(400).json({ error: 'Utilizador nao encontrado.' });
+        }
+
+        // Get user info for response
+        const { data: userData, error: getUserError } = await supabase.auth.admin.getUserById(targetUserId);
+        if (getUserError) {
+          console.error('[auth] Get user error:', getUserError);
           return res.status(500).json({ error: 'Erro interno' });
         }
 
-        const user = users.users.find(u => u.email === confirmEmail);
-        if (!user) {
-          return res.status(400).json({ error: 'Utilizador não encontrado.' });
+        if (userData.user.email_confirmed_at) {
+          // Already confirmed - clean up token and return success
+          await supabase.from('email_confirm_tokens').delete().eq('email', confirmEmail);
+          return res.status(200).json({ 
+            success: true, 
+            alreadyConfirmed: true, 
+            user: { id: userData.user.id, email: userData.user.email, username: userData.user.user_metadata?.username } 
+          });
         }
 
-        const storedToken = user.user_metadata?.confirm_token;
-        if (!storedToken || storedToken !== token) {
-          return res.status(400).json({ error: 'Link de confirmação inválido.' });
-        }
-
-        if (user.email_confirmed_at) {
-          return res.status(200).json({ success: true, alreadyConfirmed: true, user: { id: user.id, email: user.email, username: user.user_metadata?.username } });
-        }
-
-        const { error: updateError } = await supabase.auth.admin.updateUserById(user.id, {
+        const { error: updateError } = await supabase.auth.admin.updateUserById(targetUserId, {
           email_confirm: true,
-          user_metadata: { ...user.user_metadata, confirm_token: null },
         });
 
         if (updateError) {
-          console.error('Confirm email error:', updateError);
+          console.error('[auth] Confirm email error:', updateError);
           return res.status(400).json({ error: updateError.message });
         }
 
-        return res.status(200).json({ success: true, user: { id: user.id, email: user.email, username: user.user_metadata?.username } });
+        // Clean up used token
+        await supabase.from('email_confirm_tokens').delete().eq('email', confirmEmail);
+
+        return res.status(200).json({ 
+          success: true, 
+          user: { id: userData.user.id, email: userData.user.email, username: userData.user.user_metadata?.username } 
+        });
       }
 
-      // Legacy: confirm by userId only
+      // Legacy: confirm by userId only (same device)
       if (!userId) {
-        return res.status(400).json({ error: 'userId ou token+email obrigatório' });
+        return res.status(400).json({ error: 'userId ou token+email obrigatorio' });
       }
 
       const { error } = await supabase.auth.admin.updateUserById(userId, {
@@ -135,8 +166,37 @@ export default async function handler(req, res) {
       });
 
       if (error) {
-        console.error('Confirm email error:', error);
+        console.error('[auth] Confirm email error:', error);
         return res.status(400).json({ error: error.message });
+      }
+
+      return res.status(200).json({ success: true });
+
+    // --- SAVE CONFIRM TOKEN (for resend) ---
+    } else if (action === 'save_confirm_token') {
+      const { email: tokenEmail, token } = req.body;
+      if (!tokenEmail || !token) {
+        return res.status(400).json({ error: 'email e token obrigatorios' });
+      }
+
+      // Find the user to get user_id
+      const { data: users, error: listError } = await supabase.auth.admin.listUsers();
+      let targetUserId = null;
+      if (!listError && users?.users) {
+        const user = users.users.find(u => u.email === tokenEmail);
+        if (user) targetUserId = user.id;
+      }
+
+      const { error: upsertError } = await supabase
+        .from('email_confirm_tokens')
+        .upsert(
+          { email: tokenEmail, token, user_id: targetUserId },
+          { onConflict: 'email' }
+        );
+
+      if (upsertError) {
+        console.error('[auth] Failed to save confirm token:', upsertError);
+        return res.status(500).json({ error: 'Erro ao salvar token' });
       }
 
       return res.status(200).json({ success: true });
