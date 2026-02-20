@@ -2202,8 +2202,8 @@ const App = () => {
   const [pageHistory, setPageHistory] = useState([]);
   const [selectedPostIdx, setSelectedPostIdx] = useState(null);
   const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
-  const [userName, setUserName] = useState(savedUser?.name || '');
-  const [userEmail, setUserEmail] = useState(savedUser?.email || '');
+  const [userName, setUserName] = useState(() => getSavedUser()?.name || '');
+  const [userEmail, setUserEmail] = useState(() => getSavedUser()?.email || '');
   const [showComingSoon, setShowComingSoon] = useState(null); // null = hidden, string = feature name
   const [showAccountDeleted, setShowAccountDeleted] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
