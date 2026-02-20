@@ -1,6 +1,7 @@
+'use client';
+
 import { useState, useRef, useEffect } from 'react';
 import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus } from 'lucide-react';
-import './index.css';
 
 // --- BREVO CRM HELPER ---
 const sendToBrevo = async (action, data) => {
@@ -1600,6 +1601,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
 
 
 const getSavedUser = () => {
+  if (typeof window === 'undefined') return null;
   try {
     return JSON.parse(localStorage.getItem('dmd_user') || 'null');
   } catch {
@@ -1621,7 +1623,10 @@ const App = () => {
   const [reviewPopupType, setReviewPopupType] = useState(null);
   const [draftMessage, setDraftMessage] = useState('');
   const [isPanicOpen, setIsPanicOpen] = useState(false);
-  const [onboardingSeen, setOnboardingSeen] = useState(() => localStorage.getItem('dmd_onboarding_seen') === 'true');
+  const [onboardingSeen, setOnboardingSeen] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('dmd_onboarding_seen') === 'true';
+  });
 
   const isLoggedIn = !!savedUser;
 

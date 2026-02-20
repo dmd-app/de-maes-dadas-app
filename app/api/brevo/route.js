@@ -1,22 +1,19 @@
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+import { NextResponse } from 'next/server';
 
+export async function POST(request) {
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'Brevo API key not configured' });
+    return NextResponse.json({ error: 'Brevo API key not configured' }, { status: 500 });
   }
 
-  const { action, email, name, attributes, listIds } = req.body;
+  const { action, email, name, attributes, listIds } = await request.json();
 
   if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
+    return NextResponse.json({ error: 'Email is required' }, { status: 400 });
   }
 
   try {
     if (action === 'create_contact') {
-      // Create or update a contact in Brevo
       const response = await fetch('https://api.brevo.com/v3/contacts', {
         method: 'POST',
         headers: {
@@ -38,18 +35,16 @@ export default async function handler(req, res) {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        // "duplicate_parameter" means contact already exists, which is fine with updateEnabled
         if (errorData.code === 'duplicate_parameter') {
-          return res.status(200).json({ success: true, message: 'Contact already exists' });
+          return NextResponse.json({ success: true, message: 'Contact already exists' });
         }
         console.error('Brevo API error:', errorData);
-        return res.status(response.status).json({ error: errorData.message || 'Brevo API error' });
+        return NextResponse.json({ error: errorData.message || 'Brevo API error' }, { status: response.status });
       }
 
-      return res.status(200).json({ success: true });
+      return NextResponse.json({ success: true });
 
     } else if (action === 'send_event') {
-      // Track an event for the contact (e.g., post created, coming soon interest)
       const response = await fetch('https://api.brevo.com/v3/contacts', {
         method: 'POST',
         headers: {
@@ -69,16 +64,15 @@ export default async function handler(req, res) {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         if (errorData.code === 'duplicate_parameter') {
-          return res.status(200).json({ success: true });
+          return NextResponse.json({ success: true });
         }
         console.error('Brevo API error:', errorData);
-        return res.status(response.status).json({ error: errorData.message || 'Brevo API error' });
+        return NextResponse.json({ error: errorData.message || 'Brevo API error' }, { status: response.status });
       }
 
-      return res.status(200).json({ success: true });
+      return NextResponse.json({ success: true });
 
     } else if (action === 'notify_coming_soon') {
-      // Add contact interested in "coming soon" features to a specific list
       const response = await fetch('https://api.brevo.com/v3/contacts', {
         method: 'POST',
         headers: {
@@ -100,19 +94,19 @@ export default async function handler(req, res) {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         if (errorData.code === 'duplicate_parameter') {
-          return res.status(200).json({ success: true });
+          return NextResponse.json({ success: true });
         }
         console.error('Brevo API error:', errorData);
-        return res.status(response.status).json({ error: errorData.message || 'Brevo API error' });
+        return NextResponse.json({ error: errorData.message || 'Brevo API error' }, { status: response.status });
       }
 
-      return res.status(200).json({ success: true });
+      return NextResponse.json({ success: true });
 
     } else {
-      return res.status(400).json({ error: 'Invalid action' });
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
   } catch (err) {
     console.error('Brevo integration error:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
