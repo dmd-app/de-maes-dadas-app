@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus } from 'lucide-react';
+import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, MailCheck, RefreshCw, AlertCircle } from 'lucide-react';
 import './index.css';
 
 // --- BREVO CRM HELPER ---
@@ -568,7 +568,7 @@ const MoodCup = () => {
   );
 };
 
-const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequireLogin, draftMessage, setDraftMessage, isPanicOpen, setIsPanicOpen }) => {
+const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, isEmailConfirmed, onRequireLogin, onRequireEmailConfirm, draftMessage, setDraftMessage, isPanicOpen, setIsPanicOpen }) => {
   const panicPanelRef = useRef(null);
 
   useEffect(() => {
@@ -582,6 +582,10 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, onRequir
   const handleSend = () => {
   if (draftMessage.trim()) {
       if (isLoggedIn) {
+        if (!isEmailConfirmed) {
+          onRequireEmailConfirm && onRequireEmailConfirm();
+          return;
+        }
         onSendPost && onSendPost(draftMessage.trim());
         setDraftMessage('');
         setIsPanicOpen(false);
@@ -1393,7 +1397,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
 };
 
 // --- PROFILE PAGE ---
-const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, onOpenPost }) => {
+const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, onOpenPost, isEmailConfirmed, onResendConfirmation }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const myPosts = posts.map((p, idx) => ({ ...p, originalIdx: idx })).filter((p) => p.author === "Eu");
   const totalLikes = myPosts.reduce((sum, p) => sum + (p.likes || 0), 0);
@@ -1437,7 +1441,22 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
                   <Edit3 size={14} />
                 </button>
               </div>
-              <p className="text-sm text-gray-400 mt-0.5">{userEmail}</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <p className="text-sm text-gray-400">{userEmail}</p>
+                {isEmailConfirmed ? (
+                  <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0" title="Email confirmado">
+                    <Check size={10} className="text-green-600" />
+                  </div>
+                ) : (
+                  <button
+                    onClick={onResendConfirmation}
+                    className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full flex-shrink-0"
+                    title="Email pendente"
+                  >
+                    Pendente
+                  </button>
+                )}
+              </div>
               <p className="text-xs text-[#FF66C4] font-semibold mt-1">Membro da Aldeia</p>
             </div>
           </div>
@@ -1596,6 +1615,200 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
   );
 };
 
+// --- EMAIL CONFIRMATION COMPONENTS ---
+
+const EmailPendingPage = ({ email, userName, confirmToken, onContinue, onResend }) => {
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resent, setResent] = useState(false);
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
+
+  const handleResend = () => {
+    if (resendCooldown > 0) return;
+    onResend && onResend();
+    setResendCooldown(60);
+    setResent(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-soft-bg flex flex-col items-center justify-center px-6 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
+      <div className="w-full text-center">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center mx-auto mb-6">
+          <Mail size={36} className="text-white" />
+        </div>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2 text-balance">{"Verifique o seu email"}</h1>
+        <p className="text-sm text-gray-500 leading-relaxed mb-2">
+          {"Enviamos um link de confirma\u00e7\u00e3o para:"}
+        </p>
+        <p className="text-sm font-bold text-gray-700 mb-6">{email}</p>
+        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-6">
+          <p className="text-sm text-gray-500 leading-relaxed">
+            {"Clique no link no seu email para ativar todas as funcionalidades. Verifique tamb\u00e9m a pasta de spam."}
+          </p>
+        </div>
+
+        {resent && (
+          <div className="bg-green-50 rounded-xl p-3 border border-green-200 mb-4">
+            <p className="text-xs font-semibold text-green-700">{"Email reenviado com sucesso!"}</p>
+          </div>
+        )}
+
+        <button
+          onClick={handleResend}
+          disabled={resendCooldown > 0}
+          className={`w-full py-3.5 rounded-xl font-bold text-sm active:scale-[0.98] transition-all mb-3 flex items-center justify-center gap-2 ${
+            resendCooldown > 0
+              ? 'bg-gray-100 text-gray-400'
+              : 'bg-white border-2 border-[#FF66C4] text-[#FF66C4]'
+          }`}
+        >
+          <RefreshCw size={16} className={resendCooldown > 0 ? 'animate-spin' : ''} />
+          {resendCooldown > 0 ? `Reenviar em ${resendCooldown}s` : 'Reenviar email'}
+        </button>
+
+        <button
+          onClick={onContinue}
+          className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+        >
+          {"Continuar sem confirmar"}
+        </button>
+        <p className="text-xs text-gray-400 mt-3 leading-relaxed">
+          {"Pode continuar a usar a app, mas algumas funcionalidades estar\u00e3o limitadas at\u00e9 confirmar o email."}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+const EmailConfirmPage = ({ success, onContinue }) => (
+  <div className="min-h-screen bg-soft-bg flex flex-col items-center justify-center px-6 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
+    <div className="w-full text-center">
+      {success ? (
+        <>
+          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+            <MailCheck size={36} className="text-green-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">{"Email confirmado!"}</h1>
+          <p className="text-sm text-gray-500 leading-relaxed mb-6">
+            {"Sua conta est\u00e1 totalmente ativa. Agora pode usar todas as funcionalidades da Aldeia!"}
+          </p>
+          <button
+            onClick={onContinue}
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+          >
+            {"Ir para a Aldeia"}
+          </button>
+        </>
+      ) : (
+        <>
+          <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-6">
+            <AlertCircle size={36} className="text-red-500" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">{"Link inv\u00e1lido"}</h1>
+          <p className="text-sm text-gray-500 leading-relaxed mb-6">
+            {"Este link de confirma\u00e7\u00e3o \u00e9 inv\u00e1lido ou j\u00e1 foi utilizado. Tente reenviar o email de confirma\u00e7\u00e3o."}
+          </p>
+          <button
+            onClick={onContinue}
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+          >
+            Voltar
+          </button>
+        </>
+      )}
+    </div>
+  </div>
+);
+
+const EmailConfirmBanner = ({ onResend }) => {
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
+
+  return (
+    <div className="mx-6 mb-3 bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3">
+      <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+        <Mail size={18} className="text-amber-600" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-semibold text-amber-800">{"Confirme o seu email"}</p>
+        <p className="text-[11px] text-amber-600 leading-relaxed">{"Para desbloquear todas as funcionalidades."}</p>
+      </div>
+      <button
+        onClick={() => { if (resendCooldown === 0) { onResend(); setResendCooldown(60); } }}
+        className="text-[10px] font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full flex-shrink-0 active:scale-95 transition-all"
+      >
+        {resendCooldown > 0 ? `${resendCooldown}s` : 'Reenviar'}
+      </button>
+    </div>
+  );
+};
+
+const EmailConfirmRequiredPopup = ({ onClose, onResend }) => {
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resent, setResent] = useState(false);
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-6">
+      <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl">
+        <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-4">
+          <Mail size={28} className="text-amber-500" />
+        </div>
+        <h3 className="font-bold text-gray-800 text-lg mb-2">{"Confirme o seu email"}</h3>
+        <p className="text-sm text-gray-500 leading-relaxed mb-5">
+          {"Para postar ou comentar, precisa primeiro confirmar o seu email. Verifique a sua caixa de entrada."}
+        </p>
+        {resent && (
+          <div className="bg-green-50 rounded-xl p-3 border border-green-200 mb-4">
+            <p className="text-xs font-semibold text-green-700">{"Email reenviado!"}</p>
+          </div>
+        )}
+        <button
+          onClick={() => {
+            if (resendCooldown === 0) {
+              onResend();
+              setResendCooldown(60);
+              setResent(true);
+            }
+          }}
+          disabled={resendCooldown > 0}
+          className={`w-full py-3 rounded-xl font-bold text-sm active:scale-[0.98] transition-all mb-3 flex items-center justify-center gap-2 ${
+            resendCooldown > 0
+              ? 'bg-gray-100 text-gray-400'
+              : 'border-2 border-[#FF66C4] text-[#FF66C4]'
+          }`}
+        >
+          <RefreshCw size={16} />
+          {resendCooldown > 0 ? `Reenviar em ${resendCooldown}s` : 'Reenviar email'}
+        </button>
+        <button
+          onClick={onClose}
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+        >
+          ENTENDI
+        </button>
+      </div>
+    </div>
+  );
+};
+
 // --- UTILITIES ---
 
 
@@ -1622,8 +1835,57 @@ const App = () => {
   const [draftMessage, setDraftMessage] = useState('');
   const [isPanicOpen, setIsPanicOpen] = useState(false);
   const [onboardingSeen, setOnboardingSeen] = useState(() => localStorage.getItem('dmd_onboarding_seen') === 'true');
+  const [showEmailConfirmRequired, setShowEmailConfirmRequired] = useState(false);
 
   const isLoggedIn = !!savedUser;
+  const isEmailConfirmed = !!savedUser?.emailConfirmed;
+
+  // Helper to send confirmation email
+  const sendConfirmationEmail = (email, name, token) => {
+    const baseUrl = window.location.origin;
+    sendToBrevo('send_confirmation_email', {
+      email,
+      userName: name,
+      confirmToken: token,
+      baseUrl,
+    });
+  };
+
+  // Helper to resend confirmation email from current user
+  const resendConfirmationEmail = () => {
+    if (savedUser && savedUser.confirmToken && !savedUser.emailConfirmed) {
+      sendConfirmationEmail(savedUser.email, savedUser.name, savedUser.confirmToken);
+    }
+  };
+
+  // Detect confirmation link in URL on load
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    const email = params.get('email');
+    const path = window.location.pathname;
+
+    if (path === '/confirm' && token && email) {
+      // Clean URL
+      window.history.replaceState({}, '', '/');
+
+      const user = getSavedUser();
+      if (user && user.confirmToken === token && user.email === email && !user.emailConfirmed) {
+        // Mark as confirmed
+        const updatedUser = { ...user, emailConfirmed: true };
+        localStorage.setItem('dmd_user', JSON.stringify(updatedUser));
+        setSavedUser(updatedUser);
+        setUserName(updatedUser.name);
+        setUserEmail(updatedUser.email);
+        setCurrentPage('emailConfirmed');
+      } else if (user && user.emailConfirmed && user.email === email) {
+        // Already confirmed
+        setCurrentPage('emailConfirmed');
+      } else {
+        setCurrentPage('emailConfirmFailed');
+      }
+    }
+  }, []);
 
   const completeOnboarding = () => {
     setOnboardingSeen(true);
@@ -1669,8 +1931,8 @@ const App = () => {
     setPageHistory((prev) => {
       const newHistory = [...prev];
       let previousPage = newHistory.pop();
-      // Skip auth/onboarding pages in history
-      while (previousPage && ['onboarding', 'signup', 'login'].includes(previousPage)) {
+      // Skip auth/onboarding/email pages in history
+      while (previousPage && ['onboarding', 'signup', 'login', 'emailPending', 'emailConfirmed', 'emailConfirmFailed'].includes(previousPage)) {
         previousPage = newHistory.pop();
       }
       const destination = previousPage || 'inicio';
@@ -1685,6 +1947,10 @@ const App = () => {
   };
 
   const handleSendPost = (text, category, categoryColor) => {
+    if (isLoggedIn && !isEmailConfirmed) {
+      setShowEmailConfirmRequired(true);
+      return;
+    }
     const newPost = {
       category: category || "Desabafo",
       categoryColor: categoryColor || "bg-[#FF66C4] text-white",
@@ -1760,6 +2026,10 @@ const App = () => {
 
   const handleAddComment = (text) => {
     if (selectedPostIdx === null) return;
+    if (isLoggedIn && !isEmailConfirmed) {
+      setShowEmailConfirmRequired(true);
+      return;
+    }
     const updated = [...rodasPosts];
     const newComment = { author: "Eu", time: "Agora", text, likes: 0, liked: false, replies: [], status: 'pending' };
     updated[selectedPostIdx] = {
@@ -1792,6 +2062,10 @@ const App = () => {
 
   const handleReplyComment = (commentIdx, text) => {
     if (selectedPostIdx === null) return;
+    if (isLoggedIn && !isEmailConfirmed) {
+      setShowEmailConfirmRequired(true);
+      return;
+    }
     const updated = [...rodasPosts];
     const post = { ...updated[selectedPostIdx] };
     const comments = [...(post.commentsList || [])];
@@ -1932,13 +2206,56 @@ const App = () => {
         onSignup={({ email, username }) => {
           setUserName(username);
           setUserEmail(email);
-          const userData = { name: username, email };
+          const confirmToken = crypto.randomUUID();
+          const userData = { name: username, email, emailConfirmed: false, confirmToken };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
           sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
-          goAfterAuth();
+          sendConfirmationEmail(email, username, confirmToken);
+          setCurrentPage('emailPending');
         }}
         onGoToLogin={() => setCurrentPage('login')}
+      />
+    );
+  }
+
+  // Render Email Pending page (after signup)
+  if (currentPage === 'emailPending') {
+    return (
+      <EmailPendingPage
+        email={userEmail}
+        userName={userName}
+        confirmToken={savedUser?.confirmToken}
+        onContinue={goAfterAuth}
+        onResend={resendConfirmationEmail}
+      />
+    );
+  }
+
+  // Render Email Confirmed success page
+  if (currentPage === 'emailConfirmed') {
+    return (
+      <EmailConfirmPage
+        success={true}
+        onContinue={() => {
+          setCurrentPage('inicio');
+          setPageHistory([]);
+          window.scrollTo(0, 0);
+        }}
+      />
+    );
+  }
+
+  // Render Email Confirm Failed page
+  if (currentPage === 'emailConfirmFailed') {
+    return (
+      <EmailConfirmPage
+        success={false}
+        onContinue={() => {
+          setCurrentPage('inicio');
+          setPageHistory([]);
+          window.scrollTo(0, 0);
+        }}
       />
     );
   }
@@ -2010,6 +2327,8 @@ const App = () => {
           userEmail={userEmail}
           posts={rodasPosts}
           onOpenPost={handleOpenPost}
+          isEmailConfirmed={isEmailConfirmed}
+          onResendConfirmation={resendConfirmationEmail}
           onLogout={() => {
             setUserName('');
             setUserEmail('');
@@ -2068,6 +2387,12 @@ const App = () => {
         {reviewPopupType && (
           <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
         )}
+        {showEmailConfirmRequired && (
+          <EmailConfirmRequiredPopup
+            onClose={() => setShowEmailConfirmRequired(false)}
+            onResend={resendConfirmationEmail}
+          />
+        )}
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
             <Heart size={22} />
@@ -2094,12 +2419,14 @@ const App = () => {
         onSignup={({ email, username }) => {
           setUserName(username);
           setUserEmail(email);
-          const userData = { name: username, email };
+          const confirmToken = crypto.randomUUID();
+          const userData = { name: username, email, emailConfirmed: false, confirmToken };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
           sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
+          sendConfirmationEmail(email, username, confirmToken);
           setPendingAction({ type: 'rodas' });
-          goAfterAuth();
+          setCurrentPage('emailPending');
         }}
           onGoToLogin={() => setCurrentPage('login')}
         />
@@ -2173,6 +2500,19 @@ const App = () => {
         <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
       </header>
 
+      {/* Email Confirm Banner */}
+      {isLoggedIn && !isEmailConfirmed && (
+        <EmailConfirmBanner onResend={resendConfirmationEmail} />
+      )}
+
+      {/* Email Confirm Required Popup */}
+      {showEmailConfirmRequired && (
+        <EmailConfirmRequiredPopup
+          onClose={() => setShowEmailConfirmRequired(false)}
+          onResend={resendConfirmationEmail}
+        />
+      )}
+
       {/* Account Deleted Popup */}
       {showAccountDeleted && (
         <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-6">
@@ -2206,10 +2546,12 @@ const App = () => {
         onSendPost={handleSendPost}
         onComingSoon={() => setShowComingSoon(true)}
         isLoggedIn={isLoggedIn}
+        isEmailConfirmed={isEmailConfirmed}
         onRequireLogin={(action) => {
           setPendingAction(action);
           navigateTo('signup');
         }}
+        onRequireEmailConfirm={() => setShowEmailConfirmRequired(true)}
         draftMessage={draftMessage}
         setDraftMessage={setDraftMessage}
         isPanicOpen={isPanicOpen}
