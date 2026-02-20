@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   try {
     // --- SIGNUP ---
     if (action === 'signup') {
-      const { email, password, username } = req.body;
+      const { email, password, username, confirmToken } = req.body;
       console.log('[auth] Signup attempt - email:', email, 'username:', username);
       if (!email || !password || !username) {
         return res.status(400).json({ error: 'email, password e username obrigatórios' });
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
       const { data, error } = await supabase.auth.admin.createUser({
         email,
         password,
-        user_metadata: { username },
+        user_metadata: { username, confirm_token: confirmToken || null },
         email_confirm: false,
       });
 
@@ -86,14 +86,51 @@ export default async function handler(req, res) {
         },
       });
 
-    // --- CONFIRM EMAIL (verify token) ---
+    // --- CONFIRM EMAIL (verify token server-side) ---
     } else if (action === 'confirm_email') {
-      const { userId } = req.body;
-      if (!userId) {
-        return res.status(400).json({ error: 'userId obrigatório' });
+      const { userId, email: confirmEmail, token } = req.body;
+
+      // If token + email provided, verify server-side (works cross-device)
+      if (token && confirmEmail) {
+        const { data: users, error: listError } = await supabase.auth.admin.listUsers();
+        if (listError) {
+          console.error('List users error:', listError);
+          return res.status(500).json({ error: 'Erro interno' });
+        }
+
+        const user = users.users.find(u => u.email === confirmEmail);
+        if (!user) {
+          return res.status(400).json({ error: 'Utilizador não encontrado.' });
+        }
+
+        const storedToken = user.user_metadata?.confirm_token;
+        if (!storedToken || storedToken !== token) {
+          return res.status(400).json({ error: 'Link de confirmação inválido.' });
+        }
+
+        if (user.email_confirmed_at) {
+          return res.status(200).json({ success: true, alreadyConfirmed: true, user: { id: user.id, email: user.email, username: user.user_metadata?.username } });
+        }
+
+        const { error: updateError } = await supabase.auth.admin.updateUserById(user.id, {
+          email_confirm: true,
+          user_metadata: { ...user.user_metadata, confirm_token: null },
+        });
+
+        if (updateError) {
+          console.error('Confirm email error:', updateError);
+          return res.status(400).json({ error: updateError.message });
+        }
+
+        return res.status(200).json({ success: true, user: { id: user.id, email: user.email, username: user.user_metadata?.username } });
       }
 
-      const { data, error } = await supabase.auth.admin.updateUserById(userId, {
+      // Legacy: confirm by userId only
+      if (!userId) {
+        return res.status(400).json({ error: 'userId ou token+email obrigatório' });
+      }
+
+      const { error } = await supabase.auth.admin.updateUserById(userId, {
         email_confirm: true,
       });
 

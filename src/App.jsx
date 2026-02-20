@@ -97,6 +97,7 @@ const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
+              autoComplete="off"
               className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
           </div>
@@ -113,6 +114,7 @@ const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Como quer ser chamada?"
+              autoComplete="off"
               className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
           </div>
@@ -129,6 +131,7 @@ const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={"M\u00ednimo 6 caracteres"}
+              autoComplete="new-password"
               className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
             <button onClick={() => setShowPassword(!showPassword)} className="text-gray-400">
@@ -243,6 +246,7 @@ const LoginPage = ({ onLogin, onGoToSignup, onBack, onForgotPassword }) => {
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               placeholder="seu@email.com"
+              autoComplete="email"
               className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
           </div>
@@ -263,6 +267,7 @@ const LoginPage = ({ onLogin, onGoToSignup, onBack, onForgotPassword }) => {
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
               placeholder="Sua senha"
+              autoComplete="current-password"
               className="flex-1 text-base text-gray-700 placeholder-gray-400 outline-none bg-transparent"
             />
             <button onClick={() => setShowPassword(!showPassword)} className="text-gray-400">
@@ -2221,29 +2226,32 @@ const App = () => {
       // Clean URL
       window.history.replaceState({}, '', '/');
 
-      const user = getSavedUser();
-      if (user && user.confirmToken === token && user.email === email && !user.emailConfirmed) {
-        // Mark as confirmed locally
-        const updatedUser = { ...user, emailConfirmed: true };
-        localStorage.setItem('dmd_user', JSON.stringify(updatedUser));
-        setSavedUser(updatedUser);
-        setUserName(updatedUser.name);
-        setUserEmail(updatedUser.email);
-        // Also confirm on server (Supabase)
-        if (user.id) {
-          fetch('/api/auth', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'confirm_email', userId: user.id }),
-          }).catch(() => {});
-        }
-        setCurrentPage('emailConfirmed');
-      } else if (user && user.emailConfirmed && user.email === email) {
-        // Already confirmed
-        setCurrentPage('emailConfirmed');
-      } else {
-        setCurrentPage('emailConfirmFailed');
-      }
+      // Verify token server-side (works from any device)
+      fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'confirm_email', email, token }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            // Update local state if user is on same device
+            const localUser = getSavedUser();
+            if (localUser && localUser.email === email) {
+              const updatedUser = { ...localUser, emailConfirmed: true };
+              localStorage.setItem('dmd_user', JSON.stringify(updatedUser));
+              setSavedUser(updatedUser);
+              setUserName(updatedUser.name);
+              setUserEmail(updatedUser.email);
+            }
+            setCurrentPage('emailConfirmed');
+          } else {
+            setCurrentPage('emailConfirmFailed');
+          }
+        })
+        .catch(() => {
+          setCurrentPage('emailConfirmFailed');
+        });
     }
   }, []);
 
@@ -2577,26 +2585,24 @@ const App = () => {
       <SignupPage
         onBack={pageHistory.length > 0 ? goBack : null}
         onSignup={async ({ email, username, password }) => {
+          const confirmToken = crypto.randomUUID();
           const res = await fetch('/api/auth', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'signup', email, password, username }),
+            body: JSON.stringify({ action: 'signup', email, password, username, confirmToken }),
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
 
           setUserName(username);
           setUserEmail(email);
-          const confirmToken = crypto.randomUUID();
           const userData = { id: data.user.id, name: username, email, emailConfirmed: false, confirmToken };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
 
-          // Send to Brevo CRM + confirmation email (await to catch errors)
-          const brevoResult = await sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
-          console.log('[v0] Brevo create_contact result:', brevoResult);
-          const confirmResult = await sendToBrevo('send_confirmation_email', { email, userName: username, confirmToken, baseUrl: window.location.origin });
-          console.log('[v0] Brevo send_confirmation_email result:', confirmResult);
+          // Send to Brevo CRM + confirmation email
+          await sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
+          await sendToBrevo('send_confirmation_email', { email, userName: username, confirmToken, baseUrl: window.location.origin });
 
           setCurrentPage('emailPending');
         }}
@@ -2839,26 +2845,24 @@ const App = () => {
       return (
         <SignupPage
         onSignup={async ({ email, username, password }) => {
+          const confirmToken = crypto.randomUUID();
           const res = await fetch('/api/auth', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'signup', email, password, username }),
+            body: JSON.stringify({ action: 'signup', email, password, username, confirmToken }),
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
 
           setUserName(username);
           setUserEmail(email);
-          const confirmToken = crypto.randomUUID();
           const userData = { id: data.user.id, name: username, email, emailConfirmed: false, confirmToken };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
 
-          // Send to Brevo CRM + confirmation email (await to catch errors)
-          const brevoResult = await sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
-          console.log('[v0] Brevo create_contact result (rodas):', brevoResult);
-          const confirmResult = await sendToBrevo('send_confirmation_email', { email, userName: username, confirmToken, baseUrl: window.location.origin });
-          console.log('[v0] Brevo send_confirmation_email result (rodas):', confirmResult);
+          // Send to Brevo CRM + confirmation email
+          await sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
+          await sendToBrevo('send_confirmation_email', { email, userName: username, confirmToken, baseUrl: window.location.origin });
 
           setPendingAction({ type: 'rodas' });
           setCurrentPage('emailPending');
