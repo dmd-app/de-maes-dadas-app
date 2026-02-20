@@ -10,7 +10,7 @@ export default {
         'soft-bg': '#F0F4FF',       // Fundo Azul Bebê
         'soft-blue': '#1E3A8A',     // Azul do Logo
         'soft-purple': '#A855F7',   // Roxo dos Botões
-        'soft-pink': '#EC4899',     // Rosa dos Detalhes
+        'soft-pink': '#3B82F6',     // Azul dos Detalhes
         'soft-green': '#84CC16',    // Verde do Copo Cheio
         'soft-orange': '#F97316',   // Laranja do Copo Vazio
         'cup-empty': '#3B82F6',     // Azul - Exausta/Tristeza (0-1)
