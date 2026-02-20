@@ -861,7 +861,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
           </div>
         )}
         {filteredPosts.map((post) => (
-          <div key={post.originalIdx} onClick={() => onOpenPost && onOpenPost(post.originalIdx)} className={`bg-white rounded-2xl p-5 shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform ${post.status === 'pending' ? 'opacity-50' : ''}`}>
+          <div key={post.id || post.originalIdx} onClick={() => onOpenPost && onOpenPost(post.id)} className={`bg-white rounded-2xl p-5 shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform ${post.status === 'pending' ? 'opacity-50' : ''}`}>
             {/* Pending Badge */}
             {post.status === 'pending' && (
               <div className="flex items-center gap-1.5 mb-2">
@@ -1017,10 +1017,10 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogi
         <div className="flex flex-col gap-3">
           {posts.map((post, idx) => ({ ...post, originalIdx: idx })).filter((p) => !p.status || p.status === 'active' || p.status === 'approved').slice(0, 2).map((post) => (
             <div
-              key={post.originalIdx}
+              key={post.id || post.originalIdx}
               onClick={() => {
                 if (isLoggedIn) {
-                  onOpenPost && onOpenPost(post.originalIdx);
+                  onOpenPost && onOpenPost(post.id);
                 } else {
                   onRequireLogin && onRequireLogin({ type: 'rodas' });
                 }
@@ -2815,17 +2815,11 @@ const App = () => {
     }
   };
 
-  const handleOpenPost = (idxOrId) => {
-    // Support both index and post ID lookup
-    if (typeof idxOrId === 'string') {
-      // It's a post ID, find the index in rodasPosts
-      const foundIdx = rodasPosts.findIndex(p => p.id === idxOrId);
-      if (foundIdx !== -1) {
-        setSelectedPostIdx(foundIdx);
-        navigateTo('postDetail');
-      }
-    } else {
-      setSelectedPostIdx(idxOrId);
+  const handleOpenPost = (postId) => {
+    if (!postId) return;
+    const foundIdx = rodasPosts.findIndex(p => p.id === postId);
+    if (foundIdx !== -1) {
+      setSelectedPostIdx(foundIdx);
       navigateTo('postDetail');
     }
   };
