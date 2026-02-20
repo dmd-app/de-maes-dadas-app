@@ -93,6 +93,7 @@ export default async function handler(req, res) {
 
     } else if (action === 'notify_coming_soon') {
       const { feature, userId } = req.body;
+      console.log('[brevo] notify_coming_soon - email:', email, 'feature:', feature, 'userId:', userId);
 
       // 1. Save to Supabase database
       const supabase = getSupabase();
@@ -103,11 +104,44 @@ export default async function handler(req, res) {
           .from('coming_soon_notifications')
           .upsert(insertData, { onConflict: 'email,feature' });
         if (dbError) {
-          console.error('Supabase insert error:', dbError);
+          console.error('[brevo] Supabase insert error:', JSON.stringify(dbError));
+        } else {
+          console.log('[brevo] Saved to Supabase coming_soon_notifications:', email);
+        }
+      } else {
+        console.error('[brevo] Supabase client not available (missing SUPABASE_SERVICE_ROLE_KEY?)');
+      }
+
+      // 2. First get existing Brevo lists to find a valid list
+      let targetListIds = listIds || [];
+      if (targetListIds.length === 0) {
+        try {
+          const listsRes = await fetch('https://api.brevo.com/v3/contacts/lists?limit=50&offset=0', {
+            headers: { 'accept': 'application/json', 'api-key': apiKey },
+          });
+          if (listsRes.ok) {
+            const listsData = await listsRes.json();
+            console.log('[brevo] Available lists:', JSON.stringify(listsData.lists?.map(l => ({ id: l.id, name: l.name }))));
+            if (listsData.lists && listsData.lists.length > 0) {
+              targetListIds = [listsData.lists[0].id];
+            }
+          }
+        } catch (e) {
+          console.error('[brevo] Failed to fetch lists:', e.message);
         }
       }
 
-      // 2. Add contact to Brevo CRM list
+      // 3. Add contact to Brevo CRM (simple - no custom attributes that may not exist)
+      const contactPayload = {
+        email,
+        updateEnabled: true,
+      };
+      if (targetListIds.length > 0) {
+        contactPayload.listIds = targetListIds;
+      }
+
+      console.log('[brevo] Creating/updating contact with payload:', JSON.stringify(contactPayload));
+
       const response = await fetch('https://api.brevo.com/v3/contacts', {
         method: 'POST',
         headers: {
@@ -115,27 +149,37 @@ export default async function handler(req, res) {
           'content-type': 'application/json',
           'api-key': apiKey,
         },
-        body: JSON.stringify({
-          email,
-          attributes: {
-            SOURCE: 'coming_soon_notify',
-            COMING_SOON_INTEREST: true,
-            COMING_SOON_FEATURE: feature || 'general',
-          },
-          listIds: listIds || [3],
-          updateEnabled: true,
-        }),
+        body: JSON.stringify(contactPayload),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.error('[brevo] notify_coming_soon API error:', JSON.stringify(errorData));
         if (errorData.code === 'duplicate_parameter') {
+          console.log('[brevo] Contact already exists, updating list membership');
+          // Try to update existing contact's list membership
+          if (targetListIds.length > 0) {
+            try {
+              await fetch(`https://api.brevo.com/v3/contacts/lists/${targetListIds[0]}/contacts/add`, {
+                method: 'POST',
+                headers: {
+                  'accept': 'application/json',
+                  'content-type': 'application/json',
+                  'api-key': apiKey,
+                },
+                body: JSON.stringify({ emails: [email] }),
+              });
+              console.log('[brevo] Added existing contact to list:', targetListIds[0]);
+            } catch (e) {
+              console.error('[brevo] Failed to add to list:', e.message);
+            }
+          }
           return res.status(200).json({ success: true });
         }
-        console.error('Brevo API error:', errorData);
         return res.status(response.status).json({ error: errorData.message || 'Brevo API error' });
       }
 
+      console.log('[brevo] notify_coming_soon completed successfully for:', email);
       return res.status(200).json({ success: true });
 
     } else if (action === 'send_confirmation_email') {
