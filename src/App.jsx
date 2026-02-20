@@ -3378,6 +3378,25 @@ const App = () => {
     );
   }
 
+  // Render Post Detail page
+  if (currentPage === 'postDetail' && selectedPostIdx !== null && rodasPosts[selectedPostIdx]) {
+    return (
+      <>
+        <PostDetail
+          post={rodasPosts[selectedPostIdx]}
+          onBack={goBack}
+          onAddComment={handleAddComment}
+          onLikePost={handleLikePostDetail}
+          onLikeComment={handleLikeComment}
+          onReplyComment={handleReplyComment}
+          onLikeReply={handleLikeReply}
+          onEditPost={handleEditPost}
+        />
+        <NavBar currentPage="postDetail" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
+      </>
+    );
+  }
+
   // Render Rodas de Conversa page (requires login)
   if (currentPage === 'rodas') {
     if (!isLoggedIn) {
