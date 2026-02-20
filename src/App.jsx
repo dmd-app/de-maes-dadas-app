@@ -167,7 +167,7 @@ const SignupPage = ({ onSignup, onGoToLogin, onBack }) => {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className={`w-full mt-4 py-4 bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading ? 'opacity-70' : ''}`}
+          className={`w-full mt-4 py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading ? 'opacity-70' : ''}`}
         >
           {loading ? 'CRIANDO CONTA...' : 'CRIAR CONTA'}
         </button>
@@ -222,7 +222,7 @@ const LoginPage = ({ onLogin, onGoToSignup, onBack, onForgotPassword }) => {
         </div>
       )}
       <div className={`relative overflow-hidden ${onBack ? 'pt-4' : 'pt-16'} pb-10 px-8`}>
-        <div className="w-40 h-40 rounded-full bg-[#3B6FED]/10 blur-3xl absolute -top-10 -right-10"></div>
+        <div className="w-40 h-40 rounded-full bg-[#FF66C4]/10 blur-3xl absolute -top-10 -right-10"></div>
         <div className="w-32 h-32 rounded-full bg-soft-blue/10 blur-3xl absolute -bottom-5 -left-10"></div>
         <div className="relative z-10">
           <img src="/images/logo-horizontal-azul.png" alt="DeMaesDadas" className="h-10 mb-2" />
@@ -258,7 +258,7 @@ const LoginPage = ({ onLogin, onGoToSignup, onBack, onForgotPassword }) => {
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-xs font-semibold text-gray-600">Senha</label>
-            <button onClick={() => onForgotPassword && onForgotPassword()} className="text-xs text-[#3B6FED] font-semibold">Esqueci minha senha</button>
+            <button onClick={() => onForgotPassword && onForgotPassword()} className="text-xs text-[#FF66C4] font-semibold">Esqueci minha senha</button>
           </div>
           <div className={`flex items-center gap-3 bg-white rounded-xl border ${errors.password ? 'border-red-300' : 'border-gray-200'} px-4 py-3 focus-within:ring-2 focus-within:ring-soft-blue/30 transition-all`}>
             <Lock size={18} className="text-gray-400 flex-shrink-0" />
@@ -287,7 +287,7 @@ const LoginPage = ({ onLogin, onGoToSignup, onBack, onForgotPassword }) => {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className={`w-full mt-4 py-4 bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading ? 'opacity-70' : ''}`}
+          className={`w-full mt-4 py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading ? 'opacity-70' : ''}`}
         >
           {loading ? 'ENTRANDO...' : 'ENTRAR'}
         </button>
@@ -321,7 +321,7 @@ const OnboardingPage = ({ onComplete }) => {
           <div
             key={i}
             className={`h-1.5 rounded-full transition-all duration-300 ${
-              i === step ? 'w-10 bg-[#3B6FED]' : i < step ? 'w-6 bg-[#3B6FED]/40' : 'w-6 bg-gray-200'
+              i === step ? 'w-10 bg-[#FF66C4]' : i < step ? 'w-6 bg-[#FF66C4]/40' : 'w-6 bg-gray-200'
             }`}
           />
         ))}
@@ -333,7 +333,7 @@ const OnboardingPage = ({ onComplete }) => {
             <h2 className="text-2xl font-bold text-gray-800 leading-tight">
               {"Aqui \u00e9 uma comunidade"}
             </h2>
-            <h2 className="text-2xl font-bold text-[#3B6FED] leading-tight mb-6">
+            <h2 className="text-2xl font-bold text-[#FF66C4] leading-tight mb-6">
               de apoio real.
             </h2>
 
@@ -348,7 +348,7 @@ const OnboardingPage = ({ onComplete }) => {
               <p className="text-gray-600">Oferecemos ferramentas.</p>
               <p className="text-gray-600">Perguntas certas.</p>
               <p className="text-gray-600">{"Espa\u00e7os de escuta."}</p>
-              <p className="text-[#3B6FED] font-bold text-lg mt-1">{"Presen\u00e7a."}</p>
+              <p className="text-[#FF66C4] font-bold text-lg mt-1">{"Presen\u00e7a."}</p>
             </div>
           </div>
 
@@ -373,8 +373,8 @@ const OnboardingPage = ({ onComplete }) => {
             <div className="flex flex-col gap-4">
               {onboardingAgreements.map((item, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-[#3B6FED]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check size={14} className="text-[#3B6FED]" />
+                  <div className="w-6 h-6 rounded-full bg-[#FF66C4]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check size={14} className="text-[#FF66C4]" />
                   </div>
                   <div>
                     <p className="font-semibold text-gray-800 text-sm">{item.title}</p>
@@ -393,7 +393,7 @@ const OnboardingPage = ({ onComplete }) => {
           <div className="px-8 pb-10 flex flex-col gap-3">
             <button
               onClick={onComplete}
-              className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white shadow-lg font-bold text-sm transition-all active:scale-[0.97]"
+              className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-lg font-bold text-sm transition-all active:scale-[0.97]"
             >
               Aceitar
             </button>
@@ -430,7 +430,7 @@ const ComingSoonPopup = ({ onClose, isLoggedIn, userEmail, userId, feature }) =>
     <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-6">
       <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl">
         <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
-          <Heart size={28} className="text-[#3B6FED]" />
+          <Heart size={28} className="text-[#FF66C4]" />
         </div>
         <h3 className="font-bold text-gray-800 text-lg mb-2">{featureName !== 'general' ? featureName : 'Coming Soon'}</h3>
         <p className="text-sm text-gray-500 leading-relaxed mb-5">
@@ -446,14 +446,14 @@ const ComingSoonPopup = ({ onClose, isLoggedIn, userEmail, userId, feature }) =>
                 value={notifyEmail}
                 onChange={(e) => setNotifyEmail(e.target.value)}
                 placeholder="seu@email.com"
-                className="flex-1 min-w-0 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-[#3B6FED]/30 transition-all"
+                className="flex-1 min-w-0 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
               />
               <button
                 onClick={handleNotify}
                 disabled={!notifyEmail.trim() || !notifyEmail.includes('@')}
                 className={`shrink-0 px-4 py-2.5 rounded-xl font-bold text-xs transition-all active:scale-[0.98] ${
                   notifyEmail.trim() && notifyEmail.includes('@')
-                    ? 'bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white'
+                    ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white'
                     : 'bg-gray-100 text-gray-300'
                 }`}
               >
@@ -471,7 +471,7 @@ const ComingSoonPopup = ({ onClose, isLoggedIn, userEmail, userId, feature }) =>
 
         <button
           onClick={onClose}
-          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
         >
           ENTENDI
         </button>
@@ -498,7 +498,7 @@ const ReviewPendingPopup = ({ onClose, type }) => {
         </p>
         <button
           onClick={onClose}
-          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
         >
           OK
         </button>
@@ -643,7 +643,7 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, isEmailC
               }, 350);
             }
           }}
-          className="col-span-2 bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white p-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all"
+          className="col-span-2 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white p-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all"
         >
           <Heart fill="white" size={20} />
           <span className="font-bold tracking-wide">ABRIR O CORAÇÃO</span>
@@ -652,14 +652,14 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, isEmailC
         {/* Inline expand below button */}
         <div ref={panicPanelRef} className={`col-span-2 overflow-hidden transition-all duration-300 ease-in-out ${isPanicOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center">
-            <Heart size={36} className="text-[#3B6FED] mb-3 fill-[#3B6FED]" />
+            <Heart size={36} className="text-[#FF66C4] mb-3 fill-[#FF66C4]" />
             <h4 className="text-gray-800 font-bold mb-1">{"O que está pesando aí dentro?"}</h4>
             <p className="text-gray-400 text-sm mb-4">Desabafe...</p>
             
             <textarea 
               value={draftMessage}
               onChange={(e) => setDraftMessage(e.target.value)}
-              className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#3B6FED] focus:outline-none text-gray-700 resize-none h-28 mb-4 text-sm"
+              className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF66C4] focus:outline-none text-gray-700 resize-none h-28 mb-4 text-sm"
               placeholder="Escreva aqui seus sentimentos..."
             ></textarea>
             
@@ -669,7 +669,7 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, isEmailC
                 disabled={!draftMessage.trim()}
                 className={`w-full py-3 font-bold rounded-full text-sm transition-all active:scale-[0.98] ${
                   draftMessage.trim()
-                    ? 'bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white shadow-md'
+                    ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-md'
                     : 'bg-gray-200 text-gray-400'
                 }`}
               >
@@ -695,14 +695,14 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, isEmailC
             onRequireLogin && onRequireLogin({ type: 'rodas' });
           }
         }} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#3B6FED] to-[#1E40AF] flex items-center justify-center text-white">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
             <MessageCircle size={24} />
           </div>
           <span className="font-semibold text-gray-700 text-sm text-center leading-tight">Rodas de Conversa</span>
         </button>
 
         <button onClick={() => onComingSoon('Biblioteca')} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#3B6FED] to-[#1E40AF] flex items-center justify-center text-white">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
             <BookOpen size={24} />
           </div>
           <span className="font-semibold text-gray-700 text-sm text-center leading-tight">{"Biblioteca\n(O Espelho)"}</span>
@@ -716,7 +716,7 @@ const ContentSection = ({ title, items, badgeColor, cardWidth = "180px", onComin
   <section className="py-4 bg-soft-bg">
     <div className="px-6 mb-4 flex justify-between items-center">
       <h3 className="text-lg font-sans font-bold text-gray-800">{title}</h3>
-      <button onClick={() => onComingSoon(feature || title)} className="text-xs font-bold text-[#3B6FED] uppercase tracking-wider">Ver tudo</button>
+      <button onClick={() => onComingSoon(feature || title)} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
     </div>
     
     <div className="flex overflow-x-auto px-6 gap-4 pb-8 snap-x hide-scrollbar">
@@ -783,7 +783,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
   const [newPostCategory, setNewPostCategory] = useState("Desabafo");
 
   const categoryOptions = [
-    { name: "Desabafo", color: "bg-[#3B6FED] text-white" },
+    { name: "Desabafo", color: "bg-[#FF66C4] text-white" },
     { name: "Sono", color: "bg-soft-blue text-white" },
     { name: "Maternidade Solo", color: "bg-soft-purple text-white" },
   ];
@@ -791,7 +791,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
   const handleNewPost = () => {
     if (newPostText.trim()) {
       const cat = categoryOptions.find(c => c.name === newPostCategory);
-      onSendPost && onSendPost(newPostText.trim(), newPostCategory, cat?.color || "bg-[#3B6FED] text-white");
+      onSendPost && onSendPost(newPostText.trim(), newPostCategory, cat?.color || "bg-[#FF66C4] text-white");
       setNewPostText('');
       setNewPostCategory('Desabafo');
       setIsNewPostOpen(false);
@@ -906,7 +906,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
       <div className="sticky bottom-28 z-30 flex justify-end px-6 -mt-16 pointer-events-none">
         <button
           onClick={() => setIsNewPostOpen(true)}
-          className="w-14 h-14 bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-all pointer-events-auto"
+          className="w-14 h-14 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-all pointer-events-auto"
         >
           <Plus size={28} />
         </button>
@@ -946,7 +946,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
               value={newPostText}
               onChange={(e) => setNewPostText(e.target.value)}
               placeholder={"O que voc\u00ea quer compartilhar?"}
-              className="w-full min-h-[100px] text-sm text-gray-700 placeholder-gray-400 outline-none p-3 bg-gray-50 rounded-xl border border-gray-200 resize-none focus:ring-2 focus:ring-[#3B6FED]/30 transition-all"
+              className="w-full min-h-[100px] text-sm text-gray-700 placeholder-gray-400 outline-none p-3 bg-gray-50 rounded-xl border border-gray-200 resize-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
             />
 
             <button
@@ -954,7 +954,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
               disabled={!newPostText.trim()}
               className={`w-full mt-3 py-3 rounded-xl font-bold text-sm tracking-wide transition-all active:scale-[0.98] ${
                 newPostText.trim()
-                  ? 'bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white shadow-lg'
+                  ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-lg'
                   : 'bg-gray-100 text-gray-300'
               }`}
             >
@@ -992,14 +992,14 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogi
           }}
           className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all"
         >
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#3B6FED] to-[#1E40AF] flex items-center justify-center text-white">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
             <MessageCircle size={24} />
           </div>
           <h3 className="font-semibold text-gray-700 text-sm text-center leading-tight">Rodas de Conversa</h3>
         </button>
 
         <button onClick={() => onComingSoon('Biblioteca')} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#3B6FED] to-[#1E40AF] flex items-center justify-center text-white">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
             <BookOpen size={24} />
           </div>
           <h3 className="font-semibold text-gray-700 text-sm text-center leading-tight">{"Biblioteca\n(O Espelho)"}</h3>
@@ -1012,7 +1012,7 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogi
           <h3 className="text-lg font-sans font-bold text-gray-800">Conversas Recentes</h3>
           <button onClick={() => {
             if (isLoggedIn) { onNavigate('rodas'); } else { onRequireLogin && onRequireLogin({ type: 'rodas' }); }
-          }} className="text-xs font-bold text-[#3B6FED] uppercase tracking-wider">Ver tudo</button>
+          }} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
         </div>
         <div className="flex flex-col gap-3">
           {posts.map((post, idx) => ({ ...post, originalIdx: idx })).filter((p) => !p.status || p.status === 'active').slice(0, 2).map((post) => (
@@ -1064,7 +1064,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
   const isMyPost = post.author === "Eu";
 
   const categoryOptions = [
-    { name: "Desabafo", color: "bg-[#3B6FED] text-white" },
+    { name: "Desabafo", color: "bg-[#FF66C4] text-white" },
     { name: "Sono", color: "bg-indigo-400 text-white" },
     { name: "Maternidade Solo", color: "bg-soft-blue text-white" },
     { name: "Volta ao Trabalho", color: "bg-emerald-500 text-white" },
@@ -1158,8 +1158,8 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
 
           <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
             <div className="flex items-center gap-4">
-              <button onClick={onLikePost} className={`flex items-center gap-1.5 transition-colors ${post.liked ? 'text-[#3B6FED]' : 'text-gray-400 hover:text-[#3B6FED]'}`}>
-                <Heart size={18} fill={post.liked ? '#3B6FED' : 'none'} />
+              <button onClick={onLikePost} className={`flex items-center gap-1.5 transition-colors ${post.liked ? 'text-[#FF66C4]' : 'text-gray-400 hover:text-[#FF66C4]'}`}>
+                <Heart size={18} fill={post.liked ? '#FF66C4' : 'none'} />
                 <span className="text-sm font-medium">{post.likes}</span>
               </button>
               <span className="flex items-center gap-1.5 text-gray-400">
@@ -1230,7 +1230,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
               type="text"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="w-full text-sm text-gray-700 placeholder-gray-400 outline-none px-3 py-2.5 bg-gray-50 rounded-xl border border-gray-200 mb-3 focus:ring-2 focus:ring-[#3B6FED]/30 transition-all"
+              className="w-full text-sm text-gray-700 placeholder-gray-400 outline-none px-3 py-2.5 bg-gray-50 rounded-xl border border-gray-200 mb-3 focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
               placeholder={"T\u00edtulo da conversa"}
             />
 
@@ -1239,7 +1239,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
             <textarea
               value={editDesc}
               onChange={(e) => setEditDesc(e.target.value)}
-              className="w-full min-h-[80px] text-sm text-gray-700 placeholder-gray-400 outline-none p-3 bg-gray-50 rounded-xl border border-gray-200 resize-none focus:ring-2 focus:ring-[#3B6FED]/30 transition-all"
+              className="w-full min-h-[80px] text-sm text-gray-700 placeholder-gray-400 outline-none p-3 bg-gray-50 rounded-xl border border-gray-200 resize-none focus:ring-2 focus:ring-[#FF66C4]/30 transition-all"
               placeholder={"O que voc\u00ea quer compartilhar?"}
             />
 
@@ -1248,7 +1248,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
               disabled={!editTitle.trim() || !editDesc.trim()}
               className={`w-full mt-3 py-3 rounded-xl font-bold text-sm tracking-wide transition-all active:scale-[0.98] ${
                 editTitle.trim() && editDesc.trim()
-                  ? 'bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white shadow-lg'
+                  ? 'bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white shadow-lg'
                   : 'bg-gray-100 text-gray-300'
               }`}
             >
@@ -1271,7 +1271,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
           />
           <button
             onClick={handleSendComment}
-            className={`p-2.5 rounded-xl transition-all ${newComment.trim() ? 'bg-[#3B6FED] text-white' : 'bg-gray-100 text-gray-300'}`}
+            className={`p-2.5 rounded-xl transition-all ${newComment.trim() ? 'bg-[#FF66C4] text-white' : 'bg-gray-100 text-gray-300'}`}
             disabled={!newComment.trim()}
           >
             <Send size={18} />
@@ -1312,9 +1312,9 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
               <div className="flex items-center gap-4 pl-9 mt-2">
                 <button
                   onClick={() => onLikeComment(comment.originalIdx)}
-                  className={`flex items-center gap-1 text-xs transition-colors ${comment.liked ? 'text-[#3B6FED]' : 'text-gray-400 hover:text-[#3B6FED]'}`}
+                  className={`flex items-center gap-1 text-xs transition-colors ${comment.liked ? 'text-[#FF66C4]' : 'text-gray-400 hover:text-[#FF66C4]'}`}
                 >
-                  <Heart size={14} fill={comment.liked ? '#3B6FED' : 'none'} />
+                  <Heart size={14} fill={comment.liked ? '#FF66C4' : 'none'} />
                   <span>{comment.likes || 0}</span>
                 </button>
                 <button
@@ -1334,13 +1334,13 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSendReply(comment.originalIdx)}
-                    className="flex-1 text-xs text-gray-700 placeholder-gray-400 outline-none px-3 py-2 bg-gray-50 rounded-xl border border-gray-200 focus:ring-1 focus:ring-[#3B6FED]"
+                    className="flex-1 text-xs text-gray-700 placeholder-gray-400 outline-none px-3 py-2 bg-gray-50 rounded-xl border border-gray-200 focus:ring-1 focus:ring-[#FF66C4]"
                     placeholder={"Escreva uma resposta..."}
                     autoFocus
                   />
                   <button
                     onClick={() => handleSendReply(comment.originalIdx)}
-                    className={`p-2 rounded-xl transition-all ${replyText.trim() ? 'bg-[#3B6FED] text-white' : 'bg-gray-100 text-gray-300'}`}
+                    className={`p-2 rounded-xl transition-all ${replyText.trim() ? 'bg-[#FF66C4] text-white' : 'bg-gray-100 text-gray-300'}`}
                     disabled={!replyText.trim()}
                   >
                     <Send size={14} />
@@ -1373,9 +1373,9 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
                       <div className="pl-7 mt-1.5">
                         <button
                           onClick={() => onLikeReply(comment.originalIdx, rIdx)}
-                          className={`flex items-center gap-1 text-[11px] transition-colors ${reply.liked ? 'text-[#3B6FED]' : 'text-gray-400 hover:text-[#3B6FED]'}`}
+                          className={`flex items-center gap-1 text-[11px] transition-colors ${reply.liked ? 'text-[#FF66C4]' : 'text-gray-400 hover:text-[#FF66C4]'}`}
                         >
-                          <Heart size={12} fill={reply.liked ? '#3B6FED' : 'none'} />
+                          <Heart size={12} fill={reply.liked ? '#FF66C4' : 'none'} />
                           <span>{reply.likes || 0}</span>
                         </button>
                       </div>
@@ -1416,7 +1416,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
 
       {/* Profile Section */}
       <div className="relative overflow-hidden pt-4 pb-8 px-6">
-        <div className="w-48 h-48 rounded-full bg-[#3B6FED]/10 blur-3xl absolute -top-16 -right-16"></div>
+        <div className="w-48 h-48 rounded-full bg-[#FF66C4]/10 blur-3xl absolute -top-16 -right-16"></div>
         <div className="w-36 h-36 rounded-full bg-soft-blue/10 blur-3xl absolute -bottom-10 -left-10"></div>
         <div className="relative z-10">
           <div className="flex items-start justify-between mb-6">
@@ -1425,7 +1425,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
 
           {/* Avatar + Info */}
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#3B6FED] to-[#1E40AF] flex items-center justify-center shadow-lg flex-shrink-0">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center shadow-lg flex-shrink-0">
               <span className="text-white text-2xl font-bold">
                 {userName ? userName.charAt(0).toUpperCase() : "M"}
               </span>
@@ -1453,7 +1453,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
                   </button>
                 )}
               </div>
-              <p className="text-xs text-[#3B6FED] font-semibold mt-1">Membro da Aldeia</p>
+              <p className="text-xs text-[#FF66C4] font-semibold mt-1">Membro da Aldeia</p>
             </div>
           </div>
         </div>
@@ -1467,7 +1467,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
             <p className="text-[11px] text-gray-400 mt-0.5">Conversas</p>
           </div>
           <div className="text-center border-x border-gray-100">
-            <p className="text-xl font-bold text-[#3B6FED]">{totalLikes}</p>
+            <p className="text-xl font-bold text-[#FF66C4]">{totalLikes}</p>
             <p className="text-[11px] text-gray-400 mt-0.5">Curtidas</p>
           </div>
           <div className="text-center">
@@ -1577,7 +1577,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
                 </div>
                 <button
                   onClick={() => onToggleNotifPref && onToggleNotifPref(pref.key)}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${notifPrefs?.[pref.key] ? 'bg-[#3B6FED]' : 'bg-gray-300'}`}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${notifPrefs?.[pref.key] ? 'bg-[#FF66C4]' : 'bg-gray-300'}`}
                 >
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${notifPrefs?.[pref.key] ? 'translate-x-5' : ''}`} />
                 </button>
@@ -1682,7 +1682,7 @@ const EmailPendingPage = ({ email, userName, confirmToken, onContinue, onResend,
   return (
     <div className="min-h-screen bg-soft-bg flex flex-col items-center justify-center px-6 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
       <div className="w-full text-center">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#3B6FED] to-[#1E40AF] flex items-center justify-center mx-auto mb-6">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center mx-auto mb-6">
           <Mail size={36} className="text-white" />
         </div>
         <h1 className="text-2xl font-bold text-gray-800 mb-2 text-balance">{"Verifique o seu email"}</h1>
@@ -1708,7 +1708,7 @@ const EmailPendingPage = ({ email, userName, confirmToken, onContinue, onResend,
           className={`w-full py-3.5 rounded-xl font-bold text-sm active:scale-[0.98] transition-all mb-3 flex items-center justify-center gap-2 ${
             resendCooldown > 0
               ? 'bg-gray-100 text-gray-400'
-              : 'bg-white border-2 border-[#3B6FED] text-[#3B6FED]'
+              : 'bg-white border-2 border-[#FF66C4] text-[#FF66C4]'
           }`}
         >
           <RefreshCw size={16} className={resendCooldown > 0 ? 'animate-spin' : ''} />
@@ -1717,7 +1717,7 @@ const EmailPendingPage = ({ email, userName, confirmToken, onContinue, onResend,
 
         <button
           onClick={onContinue}
-          className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+          className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
         >
           {"Continuar sem confirmar"}
         </button>
@@ -1743,7 +1743,7 @@ const EmailConfirmPage = ({ success, onContinue }) => (
           </p>
           <button
             onClick={onContinue}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
           >
             {"Ir para a Aldeia"}
           </button>
@@ -1759,7 +1759,7 @@ const EmailConfirmPage = ({ success, onContinue }) => (
           </p>
           <button
             onClick={onContinue}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
           >
             Voltar
           </button>
@@ -1836,7 +1836,7 @@ const EmailConfirmRequiredPopup = ({ onClose, onResend }) => {
           className={`w-full py-3 rounded-xl font-bold text-sm active:scale-[0.98] transition-all mb-3 flex items-center justify-center gap-2 ${
             resendCooldown > 0
               ? 'bg-gray-100 text-gray-400'
-              : 'border-2 border-[#3B6FED] text-[#3B6FED]'
+              : 'border-2 border-[#FF66C4] text-[#FF66C4]'
           }`}
         >
           <RefreshCw size={16} />
@@ -1844,7 +1844,7 @@ const EmailConfirmRequiredPopup = ({ onClose, onResend }) => {
         </button>
         <button
           onClick={onClose}
-          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
         >
           ENTENDI
         </button>
@@ -1906,7 +1906,7 @@ const ForgotPasswordPage = ({ onBack, onCodeSent }) => {
         </button>
       </div>
       <div className="flex-1 flex flex-col items-center justify-center px-8 pb-10">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#3B6FED] to-[#1E40AF] flex items-center justify-center mx-auto mb-6">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center mx-auto mb-6">
           <Lock size={36} className="text-white" />
         </div>
         <h1 className="text-2xl font-bold text-gray-800 mb-2 text-center text-balance">{"Recuperar senha"}</h1>
@@ -1941,7 +1941,7 @@ const ForgotPasswordPage = ({ onBack, onCodeSent }) => {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className={`w-full py-4 bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading ? 'opacity-70' : ''}`}
+              className={`w-full py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading ? 'opacity-70' : ''}`}
             >
               {loading ? 'ENVIANDO...' : 'ENVIAR C\u00d3DIGO'}
             </button>
@@ -2056,7 +2056,7 @@ const ResetPasswordPage = ({ email, onBack, onSuccess }) => {
       <div className="flex-1 flex flex-col items-center justify-center px-8 pb-10">
         {step === 'code' ? (
           <>
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#3B6FED] to-[#1E40AF] flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center mx-auto mb-6">
               <Shield size={36} className="text-white" />
             </div>
             <h1 className="text-2xl font-bold text-gray-800 mb-2 text-center">{"Insira o c\u00f3digo"}</h1>
@@ -2076,7 +2076,7 @@ const ResetPasswordPage = ({ email, onBack, onSuccess }) => {
                   value={digit}
                   onChange={(e) => handleCodeChange(i, e.target.value)}
                   onKeyDown={(e) => handleCodeKeyDown(i, e)}
-                  className={`w-12 h-14 text-center text-xl font-bold bg-white rounded-xl border ${error ? 'border-red-300' : 'border-gray-200'} focus:ring-2 focus:ring-[#3B6FED]/30 focus:border-[#3B6FED] outline-none transition-all`}
+                  className={`w-12 h-14 text-center text-xl font-bold bg-white rounded-xl border ${error ? 'border-red-300' : 'border-gray-200'} focus:ring-2 focus:ring-[#FF66C4]/30 focus:border-[#FF66C4] outline-none transition-all`}
                 />
               ))}
             </div>
@@ -2086,7 +2086,7 @@ const ResetPasswordPage = ({ email, onBack, onSuccess }) => {
             <button
               onClick={handleVerifyCode}
               disabled={loading || fullCode.length !== 6}
-              className={`w-full py-4 bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading || fullCode.length !== 6 ? 'opacity-70' : ''}`}
+              className={`w-full py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading || fullCode.length !== 6 ? 'opacity-70' : ''}`}
             >
               {loading ? 'VERIFICANDO...' : 'VERIFICAR C\u00d3DIGO'}
             </button>
@@ -2142,7 +2142,7 @@ const ResetPasswordPage = ({ email, onBack, onSuccess }) => {
               <button
                 onClick={handleResetPassword}
                 disabled={loading}
-                className={`w-full py-4 bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading ? 'opacity-70' : ''}`}
+                className={`w-full py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide ${loading ? 'opacity-70' : ''}`}
               >
                 {loading ? 'REDEFININDO...' : 'REDEFINIR SENHA'}
               </button>
@@ -2167,7 +2167,7 @@ const PasswordResetSuccessPage = ({ onGoToLogin }) => (
       </p>
       <button
         onClick={onGoToLogin}
-        className="w-full py-4 bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide"
+        className="w-full py-4 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition-all text-sm tracking-wide"
       >
         IR PARA LOGIN
       </button>
@@ -2263,7 +2263,7 @@ const AdminPage = ({ adminEmail, onBack }) => {
 
       {loading ? (
         <div className="flex items-center justify-center pt-20">
-          <div className="w-8 h-8 border-3 border-[#3B6FED] border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-3 border-[#FF66C4] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : total === 0 ? (
         <div className="flex flex-col items-center justify-center pt-20 px-6">
@@ -2364,7 +2364,7 @@ const NavBar = ({ currentPage, onNavigate, unreadCount = 0, isAdmin = false }) =
             <tab.icon size={22} fill={tab.filled ? '#374151' : 'none'} stroke={tab.filled ? '#374151' : 'currentColor'} />
           )}
           {tab.badge > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#3B6FED] text-white text-[10px] font-bold flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#FF66C4] text-white text-[10px] font-bold flex items-center justify-center">
               {tab.badge > 99 ? '99+' : tab.badge}
             </span>
           )}
@@ -2455,7 +2455,7 @@ const NotificationsPage = ({ notifications, onMarkAllRead, onBack, onNavigateToP
                   {n.body && <p className="text-xs text-gray-400 mt-0.5 truncate">{n.body}</p>}
                   <p className="text-[11px] text-gray-300 mt-1">{timeAgo(n.created_at)}</p>
                 </div>
-                {!n.read && <div className="w-2.5 h-2.5 rounded-full bg-[#3B6FED] flex-shrink-0 mt-1.5" />}
+                {!n.read && <div className="w-2.5 h-2.5 rounded-full bg-[#FF66C4] flex-shrink-0 mt-1.5" />}
               </button>
             );
           })}
@@ -2703,7 +2703,7 @@ const App = () => {
   const resolvePendingAction = () => {
     if (pendingAction) {
       if (pendingAction.type === 'post') {
-        handleSendPost(pendingAction.text, 'Desabafo', 'bg-[#3B6FED] text-white');
+        handleSendPost(pendingAction.text, 'Desabafo', 'bg-[#FF66C4] text-white');
         setReviewPopupType('post');
         setPendingAction(null);
         setDraftMessage('');
@@ -2771,7 +2771,7 @@ const App = () => {
           action: 'create',
           body: text,
           category: category || 'Desabafo',
-          categoryColor: categoryColor || '#3B6FED',
+          categoryColor: categoryColor || '#FF66C4',
           authorName: userName || 'Anonima',
           userId: savedUser?.id || null,
         }),
@@ -3319,13 +3319,13 @@ const App = () => {
             <p className="text-sm text-gray-400 text-center mb-8 leading-relaxed">{"Crie sua conta ou fa\u00e7a login para acessar seu perfil e todas as funcionalidades."}</p>
             <button
               onClick={() => navigateTo('signup')}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white font-bold text-sm active:scale-[0.98] transition-all mb-3"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all mb-3"
             >
               Criar Conta
             </button>
             <button
               onClick={() => navigateTo('login')}
-              className="w-full py-3.5 rounded-xl border-2 border-[#3B6FED] text-[#3B6FED] font-bold text-sm active:scale-[0.98] transition-all"
+              className="w-full py-3.5 rounded-xl border-2 border-[#FF66C4] text-[#FF66C4] font-bold text-sm active:scale-[0.98] transition-all"
             >
               {"J\u00e1 tenho conta"}
             </button>
@@ -3477,7 +3477,7 @@ const App = () => {
             </p>
             <button
               onClick={() => setShowAccountDeleted(false)}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#3B6FED] to-[#1E40AF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
             >
               Entendi
             </button>
@@ -3508,7 +3508,7 @@ const App = () => {
         isPanicOpen={isPanicOpen}
         setIsPanicOpen={setIsPanicOpen}
       />
-      <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#3B6FED] text-white" feature="Jornadas" onComingSoon={(feat) => setShowComingSoon(feat)} />
+      <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" feature="Jornadas" onComingSoon={(feat) => setShowComingSoon(feat)} />
 
       <div className="mx-6 h-px bg-white" />
 
@@ -3517,7 +3517,7 @@ const App = () => {
         <div className="px-6 mb-2">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-sans font-bold text-gray-800">Os Guardi&#245;es do Cuidado</h3>
-            <button onClick={() => setShowComingSoon('Guardioes')} className="text-xs font-bold text-[#3B6FED] uppercase tracking-wider">Ver tudo</button>
+            <button onClick={() => setShowComingSoon('Guardioes')} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
           </div>
           <p className="text-xs text-gray-400 leading-relaxed mt-1">
             Encontros com saberes que sustentam a vida. N&#227;o s&#227;o gurus. S&#227;o pessoas que caminham com o corpo, a escuta e a experi&#234;ncia.
