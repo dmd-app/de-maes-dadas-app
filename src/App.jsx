@@ -616,15 +616,19 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, isEmailC
 
   const handleSend = () => {
   if (draftMessage.trim()) {
+      console.log("[v0] handleSend: isLoggedIn=", isLoggedIn, "isEmailConfirmed=", isEmailConfirmed);
       if (isLoggedIn) {
         if (!isEmailConfirmed) {
+          console.log("[v0] handleSend: email not confirmed, showing popup");
           onRequireEmailConfirm && onRequireEmailConfirm();
           return;
         }
+        console.log("[v0] handleSend: calling onSendPost");
         onSendPost && onSendPost(draftMessage.trim());
         setDraftMessage('');
         setIsPanicOpen(false);
       } else {
+        console.log("[v0] handleSend: not logged in, redirecting to signup");
         onRequireLogin && onRequireLogin({ type: 'post', text: draftMessage.trim() });
       }
     }
@@ -2758,7 +2762,9 @@ const App = () => {
   };
 
   const handleSendPost = async (text, category, categoryColor) => {
+    console.log("[v0] handleSendPost: isLoggedIn=", isLoggedIn, "isEmailConfirmed=", isEmailConfirmed, "savedUser=", JSON.stringify(savedUser));
     if (isLoggedIn && !isEmailConfirmed) {
+      console.log("[v0] handleSendPost: email not confirmed, showing popup");
       setShowEmailConfirmRequired(true);
       return;
     }
@@ -3499,10 +3505,11 @@ const App = () => {
         isLoggedIn={isLoggedIn}
         isEmailConfirmed={isEmailConfirmed}
         onRequireLogin={(action) => {
+          console.log("[v0] Inicio onRequireLogin called with:", JSON.stringify(action), "isLoggedIn=", isLoggedIn, "savedUser=", !!savedUser);
           setPendingAction(action);
           navigateTo('signup');
         }}
-        onRequireEmailConfirm={() => setShowEmailConfirmRequired(true)}
+        onRequireEmailConfirm={() => { console.log("[v0] Inicio onRequireEmailConfirm called"); setShowEmailConfirmRequired(true); }}
         draftMessage={draftMessage}
         setDraftMessage={setDraftMessage}
         isPanicOpen={isPanicOpen}
