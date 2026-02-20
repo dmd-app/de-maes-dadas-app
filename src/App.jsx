@@ -1494,7 +1494,7 @@ const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAcc
             {myPosts.map((post) => (
               <div
                 key={post.originalIdx}
-                onClick={() => onOpenPost && onOpenPost(post.originalIdx)}
+                onClick={() => onOpenPost && onOpenPost(post.id)}
                 className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform"
               >
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -1523,7 +1523,7 @@ const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAcc
                   )}
                   <span className="text-xs text-gray-400">{post.time}</span>
                 </div>
-                <p className="text-sm font-semibold text-gray-700">{post.title}</p>
+                <p className="text-sm text-gray-600 line-clamp-2">{post.body || post.title || ''}</p>
                 <div className="flex items-center gap-4 mt-2">
                   <span className="flex items-center gap-1 text-xs text-gray-400">
                     <Heart size={14} />
@@ -2800,9 +2800,19 @@ const App = () => {
     }
   };
 
-  const handleOpenPost = (idx) => {
-    setSelectedPostIdx(idx);
-    navigateTo('postDetail');
+  const handleOpenPost = (idxOrId) => {
+    // Support both index and post ID lookup
+    if (typeof idxOrId === 'string') {
+      // It's a post ID, find the index in rodasPosts
+      const foundIdx = rodasPosts.findIndex(p => p.id === idxOrId);
+      if (foundIdx !== -1) {
+        setSelectedPostIdx(foundIdx);
+        navigateTo('postDetail');
+      }
+    } else {
+      setSelectedPostIdx(idxOrId);
+      navigateTo('postDetail');
+    }
   };
 
   const handleEditPost = ({ title, desc, category, categoryColor }) => {
@@ -3383,22 +3393,28 @@ const App = () => {
   }
 
   // Render Post Detail page
-  if (currentPage === 'postDetail' && selectedPostIdx !== null && rodasPosts[selectedPostIdx]) {
-    return (
-      <>
-        <PostDetail
-          post={rodasPosts[selectedPostIdx]}
-          onBack={goBack}
-          onAddComment={handleAddComment}
-          onLikePost={handleLikePostDetail}
-          onLikeComment={handleLikeComment}
-          onReplyComment={handleReplyComment}
-          onLikeReply={handleLikeReply}
-          onEditPost={handleEditPost}
-        />
-        <NavBar currentPage="postDetail" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
-      </>
-    );
+  if (currentPage === 'postDetail') {
+    const post = selectedPostIdx !== null ? rodasPosts[selectedPostIdx] : null;
+    if (post) {
+      return (
+        <>
+          <PostDetail
+            post={post}
+            onBack={goBack}
+            onAddComment={handleAddComment}
+            onLikePost={handleLikePostDetail}
+            onLikeComment={handleLikeComment}
+            onReplyComment={handleReplyComment}
+            onLikeReply={handleLikeReply}
+            onEditPost={handleEditPost}
+          />
+          <NavBar currentPage="postDetail" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
+        </>
+      );
+    }
+    // Post not found at index, go back
+    goBack();
+    return null;
   }
 
   // Render Rodas de Conversa page (requires login)
