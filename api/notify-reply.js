@@ -88,7 +88,7 @@ export default async function handler(req, res) {
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background-color:#FFF5F9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<body style="margin:0;padding:0;background-color:#F0F4FF;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <div style="max-width:480px;margin:0 auto;padding:40px 24px;">
     <div style="text-align:center;margin-bottom:32px;">
       <h2 style="color:#FF66C4;font-size:22px;margin:0;">De M\u00e3es Dadas</h2>
@@ -105,7 +105,7 @@ export default async function handler(req, res) {
       </p>
 
       <!-- Post preview -->
-      <div style="background:#FFF5F9;border-radius:16px;padding:16px;margin:0 0 16px;text-align:left;">
+      <div style="background:#F0F4FF;border-radius:16px;padding:16px;margin:0 0 16px;text-align:left;">
         <p style="color:#9ca3af;font-size:11px;margin:0 0 6px;text-transform:uppercase;letter-spacing:0.5px;">Seu post</p>
         <p style="color:#6b7280;font-size:13px;line-height:1.5;margin:0;font-style:italic;">"${postPreview}${postPreview.length >= 80 ? '...' : ''}"</p>
       </div>

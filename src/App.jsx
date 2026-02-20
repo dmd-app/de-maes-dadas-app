@@ -25,10 +25,9 @@ const sendToBrevo = async (action, data) => {
 // --- ALDEIA ICON (3 circles in triangle) ---
 const AldeiaIcon = ({ size = 24, filled = false, color = "currentColor" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="7.5" cy="7.5" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
-    <circle cx="16.5" cy="7.5" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
-    <circle cx="7.5" cy="16.5" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
-    <circle cx="16.5" cy="16.5" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
+    <circle cx="12" cy="6" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
+    <circle cx="6" cy="16" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
+    <circle cx="18" cy="16" r="3.5" fill={filled ? color : "none"} stroke={color} strokeWidth="1.8" />
   </svg>
 );
 
@@ -430,7 +429,7 @@ const ComingSoonPopup = ({ onClose, isLoggedIn, userEmail, userId, feature }) =>
   return (
     <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-6">
       <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl">
-        <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
           <Heart size={28} className="text-[#FF66C4]" />
         </div>
         <h3 className="font-bold text-gray-800 text-lg mb-2">{featureName !== 'general' ? featureName : 'Coming Soon'}</h3>
@@ -510,7 +509,7 @@ const ReviewPendingPopup = ({ onClose, type }) => {
 
 const Header = ({ userName }) => (
   <>
-    <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
+    <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-blue-100/50">
       <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-7" />
       <p className="text-xs text-soft-pink font-sans font-medium">Aldeia Digital</p>
     </header>
@@ -1301,7 +1300,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
             .map((comment) => (
             <div key={comment.originalIdx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 rounded-full bg-pink-100 flex items-center justify-center text-soft-pink flex-shrink-0">
+                <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-soft-pink flex-shrink-0">
                   <User size={14} />
                 </div>
                 <span className="text-sm font-semibold text-gray-700">{comment.author}</span>
@@ -2250,7 +2249,7 @@ const AdminPage = ({ adminEmail, onBack }) => {
 
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
-      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
+      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-blue-100/50">
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="text-gray-500 hover:text-gray-700">
             <ArrowLeft size={20} />
@@ -2345,7 +2344,7 @@ const AdminPage = ({ adminEmail, onBack }) => {
 const NavBar = ({ currentPage, onNavigate, unreadCount = 0, isAdmin = false }) => {
   const tabs = [
     { key: 'inicio', label: 'Inicio', icon: Heart, filled: currentPage === 'inicio' },
-    { key: 'aldeia', label: 'Aldeia', isAldeia: true, filled: currentPage === 'aldeia' },
+    { key: 'aldeia', label: 'Aldeia', isAldeia: true, filled: ['aldeia', 'rodas', 'postDetail'].includes(currentPage) },
     { key: 'notificacoes', label: 'Alertas', icon: Bell, filled: currentPage === 'notificacoes', badge: unreadCount },
     ...(isAdmin ? [{ key: 'admin', label: 'Guardia', icon: Shield, filled: currentPage === 'admin' }] : []),
     { key: 'perfil', label: 'Perfil', icon: User, filled: currentPage === 'perfil' },
@@ -2412,7 +2411,7 @@ const NotificationsPage = ({ notifications, onMarkAllRead, onBack, onNavigateToP
 
   return (
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
-      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
+      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-blue-100/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button onClick={onBack} className="text-gray-500 hover:text-gray-700">
@@ -2444,7 +2443,7 @@ const NotificationsPage = ({ notifications, onMarkAllRead, onBack, onNavigateToP
               <button
                 key={n.id}
                 onClick={() => n.post_id && onNavigateToPost && onNavigateToPost(n.post_id)}
-                className={`w-full flex items-start gap-3 p-3 rounded-xl text-left transition-colors ${n.read ? 'bg-transparent' : 'bg-white shadow-sm border border-pink-100/50'}`}
+                className={`w-full flex items-start gap-3 p-3 rounded-xl text-left transition-colors ${n.read ? 'bg-transparent' : 'bg-white shadow-sm border border-blue-100/50'}`}
               >
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getIconBg(n.type)}`}>
                   <Icon size={18} />
@@ -3433,7 +3432,7 @@ const App = () => {
         {showComingSoon && (
           <ComingSoonPopup onClose={() => setShowComingSoon(null)} isLoggedIn={isLoggedIn} userEmail={userEmail} userId={savedUser?.id} feature={showComingSoon} />
         )}
-          <NavBar currentPage="perfil" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
+          <NavBar currentPage="aldeia" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
       </>
     );
   }
@@ -3443,7 +3442,7 @@ const App = () => {
     <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
 
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
+      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-blue-100/50">
         <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-7" />
         <p className="text-xs text-soft-pink font-sans font-medium">Aldeia Digital</p>
       </header>

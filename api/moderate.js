@@ -37,7 +37,7 @@ export default async function handler(req, res) {
       }
 
       return res.status(200).send(`
-        <html><body style="font-family:sans-serif;text-align:center;padding:60px;background:#FFF5F9;">
+        <html><body style="font-family:sans-serif;text-align:center;padding:60px;background:#F0F4FF;">
           <div style="max-width:400px;margin:0 auto;background:white;border-radius:20px;padding:40px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
             <div style="width:60px;height:60px;border-radius:50%;background:${color};margin:0 auto 16px;display:flex;align-items:center;justify-content:center;">
               <span style="font-size:28px;color:white;">${qAction === 'quick_approve' ? '&#10003;' : '&#10007;'}</span>
@@ -195,7 +195,7 @@ export default async function handler(req, res) {
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background-color:#FFF5F9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<body style="margin:0;padding:0;background-color:#F0F4FF;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <div style="max-width:520px;margin:0 auto;padding:40px 24px;">
     <div style="text-align:center;margin-bottom:24px;">
       <h2 style="color:#1E3A8A;font-size:20px;margin:0;">Guardia da Aldeia</h2>
