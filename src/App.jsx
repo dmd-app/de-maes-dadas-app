@@ -2345,7 +2345,7 @@ const AdminPage = ({ adminEmail, onBack }) => {
 const NavBar = ({ currentPage, onNavigate, unreadCount = 0, isAdmin = false }) => {
   const tabs = [
     { key: 'inicio', label: 'Inicio', icon: Heart, filled: currentPage === 'inicio' },
-    { key: 'aldeia', label: 'Aldeia', isAldeia: true, filled: currentPage === 'aldeia' },
+    { key: 'aldeia', label: 'Aldeia', isAldeia: true, filled: ['aldeia', 'rodas', 'postDetail'].includes(currentPage) },
     { key: 'notificacoes', label: 'Alertas', icon: Bell, filled: currentPage === 'notificacoes', badge: unreadCount },
     ...(isAdmin ? [{ key: 'admin', label: 'Guardia', icon: Shield, filled: currentPage === 'admin' }] : []),
     { key: 'perfil', label: 'Perfil', icon: User, filled: currentPage === 'perfil' },
