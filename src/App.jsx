@@ -2590,8 +2590,13 @@ const App = () => {
           const userData = { id: data.user.id, name: username, email, emailConfirmed: false, confirmToken };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
-          sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
-          sendConfirmationEmail(email, username, confirmToken);
+
+          // Send to Brevo CRM + confirmation email (await to catch errors)
+          const brevoResult = await sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
+          console.log('[v0] Brevo create_contact result:', brevoResult);
+          const confirmResult = await sendToBrevo('send_confirmation_email', { email, userName: username, confirmToken, baseUrl: window.location.origin });
+          console.log('[v0] Brevo send_confirmation_email result:', confirmResult);
+
           setCurrentPage('emailPending');
         }}
         onGoToLogin={() => setCurrentPage('login')}
@@ -2847,8 +2852,13 @@ const App = () => {
           const userData = { id: data.user.id, name: username, email, emailConfirmed: false, confirmToken };
           localStorage.setItem('dmd_user', JSON.stringify(userData));
           setSavedUser(userData);
-          sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
-          sendConfirmationEmail(email, username, confirmToken);
+
+          // Send to Brevo CRM + confirmation email (await to catch errors)
+          const brevoResult = await sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
+          console.log('[v0] Brevo create_contact result (rodas):', brevoResult);
+          const confirmResult = await sendToBrevo('send_confirmation_email', { email, userName: username, confirmToken, baseUrl: window.location.origin });
+          console.log('[v0] Brevo send_confirmation_email result (rodas):', confirmResult);
+
           setPendingAction({ type: 'rodas' });
           setCurrentPage('emailPending');
         }}
