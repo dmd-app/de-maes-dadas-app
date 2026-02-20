@@ -2981,8 +2981,9 @@ const App = () => {
         <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-7" />
         <p className="text-xs text-soft-pink font-sans font-medium">Aldeia Digital</p>
       </header>
-      <div className="px-6 pt-4 pb-2 bg-soft-bg">
-        <p className="text-lg text-soft-blue font-sans">{"Bem-vinda, "}{userName || "Mam\u00e3e"}{" \ud83d\udc97"}</p>
+      <div className="px-6 pt-5 pb-3">
+        <h2 className="text-xl font-bold text-gray-800">{"Bem-vinda, "}<span className="text-soft-pink">{userName || "Mam\u00e3e"}</span>{" \ud83d\udc97"}</h2>
+        <p className="text-sm text-gray-400 mt-1">{"Sua aldeia digital de apoio"}</p>
       </div>
 
       {/* Email Confirm Banner */}
