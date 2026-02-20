@@ -803,7 +803,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
     let indexed = posts.map((post, idx) => ({ ...post, originalIdx: idx }));
 
     // Hide non-active posts from feed
-    indexed = indexed.filter((p) => !p.status || p.status === 'active');
+    indexed = indexed.filter((p) => !p.status || p.status === 'active' || p.status === 'approved');
 
     // Category filters
     if (activeFilter !== "Destaques" && activeFilter !== "Recentes") {
@@ -1015,7 +1015,7 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogi
           }} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
         </div>
         <div className="flex flex-col gap-3">
-          {posts.map((post, idx) => ({ ...post, originalIdx: idx })).filter((p) => !p.status || p.status === 'active').slice(0, 2).map((post) => (
+          {posts.map((post, idx) => ({ ...post, originalIdx: idx })).filter((p) => !p.status || p.status === 'active' || p.status === 'approved').slice(0, 2).map((post) => (
             <div
               key={post.originalIdx}
               onClick={() => {
@@ -1282,10 +1282,10 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
       {/* Comments Section */}
       <div className="px-6">
         <h3 className="font-bold text-gray-800 mb-4">
-          {"Coment\u00e1rios"} ({post.commentsList?.filter((c) => !c.status || c.status === 'active').length || 0})
+          {"Coment\u00e1rios"} ({post.commentsList?.filter((c) => !c.status || c.status === 'active' || c.status === 'approved').length || 0})
         </h3>
 
-        {(!post.commentsList || post.commentsList.filter((c) => !c.status || c.status === 'active').length === 0) && (
+        {(!post.commentsList || post.commentsList.filter((c) => !c.status || c.status === 'active' || c.status === 'approved').length === 0) && (
           <div className="bg-white rounded-2xl p-6 border border-gray-100 text-center">
             <MessageCircle size={32} className="text-gray-200 mx-auto mb-2" />
             <p className="text-sm text-gray-400">{"Nenhum coment\u00e1rio ainda. Seja a primeira!"}</p>
@@ -1295,7 +1295,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
         <div className="flex flex-col gap-3">
           {post.commentsList
             ?.map((comment, idx) => ({ ...comment, originalIdx: idx }))
-            .filter((c) => !c.status || c.status === 'active')
+            .filter((c) => !c.status || c.status === 'active' || c.status === 'approved')
             .sort((a, b) => ((b.likes || 0) + (b.replies?.length || 0)) - ((a.likes || 0) + (a.replies?.length || 0)))
             .map((comment) => (
             <div key={comment.originalIdx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
@@ -1349,9 +1349,9 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
               )}
 
               {/* Replies */}
-              {comment.replies && comment.replies.filter((r) => !r.status || r.status === 'active').length > 0 && (
+              {comment.replies && comment.replies.filter((r) => !r.status || r.status === 'active' || r.status === 'approved').length > 0 && (
                 <div className="pl-9 mt-3 flex flex-col gap-2">
-                  {comment.replies.filter((r) => !r.status || r.status === 'active').map((reply, rIdx) => (
+                  {comment.replies.filter((r) => !r.status || r.status === 'active' || r.status === 'approved').map((reply, rIdx) => (
                     <div key={rIdx} className="bg-gray-50 rounded-xl p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center text-soft-purple flex-shrink-0">
@@ -1513,7 +1513,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
                       {"N\u00e3o aprovado"}
                     </span>
                   )}
-                  {(!post.status || post.status === 'active') && (
+                  {(!post.status || post.status === 'active' || post.status === 'approved') && (
                     <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-green-100 text-green-700">
                       Ativo
                     </span>
