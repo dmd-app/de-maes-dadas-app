@@ -45,10 +45,13 @@ export default async function handler(req, res) {
   try {
     // ─── LIST POSTS ──────────────────────────────────────────
     if (action === 'list') {
-      const { data: posts, error } = await supabase
+      // RLS now handles visibility: approved posts + own pending posts
+      // The query just fetches without explicit status filter — RLS does the work
+      const sb = serviceSupabase || supabase;
+      const { data: posts, error } = await sb
         .from('posts')
         .select('*')
-        .eq('status', 'active')
+        .in('status', ['approved', 'pending'])
         .order('created_at', { ascending: false })
         .limit(50);
 
@@ -57,15 +60,32 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: error.message });
       }
 
+      // Get the current user id from the access token if available
+      let currentUserId = null;
+      if (accessToken) {
+        const { data: { user } } = await supabase.auth.getUser(accessToken);
+        currentUserId = user?.id || null;
+      }
+
+      // Filter: show approved posts + only MY pending posts
+      const visiblePosts = posts.filter(p =>
+        p.status === 'approved' || (p.status === 'pending' && p.user_id === currentUserId)
+      );
+
       // For each post, fetch comments and check if current user liked it
-      const enriched = await Promise.all(posts.map(async (post) => {
-        // Fetch comments for this post
-        const { data: comments } = await supabase
+      const enriched = await Promise.all(visiblePosts.map(async (post) => {
+        // Fetch comments for this post (approved + own pending)
+        const { data: allComments } = await sb
           .from('comments')
           .select('*')
           .eq('post_id', post.id)
-          .eq('status', 'active')
+          .in('status', ['approved', 'pending'])
           .order('created_at', { ascending: true });
+
+        // Filter comments: approved + own pending
+        const comments = (allComments || []).filter(c =>
+          c.status === 'approved' || (c.status === 'pending' && c.user_id === currentUserId)
+        );
 
         // Check if current user liked this post
         let liked = false;
@@ -98,6 +118,7 @@ export default async function handler(req, res) {
             time: formatTimeAgo(c.created_at),
             parentCommentId: c.parent_comment_id,
             userId: c.user_id,
+            status: c.status,
             replies: [],
           };
         }));
@@ -157,6 +178,19 @@ export default async function handler(req, res) {
         console.error('[posts] create error:', error);
         return res.status(500).json({ error: error.message });
       }
+
+      // Fire-and-forget: notify admin of new pending post
+      fetch(`${req.headers.origin || ''}/api/moderate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'notify_admin',
+          contentType: 'post',
+          contentId: post.id,
+          author: post.author_name,
+          body: post.body,
+        }),
+      }).catch(e => console.error('[posts] notify_admin failed:', e));
 
       return res.status(200).json({
         success: true,
@@ -235,6 +269,19 @@ export default async function handler(req, res) {
       // Increment comment count on post
       await sb.rpc('increment_post_comments', { p_post_id: postId });
 
+      // Fire-and-forget: notify admin of new pending comment
+      fetch(`${req.headers.origin || ''}/api/moderate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'notify_admin',
+          contentType: 'comment',
+          contentId: comment.id,
+          author: comment.author_name,
+          body: comment.body,
+        }),
+      }).catch(e => console.error('[posts] notify_admin comment failed:', e));
+
       return res.status(200).json({
         success: true,
         comment: {
@@ -246,6 +293,7 @@ export default async function handler(req, res) {
           time: 'agora',
           parentCommentId: comment.parent_comment_id,
           userId: comment.user_id,
+          status: comment.status,
           replies: [],
         },
       });
@@ -287,7 +335,7 @@ export default async function handler(req, res) {
 
       const { error } = await sb
         .from('posts')
-        .update({ status: 'removed' })
+        .update({ status: 'rejected' })
         .eq('id', postId)
         .eq('user_id', userId);
 

@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, MailCheck, RefreshCw, AlertCircle } from 'lucide-react';
+import { supabase } from './lib/supabase';
 import './index.css';
 
 // --- BREVO CRM HELPER ---
@@ -492,8 +493,8 @@ const ReviewPendingPopup = ({ onClose, type }) => {
         </h3>
         <p className="text-sm text-gray-500 leading-relaxed mb-5">
           {isComment
-            ? "Seu coment\u00e1rio ser\u00e1 analisado e em algumas horas dever\u00e1 estar no ar."
-            : "Seu post ser\u00e1 analisado e em algumas horas dever\u00e1 estar no ar."}
+            ? "Seu coment\u00e1rio foi enviado para a Guardi\u00e3 e logo estar\u00e1 no ar."
+            : "Sua mensagem foi enviada para a Guardi\u00e3 e logo estar\u00e1 no ar."}
         </p>
         <button
           onClick={onClose}
@@ -747,68 +748,20 @@ const ContentSection = ({ title, items, badgeColor, cardWidth = "180px", onComin
 );
 
 // --- RODAS DE CONVERSA PAGE ---
-const initialRodasPosts = [
-  {
-    category: "Maternidade Solo",
-    categoryColor: "bg-soft-blue text-white",
-    author: "Mariana S.",
-    time: "2h atr\u00e1s",
-    title: "Como voc\u00eas lidam com a solid\u00e3o no fim de semana?",
-    desc: "Sinto que quando chega sexta-feira, todo mundo tem planos em fam\u00edlia e eu fico aqui...",
-    likes: 24,
-    comments: 12,
-    commentsList: [
-      { author: "Ana P.", time: "1h atr\u00e1s", text: "Eu te entendo demais. Aqui \u00e9 igual. Vamos marcar algo juntas?", likes: 5, liked: false, replies: [] },
-      { author: "Juliana R.", time: "1h atr\u00e1s", text: "Passei por isso por muito tempo. O que me ajudou foi entrar em um grupo de m\u00e3es na vizinhan\u00e7a.", likes: 12, liked: false, replies: [] },
-      { author: "Camila F.", time: "45min atr\u00e1s", text: "Voc\u00ea n\u00e3o est\u00e1 sozinha. Estamos aqui.", likes: 8, liked: false, replies: [] },
-    ],
-  },
-  {
-    category: "Desabafo",
-    categoryColor: "bg-[#FF66C4] text-white",
-    author: "An\u00f4nima",
-    time: "5h atr\u00e1s",
-    title: "Eu gritei hoje. E a culpa t\u00e1 me consumindo.",
-    desc: "Foi por uma bobagem. O copo de leite caiu. Mas eu explodi como se fosse o fim do mundo.",
-    likes: 156,
-    comments: 43,
-    commentsList: [
-      { author: "Fernanda L.", time: "4h atr\u00e1s", text: "J\u00e1 passei por isso tantas vezes. Respira fundo, voc\u00ea \u00e9 humana.", likes: 34, liked: false, replies: [] },
-      { author: "Renata B.", time: "3h atr\u00e1s", text: "A culpa \u00e9 o peso mais pesado da maternidade. Mas voc\u00ea reconhecer j\u00e1 \u00e9 um ato de amor.", likes: 21, liked: false, replies: [] },
-      { author: "Beatriz S.", time: "2h atr\u00e1s", text: "Eu chorei lendo isso. Obrigada por compartilhar.", likes: 15, liked: false, replies: [] },
-      { author: "Luana M.", time: "1h atr\u00e1s", text: "Nenhuma m\u00e3e \u00e9 perfeita. Voc\u00ea est\u00e1 fazendo o seu melhor.", likes: 9, liked: false, replies: [] },
-    ],
-  },
-  {
-    category: "Volta ao Trabalho",
-    categoryColor: "bg-emerald-500 text-white",
-    author: "Carla T.",
-    time: "1d atr\u00e1s",
-    title: "Dicas para a adapta\u00e7\u00e3o na creche?",
-    desc: "Meu beb\u00ea tem 6 meses e eu s\u00f3 choro pensando em deixar ele l\u00e1 semana que vem.",
-    likes: 8,
-    comments: 5,
-    commentsList: [
-      { author: "Patricia A.", time: "20h atr\u00e1s", text: "Faz adapta\u00e7\u00e3o gradual. Primeiro dia 1h, segundo 2h... funciona muito!", likes: 3, liked: false, replies: [] },
-      { author: "Debora K.", time: "18h atr\u00e1s", text: "Leva um paninho com seu cheiro. Ajuda demais.", likes: 7, liked: false, replies: [] },
-    ],
-  },
-  {
-    category: "Sono",
-    categoryColor: "bg-indigo-400 text-white",
-    author: "Renata M.",
-    time: "3h atr\u00e1s",
-    title: "Algu\u00e9m mais acorda 5x por noite?",
-    desc: "Meu filho tem 14 meses e ainda n\u00e3o dorme a noite toda. Estou destruida.",
-    likes: 89,
-    comments: 27,
-    commentsList: [
-      { author: "Amanda G.", time: "2h atr\u00e1s", text: "O meu tem 18 meses e \u00e9 a mesma coisa. Solidariedade total.", likes: 18, liked: false, replies: [] },
-      { author: "Isabela T.", time: "1h atr\u00e1s", text: "Consultora de sono mudou minha vida. Se precisar, indico.", likes: 11, liked: false, replies: [] },
-      { author: "Thais R.", time: "40min atr\u00e1s", text: "Fa\u00e7a revezamento com algu\u00e9m se puder. Voc\u00ea precisa dormir tamb\u00e9m.", likes: 6, liked: false, replies: [] },
-    ],
-  },
-];
+// Welcome card shown when database is empty
+const WELCOME_CARD = {
+  id: 'welcome',
+  category: 'Aldeia',
+  categoryColor: 'bg-soft-blue text-white',
+  author: 'Aldeia DeMaesDadas',
+  time: '',
+  title: 'Bem-vinda a sua Aldeia!',
+  desc: 'Este e o espaco onde maes se apoiam de verdade. Compartilhe suas experiencias, desabafos e vitorias. Voce nao esta sozinha. Use o botao "Abrir o Coracao" para comecar sua primeira conversa.',
+  likes: 0,
+  comments: 0,
+  commentsList: [],
+  isWelcome: true,
+};
 
 const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
   const [activeFilter, setActiveFilter] = useState("Recentes");
@@ -908,7 +861,15 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
           </div>
         )}
         {filteredPosts.map((post) => (
-          <div key={post.originalIdx} onClick={() => onOpenPost && onOpenPost(post.originalIdx)} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform">
+          <div key={post.originalIdx} onClick={() => onOpenPost && onOpenPost(post.originalIdx)} className={`bg-white rounded-2xl p-5 shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform ${post.status === 'pending' ? 'opacity-50' : ''}`}>
+            {/* Pending Badge */}
+            {post.status === 'pending' && (
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                  {"Aguardando Aprova\u00e7\u00e3o"}
+                </span>
+              </div>
+            )}
             {/* Meta */}
             <div className="flex items-center gap-2 mb-3">
               <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
@@ -1168,7 +1129,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
             </span>
             {post.status === 'pending' && (
               <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-700">
-                {"Aguardando confirma\u00e7\u00e3o"}
+                {"Aguardando Aprova\u00e7\u00e3o"}
               </span>
             )}
             {post.status === 'inactive' && (
@@ -1399,7 +1360,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
                         <span className="text-xs font-semibold text-gray-700">{reply.author}</span>
                         <span className="text-[10px] text-gray-400">{" \u2022 "}{reply.time}</span>
                         {reply.status === 'pending' && (
-                          <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">{"Aguardando confirma\u00e7\u00e3o"}</span>
+                          <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">{"Aguardando Aprova\u00e7\u00e3o"}</span>
                         )}
                         {reply.status === 'inactive' && (
                           <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-gray-200 text-gray-600">Inativo</span>
@@ -1431,14 +1392,15 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
 };
 
 // --- PROFILE PAGE ---
-const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, onOpenPost, isEmailConfirmed, onResendConfirmation }) => {
+const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, onOpenPost, isEmailConfirmed, onResendConfirmation, notifPrefs, onToggleNotifPref }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const myPosts = posts.map((p, idx) => ({ ...p, originalIdx: idx })).filter((p) => p.author === "Eu");
+  const [showNotifSettings, setShowNotifSettings] = useState(false);
+  const myPosts = posts.map((p, idx) => ({ ...p, originalIdx: idx })).filter((p) => p.author === "Eu" || p.user_id);
   const totalLikes = myPosts.reduce((sum, p) => sum + (p.likes || 0), 0);
   const totalComments = myPosts.reduce((sum, p) => sum + (p.commentsList?.length || 0), 0);
 
   const menuItems = [
-    { icon: Bell, label: "Notifica\u00e7\u00f5es", desc: "Gerencie seus alertas" },
+    { icon: Bell, label: "Notifica\u00e7\u00f5es", desc: "Gerencie seus alertas", action: () => setShowNotifSettings(!showNotifSettings) },
     { icon: Shield, label: "Privacidade", desc: "Controle quem v\u00ea seu perfil" },
     { icon: HelpCircle, label: "Ajuda", desc: "D\u00favidas frequentes" },
     { icon: Settings, label: "Configura\u00e7\u00f5es", desc: "Prefer\u00eancias do app" },
@@ -1538,7 +1500,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
                   </span>
                   {post.status === 'pending' && (
                     <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-700">
-                      {"Aguardando confirma\u00e7\u00e3o"}
+                      {"Aguardando Aprova\u00e7\u00e3o"}
                     </span>
                   )}
                   {post.status === 'inactive' && (
@@ -1582,6 +1544,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
           {menuItems.map((item, idx) => (
             <button
               key={idx}
+              onClick={item.action || undefined}
               className={`w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50 transition-colors ${idx < menuItems.length - 1 ? 'border-b border-gray-100' : ''}`}
             >
               <div className="w-10 h-10 rounded-xl bg-soft-bg flex items-center justify-center flex-shrink-0">
@@ -1591,10 +1554,37 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
                 <p className="text-sm font-semibold text-gray-700">{item.label}</p>
                 <p className="text-xs text-gray-400">{item.desc}</p>
               </div>
-              <ChevronRight size={16} className="text-gray-300" />
+              <ChevronRight size={16} className={`text-gray-300 transition-transform ${item.action && showNotifSettings && item.label === 'Notifica\u00e7\u00f5es' ? 'rotate-90' : ''}`} />
             </button>
           ))}
         </div>
+
+        {/* Notification Preferences (expandable) */}
+        {showNotifSettings && (
+          <div className="mt-3 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="px-5 py-3 border-b border-gray-100">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{"Alertas de Notifica\u00e7\u00e3o"}</p>
+            </div>
+            {[
+              { key: 'comments', label: 'Comentarios nos meus posts', desc: 'Receber alerta quando alguem comentar' },
+              { key: 'replies', label: 'Respostas aos meus comentarios', desc: 'Receber alerta quando responderem' },
+              { key: 'approvals', label: 'Post/comentario aprovado', desc: 'Receber alerta quando for aprovado' },
+            ].map((pref) => (
+              <div key={pref.key} className="flex items-center justify-between px-5 py-3.5 border-b border-gray-50 last:border-0">
+                <div>
+                  <p className="text-sm font-medium text-gray-700">{pref.label}</p>
+                  <p className="text-xs text-gray-400">{pref.desc}</p>
+                </div>
+                <button
+                  onClick={() => onToggleNotifPref && onToggleNotifPref(pref.key)}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${notifPrefs?.[pref.key] ? 'bg-[#FF66C4]' : 'bg-gray-300'}`}
+                >
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${notifPrefs?.[pref.key] ? 'translate-x-5' : ''}`} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Logout */}
@@ -2196,6 +2186,285 @@ const getSavedUser = () => {
   }
 };
 
+// ─── Admin Moderation Page ───
+const ADMIN_EMAIL = 'aldeia@demaesdadas.com.br';
+
+const AdminPage = ({ adminEmail, onBack }) => {
+  const [pending, setPending] = useState({ posts: [], comments: [] });
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null);
+
+  const fetchPending = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/moderate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'list_pending', adminEmail }),
+      });
+      const data = await res.json();
+      setPending({ posts: data.posts || [], comments: data.comments || [] });
+    } catch (e) {
+      console.error('Failed to fetch pending:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchPending(); }, []);
+
+  const handleAction = async (id, type, actionType) => {
+    setActionLoading(`${id}-${actionType}`);
+    try {
+      await fetch('/api/moderate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: actionType, id, type, adminEmail }),
+      });
+      // Remove from local list
+      if (type === 'post') {
+        setPending(prev => ({ ...prev, posts: prev.posts.filter(p => p.id !== id) }));
+      } else {
+        setPending(prev => ({ ...prev, comments: prev.comments.filter(c => c.id !== id) }));
+      }
+    } catch (e) {
+      console.error('Moderation action failed:', e);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const timeAgo = (dateStr) => {
+    if (!dateStr) return '';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'agora';
+    if (mins < 60) return `${mins}min`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h`;
+    return `${Math.floor(hrs / 24)}d`;
+  };
+
+  const total = pending.posts.length + pending.comments.length;
+
+  return (
+    <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
+      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
+        <div className="flex items-center gap-3">
+          <button onClick={onBack} className="text-gray-500 hover:text-gray-700">
+            <ArrowLeft size={20} />
+          </button>
+          <div>
+            <h1 className="text-lg font-bold text-gray-800">{"Guardi\u00e3 da Aldeia"}</h1>
+            <p className="text-xs text-gray-400">{total} {"pendente(s)"}</p>
+          </div>
+        </div>
+      </header>
+
+      {loading ? (
+        <div className="flex items-center justify-center pt-20">
+          <div className="w-8 h-8 border-3 border-[#FF66C4] border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : total === 0 ? (
+        <div className="flex flex-col items-center justify-center pt-20 px-6">
+          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-4">
+            <Check size={32} className="text-green-600" />
+          </div>
+          <h3 className="font-bold text-gray-700 mb-1">{"Tudo aprovado!"}</h3>
+          <p className="text-sm text-gray-400 text-center">{"Nenhum conteudo pendente de modera\u00e7\u00e3o."}</p>
+        </div>
+      ) : (
+        <div className="px-4 py-4 flex flex-col gap-3">
+          {/* Pending Posts */}
+          {pending.posts.map((item) => (
+            <div key={item.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700">Post</span>
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600">{item.category}</span>
+                <span className="text-xs text-gray-400 ml-auto">{timeAgo(item.createdAt)}</span>
+              </div>
+              <p className="text-xs text-gray-400 mb-1">{"Autora: "}{item.author}</p>
+              <p className="text-sm text-gray-700 leading-relaxed mb-3">{item.body}</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleAction(item.id, 'post', 'approve')}
+                  disabled={!!actionLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-green-500 text-white font-bold text-xs active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  {actionLoading === `${item.id}-approve` ? '...' : 'Aprovar'}
+                </button>
+                <button
+                  onClick={() => handleAction(item.id, 'post', 'reject')}
+                  disabled={!!actionLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-bold text-xs active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  {actionLoading === `${item.id}-reject` ? '...' : 'Rejeitar'}
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {/* Pending Comments */}
+          {pending.comments.map((item) => (
+            <div key={item.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700">{"Coment\u00e1rio"}</span>
+                <span className="text-xs text-gray-400 ml-auto">{timeAgo(item.createdAt)}</span>
+              </div>
+              <p className="text-xs text-gray-400 mb-1">{"Autora: "}{item.author}</p>
+              {item.postBody && (
+                <p className="text-xs text-gray-300 italic mb-1">{"Re: "}{item.postBody}{"..."}</p>
+              )}
+              <p className="text-sm text-gray-700 leading-relaxed mb-3">{item.body}</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleAction(item.id, 'comment', 'approve')}
+                  disabled={!!actionLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-green-500 text-white font-bold text-xs active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  {actionLoading === `${item.id}-approve` ? '...' : 'Aprovar'}
+                </button>
+                <button
+                  onClick={() => handleAction(item.id, 'comment', 'reject')}
+                  disabled={!!actionLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-bold text-xs active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  {actionLoading === `${item.id}-reject` ? '...' : 'Rejeitar'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Shared Bottom NavBar with Notifications Bell ───
+const NavBar = ({ currentPage, onNavigate, unreadCount = 0, isAdmin = false }) => {
+  const tabs = [
+    { key: 'inicio', label: 'Inicio', icon: Heart, filled: currentPage === 'inicio' },
+    { key: 'aldeia', label: 'Aldeia', isAldeia: true, filled: currentPage === 'aldeia' },
+    { key: 'notificacoes', label: 'Alertas', icon: Bell, filled: currentPage === 'notificacoes', badge: unreadCount },
+    ...(isAdmin ? [{ key: 'admin', label: 'Guardia', icon: Shield, filled: currentPage === 'admin' }] : []),
+    { key: 'perfil', label: 'Perfil', icon: User, filled: currentPage === 'perfil' },
+  ];
+
+  return (
+    <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-4 py-3 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
+      {tabs.map((tab) => (
+        <button
+          key={tab.key}
+          onClick={() => onNavigate(tab.key)}
+          className={`flex flex-col items-center gap-1 transition-colors relative ${tab.filled ? 'text-gray-800' : 'hover:text-gray-800'}`}
+        >
+          {tab.isAldeia ? (
+            <AldeiaIcon size={22} filled={tab.filled} color={tab.filled ? '#374151' : undefined} />
+          ) : (
+            <tab.icon size={22} fill={tab.filled ? '#374151' : 'none'} stroke={tab.filled ? '#374151' : 'currentColor'} />
+          )}
+          {tab.badge > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#FF66C4] text-white text-[10px] font-bold flex items-center justify-center">
+              {tab.badge > 99 ? '99+' : tab.badge}
+            </span>
+          )}
+          <span className={tab.filled ? 'font-semibold' : ''}>{tab.label}</span>
+        </button>
+      ))}
+    </nav>
+  );
+};
+
+// ─── Notifications Page ───
+const NotificationsPage = ({ notifications, onMarkAllRead, onBack, onNavigateToPost }) => {
+  const timeAgo = (dateStr) => {
+    if (!dateStr) return '';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'agora';
+    if (mins < 60) return `${mins}min`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d`;
+  };
+
+  const getIcon = (type) => {
+    switch (type) {
+      case 'comment': return MessageCircle;
+      case 'reply': return ArrowRight;
+      case 'post_approved': return Check;
+      case 'comment_approved': return Check;
+      default: return Bell;
+    }
+  };
+
+  const getIconBg = (type) => {
+    switch (type) {
+      case 'comment': return 'bg-blue-100 text-blue-600';
+      case 'reply': return 'bg-purple-100 text-purple-600';
+      case 'post_approved': return 'bg-green-100 text-green-600';
+      case 'comment_approved': return 'bg-green-100 text-green-600';
+      default: return 'bg-gray-100 text-gray-600';
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
+      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={onBack} className="text-gray-500 hover:text-gray-700">
+              <ArrowLeft size={20} />
+            </button>
+            <h1 className="text-lg font-bold text-gray-800">{"Notifica\u00e7\u00f5es"}</h1>
+          </div>
+          {notifications.length > 0 && (
+            <button onClick={onMarkAllRead} className="text-xs font-semibold text-soft-pink">
+              Marcar tudo como lido
+            </button>
+          )}
+        </div>
+      </header>
+
+      {notifications.length === 0 ? (
+        <div className="flex flex-col items-center justify-center pt-20 px-6">
+          <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+            <Bell size={32} className="text-gray-300" />
+          </div>
+          <h3 className="font-bold text-gray-700 mb-1">{"Nenhuma notifica\u00e7\u00e3o"}</h3>
+          <p className="text-sm text-gray-400 text-center">{"Quando algu\u00e9m interagir com voc\u00ea, voc\u00ea ver\u00e1 aqui."}</p>
+        </div>
+      ) : (
+        <div className="px-4 py-3 flex flex-col gap-1">
+          {notifications.map((n) => {
+            const Icon = getIcon(n.type);
+            return (
+              <button
+                key={n.id}
+                onClick={() => n.post_id && onNavigateToPost && onNavigateToPost(n.post_id)}
+                className={`w-full flex items-start gap-3 p-3 rounded-xl text-left transition-colors ${n.read ? 'bg-transparent' : 'bg-white shadow-sm border border-pink-100/50'}`}
+              >
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getIconBg(n.type)}`}>
+                  <Icon size={18} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm leading-snug ${n.read ? 'text-gray-500' : 'text-gray-800 font-medium'}`}>
+                    {n.title}
+                  </p>
+                  {n.body && <p className="text-xs text-gray-400 mt-0.5 truncate">{n.body}</p>}
+                  <p className="text-[11px] text-gray-300 mt-1">{timeAgo(n.created_at)}</p>
+                </div>
+                {!n.read && <div className="w-2.5 h-2.5 rounded-full bg-[#FF66C4] flex-shrink-0 mt-1.5" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const App = () => {
   const [savedUser, setSavedUser] = useState(getSavedUser);
   const [currentPage, setCurrentPage] = useState('inicio');
@@ -2218,8 +2487,13 @@ const App = () => {
   const isLoggedIn = !!savedUser;
   const isEmailConfirmed = !!savedUser?.emailConfirmed;
 
+  // ─── Notifications state ───
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifPrefs, setNotifPrefs] = useState({ comments: true, replies: true, approvals: true });
+
   // ─── Fetch posts from Supabase via API ───
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       setPostsLoading(true);
       const headers = { 'Content-Type': 'application/json' };
@@ -2233,20 +2507,113 @@ const App = () => {
       });
       const data = await res.json();
       if (data.posts) {
-        setRodasPosts(data.posts);
+        setRodasPosts(data.posts.length > 0 ? data.posts : [WELCOME_CARD]);
+      } else {
+        setRodasPosts([WELCOME_CARD]);
       }
     } catch (e) {
       console.error('Failed to fetch posts:', e);
-      // Fallback to seed data if API fails
-      setRodasPosts(initialRodasPosts);
+      setRodasPosts([WELCOME_CARD]);
     } finally {
       setPostsLoading(false);
     }
+  }, [savedUser?.accessToken]);
+
+  // ─── Fetch notifications ───
+  const fetchNotifications = useCallback(async () => {
+    if (!savedUser?.id) return;
+    try {
+      const res = await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'list', userId: savedUser.id }),
+      });
+      const data = await res.json();
+      if (data.notifications) setNotifications(data.notifications);
+    } catch (e) {
+      console.error('Failed to fetch notifications:', e);
+    }
+  }, [savedUser?.id]);
+
+  const fetchUnreadCount = useCallback(async () => {
+    if (!savedUser?.id) return;
+    try {
+      const res = await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'unread_count', userId: savedUser.id }),
+      });
+      const data = await res.json();
+      if (typeof data.count === 'number') setUnreadCount(data.count);
+    } catch (e) {
+      console.error('Failed to fetch unread count:', e);
+    }
+  }, [savedUser?.id]);
+
+  const markAllNotificationsRead = async () => {
+    if (!savedUser?.id) return;
+    try {
+      await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'mark_all_read', userId: savedUser.id }),
+      });
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      setUnreadCount(0);
+    } catch (e) {
+      console.error('Failed to mark notifications read:', e);
+    }
   };
 
+  // ─── Initial data fetch ───
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [fetchPosts]);
+
+  useEffect(() => {
+    fetchNotifications();
+    fetchUnreadCount();
+  }, [fetchNotifications, fetchUnreadCount]);
+
+  // ─── Supabase Realtime: live posts + comments ───
+  useEffect(() => {
+    const channel = supabase
+      .channel('realtime-posts')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, () => {
+        fetchPosts();
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'posts' }, () => {
+        fetchPosts();
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'posts' }, () => {
+        fetchPosts();
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, () => {
+        fetchPosts();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchPosts]);
+
+  // ─── Supabase Realtime: live notifications ───
+  useEffect(() => {
+    if (!savedUser?.id) return;
+
+    const channel = supabase
+      .channel('realtime-notifications')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${savedUser.id}` }, (payload) => {
+        setNotifications(prev => [payload.new, ...prev]);
+        setUnreadCount(prev => prev + 1);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [savedUser?.id]);
 
   // Helper to send confirmation email
   const sendConfirmationEmail = async (email, name, token) => {
@@ -2358,6 +2725,17 @@ const App = () => {
     setPageHistory((prev) => [...prev, currentPage]);
     setCurrentPage(page);
     window.scrollTo(0, 0);
+  };
+
+  // NavBar tab handler (resets history for main tabs)
+  const handleNavTab = (tab) => {
+    setPageHistory([]);
+    setSelectedPostIdx(null);
+    setCurrentPage(tab);
+    window.scrollTo(0, 0);
+    if (tab === 'notificacoes' && savedUser?.id) {
+      fetchNotifications();
+    }
   };
 
   const goBack = () => {
@@ -2893,6 +3271,36 @@ const App = () => {
     );
   }
 
+  // Render Admin page (only for admin email)
+  if (currentPage === 'admin' && userEmail === ADMIN_EMAIL) {
+    return (
+      <>
+        <AdminPage adminEmail={userEmail} onBack={goBack} />
+        <NavBar currentPage="admin" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
+      </>
+    );
+  }
+
+  // Render Notifications page
+  if (currentPage === 'notificacoes') {
+    return (
+      <>
+        <NotificationsPage
+          notifications={notifications}
+          onMarkAllRead={markAllNotificationsRead}
+          onBack={goBack}
+          onNavigateToPost={(postId) => {
+            const idx = rodasPosts.findIndex(p => p.id === postId);
+            if (idx >= 0) {
+              handleOpenPost(idx);
+            }
+          }}
+        />
+        <NavBar currentPage="notificacoes" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
+      </>
+    );
+  }
+
   // Render Profile page
   if (currentPage === 'perfil') {
     if (!isLoggedIn) {
@@ -2923,23 +3331,10 @@ const App = () => {
             </button>
             </div>
           </div>
-          <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-            <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-              <Heart size={22} />
-              <span>Inicio</span>
-            </button>
-            <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-              <AldeiaIcon size={22} />
-              <span>Aldeia</span>
-            </button>
-            <button className="flex flex-col items-center gap-1 text-gray-800">
-              <User size={22} fill="#374151" stroke="#374151" />
-              <span className="font-semibold">Perfil</span>
-            </button>
-          </nav>
-        </>
-      );
-    }
+        <NavBar currentPage="perfil" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
+      </>
+    );
+  }
     return (
       <>
         <ProfilePage
@@ -2949,6 +3344,8 @@ const App = () => {
           onOpenPost={handleOpenPost}
           isEmailConfirmed={isEmailConfirmed}
           onResendConfirmation={resendConfirmationEmail}
+          notifPrefs={notifPrefs}
+          onToggleNotifPref={(key) => setNotifPrefs(prev => ({ ...prev, [key]: !prev[key] }))}
           onLogout={() => {
             setUserName('');
             setUserEmail('');
@@ -2972,61 +3369,7 @@ const App = () => {
             setShowAccountDeleted(true);
           }}
         />
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-          <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={22} />
-            <span>Inicio</span>
-          </button>
-          <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <AldeiaIcon size={22} />
-            <span>Aldeia</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-gray-800">
-            <User size={22} fill="#374151" stroke="#374151" />
-            <span className="font-semibold">Perfil</span>
-          </button>
-        </nav>
-      </>
-    );
-  }
-
-  // Render Post Detail page
-  if (currentPage === 'postDetail' && selectedPostIdx !== null) {
-    return (
-      <>
-        <PostDetail
-          post={rodasPosts[selectedPostIdx]}
-          onBack={goBack}
-          onAddComment={handleAddComment}
-          onLikePost={handleLikePost}
-          onLikeComment={handleLikeComment}
-          onReplyComment={handleReplyComment}
-          onLikeReply={handleLikeReply}
-          onEditPost={handleEditPost}
-        />
-        {reviewPopupType && (
-          <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
-        )}
-        {showEmailConfirmRequired && (
-          <EmailConfirmRequiredPopup
-            onClose={() => setShowEmailConfirmRequired(false)}
-            onResend={resendConfirmationEmail}
-          />
-        )}
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-          <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={22} />
-            <span>Inicio</span>
-          </button>
-          <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 text-gray-800">
-            <AldeiaIcon size={22} filled color="#374151" />
-            <span className="font-semibold">Aldeia</span>
-          </button>
-          <button onClick={() => { setPageHistory([]); setSelectedPostIdx(null); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <User size={22} />
-            <span>Perfil</span>
-          </button>
-        </nav>
+        <NavBar currentPage="aldeia" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
       </>
     );
   }
@@ -3066,21 +3409,7 @@ const App = () => {
     return (
       <>
         <RodasDeConversa onBack={goBack} posts={rodasPosts} onOpenPost={handleOpenPost} onSendPost={handleSendPost} />
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-          <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={22} />
-            <span>Inicio</span>
-          </button>
-          <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 text-gray-800">
-            <AldeiaIcon size={22} filled color="#374151" />
-            <span className="font-semibold">Aldeia</span>
-          </button>
-
-          <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <User size={22} />
-            <span>Perfil</span>
-          </button>
-        </nav>
+        <NavBar currentPage="rodas" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
       </>
     );
   }
@@ -3103,20 +3432,7 @@ const App = () => {
         {showComingSoon && (
           <ComingSoonPopup onClose={() => setShowComingSoon(null)} isLoggedIn={isLoggedIn} userEmail={userEmail} userId={savedUser?.id} feature={showComingSoon} />
         )}
-        <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-          <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <Heart size={22} />
-            <span>Inicio</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-gray-800">
-            <AldeiaIcon size={22} filled color="#374151" />
-            <span className="font-semibold">Aldeia</span>
-          </button>
-          <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-            <User size={22} />
-            <span>Perfil</span>
-          </button>
-        </nav>
+          <NavBar currentPage="perfil" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
       </>
     );
   }
@@ -3240,21 +3556,7 @@ const App = () => {
         <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
       )}
 
-      {/* Footer Navigation - Floating */}
-      <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
-        <button className="flex flex-col items-center gap-1 text-gray-800">
-          <Heart size={22} fill="#374151" stroke="#374151" />
-          <span className="font-semibold">Inicio</span>
-        </button>
-        <button onClick={() => { setPageHistory([]); setCurrentPage('aldeia'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-          <AldeiaIcon size={22} />
-          <span>Aldeia</span>
-        </button>
-        <button onClick={() => { setPageHistory([]); setCurrentPage('perfil'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
-          <User size={22} />
-          <span>Perfil</span>
-        </button>
-      </nav>
+      <NavBar currentPage="inicio" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
     </div>
   );
 };
