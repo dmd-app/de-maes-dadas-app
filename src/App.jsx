@@ -406,13 +406,14 @@ const OnboardingPage = ({ onComplete }) => {
 
 // --- COMPONENTS ---
 
-const ComingSoonPopup = ({ onClose, isLoggedIn, userEmail, userId }) => {
+const ComingSoonPopup = ({ onClose, isLoggedIn, userEmail, userId, feature }) => {
   const [notifyEmail, setNotifyEmail] = useState(isLoggedIn && userEmail ? userEmail : '');
   const [submitted, setSubmitted] = useState(false);
+  const featureName = feature || 'general';
 
   const handleNotify = () => {
     if (notifyEmail.trim() && notifyEmail.includes('@')) {
-      const payload = { email: notifyEmail.trim(), feature: 'general' };
+      const payload = { email: notifyEmail.trim(), feature: featureName };
       if (userId) payload.userId = userId;
       sendToBrevo('notify_coming_soon', payload);
       setSubmitted(true);
@@ -425,7 +426,7 @@ const ComingSoonPopup = ({ onClose, isLoggedIn, userEmail, userId }) => {
         <div className="w-16 h-16 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
           <Heart size={28} className="text-[#FF66C4]" />
         </div>
-        <h3 className="font-bold text-gray-800 text-lg mb-2">Coming Soon</h3>
+        <h3 className="font-bold text-gray-800 text-lg mb-2">{featureName !== 'general' ? featureName : 'Coming Soon'}</h3>
         <p className="text-sm text-gray-500 leading-relaxed mb-5">
           {"Estamos preparando algo especial para voc\u00ea. Em breve estar\u00e1 dispon\u00edvel!"}
         </p>
@@ -694,7 +695,7 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, isEmailC
           <span className="font-semibold text-gray-700 text-sm text-center leading-tight">Rodas de Conversa</span>
         </button>
 
-        <button onClick={onComingSoon} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
+        <button onClick={() => onComingSoon('Biblioteca')} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
             <BookOpen size={24} />
           </div>
@@ -705,16 +706,16 @@ const ActionGrid = ({ onNavigate, onSendPost, onComingSoon, isLoggedIn, isEmailC
   );
 };
 
-const ContentSection = ({ title, items, badgeColor, cardWidth = "180px", onComingSoon }) => (
+const ContentSection = ({ title, items, badgeColor, cardWidth = "180px", onComingSoon, feature }) => (
   <section className="py-4 bg-soft-bg">
     <div className="px-6 mb-4 flex justify-between items-center">
       <h3 className="text-lg font-sans font-bold text-gray-800">{title}</h3>
-      <button onClick={onComingSoon} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
+      <button onClick={() => onComingSoon(feature || title)} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
     </div>
     
     <div className="flex overflow-x-auto px-6 gap-4 pb-8 snap-x hide-scrollbar">
       {items.map((item, idx) => (
-        <div key={idx} onClick={onComingSoon} style={{ minWidth: cardWidth, maxWidth: cardWidth }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col cursor-pointer">
+        <div key={idx} onClick={() => onComingSoon(feature || title)} style={{ minWidth: cardWidth, maxWidth: cardWidth }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col cursor-pointer">
           {/* Card Image Area */}
           <div className={`h-32 relative ${item.bgClass} flex items-center justify-center overflow-hidden`}>
              <span className={`absolute top-4 left-4 text-[10px] font-bold px-3 py-1 rounded-full ${badgeColor} z-10`}>
@@ -1031,7 +1032,7 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogi
           <h3 className="font-semibold text-gray-700 text-sm text-center leading-tight">Rodas de Conversa</h3>
         </button>
 
-        <button onClick={onComingSoon} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
+        <button onClick={() => onComingSoon('Biblioteca')} className="bg-white py-8 px-4 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-[0.98] transition-all">
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF66C4] to-[#B946FF] flex items-center justify-center text-white">
             <BookOpen size={24} />
           </div>
@@ -2178,7 +2179,7 @@ const App = () => {
   const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
   const [userName, setUserName] = useState(savedUser?.name || '');
   const [userEmail, setUserEmail] = useState(savedUser?.email || '');
-  const [showComingSoon, setShowComingSoon] = useState(false);
+  const [showComingSoon, setShowComingSoon] = useState(null); // null = hidden, string = feature name
   const [showAccountDeleted, setShowAccountDeleted] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
   const [reviewPopupType, setReviewPopupType] = useState(null);
@@ -2892,11 +2893,11 @@ const App = () => {
   if (currentPage === 'aldeia') {
     return (
       <>
-        <AldeiaPage
-          onNavigate={(page) => navigateTo(page)}
-          posts={rodasPosts}
-          onComingSoon={() => setShowComingSoon(true)}
-          isLoggedIn={isLoggedIn}
+      <AldeiaPage
+      onNavigate={(page) => navigateTo(page)}
+      posts={rodasPosts}
+      onComingSoon={(feat) => setShowComingSoon(feat || 'general')}
+      isLoggedIn={isLoggedIn}
           onRequireLogin={(action) => {
             setPendingAction(action);
             navigateTo('signup');
@@ -2904,7 +2905,7 @@ const App = () => {
           onOpenPost={handleOpenPost}
         />
         {showComingSoon && (
-          <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} userEmail={userEmail} userId={savedUser?.id} />
+          <ComingSoonPopup onClose={() => setShowComingSoon(null)} isLoggedIn={isLoggedIn} userEmail={userEmail} userId={savedUser?.id} feature={showComingSoon} />
         )}
         <nav className="fixed bottom-4 left-4 right-4 bg-white rounded-2xl px-6 py-4 flex justify-between items-center text-xs font-medium text-gray-400 max-w-[calc(28rem-2rem)] mx-auto z-50 shadow-lg border border-gray-100">
           <button onClick={() => { setPageHistory([]); setCurrentPage('inicio'); window.scrollTo(0, 0); }} className="flex flex-col items-center gap-1 hover:text-gray-800 transition-colors">
@@ -2978,7 +2979,7 @@ const App = () => {
       <ActionGrid
         onNavigate={(page) => navigateTo(page)}
         onSendPost={handleSendPost}
-        onComingSoon={() => setShowComingSoon(true)}
+        onComingSoon={(feat) => setShowComingSoon(feat || 'general')}
         isLoggedIn={isLoggedIn}
         isEmailConfirmed={isEmailConfirmed}
         onRequireLogin={(action) => {
@@ -2991,7 +2992,7 @@ const App = () => {
         isPanicOpen={isPanicOpen}
         setIsPanicOpen={setIsPanicOpen}
       />
-      <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" onComingSoon={() => setShowComingSoon(true)} />
+      <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" feature="Jornadas" onComingSoon={(feat) => setShowComingSoon(feat)} />
 
       <div className="mx-6 h-px bg-white" />
 
@@ -3000,7 +3001,7 @@ const App = () => {
         <div className="px-6 mb-2">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-sans font-bold text-gray-800">Os Guardi&#245;es do Cuidado</h3>
-            <button onClick={() => setShowComingSoon(true)} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
+            <button onClick={() => setShowComingSoon('Guardioes')} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
           </div>
           <p className="text-xs text-gray-400 leading-relaxed mt-1">
             Encontros com saberes que sustentam a vida. N&#227;o s&#227;o gurus. S&#227;o pessoas que caminham com o corpo, a escuta e a experi&#234;ncia.
@@ -3008,7 +3009,7 @@ const App = () => {
         </div>
         <div className="flex overflow-x-auto px-6 gap-4 pb-8 pt-2 snap-x hide-scrollbar">
           {guardioes.map((item, idx) => (
-            <div key={idx} onClick={() => setShowComingSoon(true)} style={{ minWidth: "180px", maxWidth: "180px" }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col cursor-pointer">
+            <div key={idx} onClick={() => setShowComingSoon('Guardioes')} style={{ minWidth: "180px", maxWidth: "180px" }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col cursor-pointer">
               <div className={`h-32 relative ${item.bgClass} flex items-center justify-center overflow-hidden`}>
                 <span className="absolute top-4 left-4 text-[10px] font-bold px-3 py-1 rounded-full bg-white/90 text-emerald-700 z-10">
                   {item.tag}
@@ -3027,11 +3028,11 @@ const App = () => {
 
       <div className="mx-6 h-px bg-white" />
 
-      <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" cardWidth="280px" onComingSoon={() => setShowComingSoon(true)} />
+      <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" cardWidth="280px" feature="Tribos" onComingSoon={(feat) => setShowComingSoon(feat)} />
       
       {/* Coming Soon Popup */}
       {showComingSoon && (
-        <ComingSoonPopup onClose={() => setShowComingSoon(false)} isLoggedIn={isLoggedIn} userEmail={userEmail} userId={savedUser?.id} />
+        <ComingSoonPopup onClose={() => setShowComingSoon(null)} isLoggedIn={isLoggedIn} userEmail={userEmail} userId={savedUser?.id} feature={showComingSoon} />
       )}
 
       {/* Review Pending Popup */}
