@@ -493,8 +493,8 @@ const ReviewPendingPopup = ({ onClose, type }) => {
         </h3>
         <p className="text-sm text-gray-500 leading-relaxed mb-5">
           {isComment
-            ? "Seu coment\u00e1rio ser\u00e1 analisado e em algumas horas dever\u00e1 estar no ar."
-            : "Seu post ser\u00e1 analisado e em algumas horas dever\u00e1 estar no ar."}
+            ? "Seu coment\u00e1rio foi enviado para a Guardi\u00e3 e logo estar\u00e1 no ar."
+            : "Sua mensagem foi enviada para a Guardi\u00e3 e logo estar\u00e1 no ar."}
         </p>
         <button
           onClick={onClose}
@@ -861,7 +861,15 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
           </div>
         )}
         {filteredPosts.map((post) => (
-          <div key={post.originalIdx} onClick={() => onOpenPost && onOpenPost(post.originalIdx)} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform">
+          <div key={post.originalIdx} onClick={() => onOpenPost && onOpenPost(post.originalIdx)} className={`bg-white rounded-2xl p-5 shadow-sm border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform ${post.status === 'pending' ? 'opacity-50' : ''}`}>
+            {/* Pending Badge */}
+            {post.status === 'pending' && (
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                  {"Aguardando Aprova\u00e7\u00e3o"}
+                </span>
+              </div>
+            )}
             {/* Meta */}
             <div className="flex items-center gap-2 mb-3">
               <span className={`text-[10px] font-bold px-3 py-1 rounded-full ${post.categoryColor}`}>
@@ -1121,7 +1129,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
             </span>
             {post.status === 'pending' && (
               <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-700">
-                {"Aguardando confirma\u00e7\u00e3o"}
+                {"Aguardando Aprova\u00e7\u00e3o"}
               </span>
             )}
             {post.status === 'inactive' && (
@@ -1352,7 +1360,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
                         <span className="text-xs font-semibold text-gray-700">{reply.author}</span>
                         <span className="text-[10px] text-gray-400">{" \u2022 "}{reply.time}</span>
                         {reply.status === 'pending' && (
-                          <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">{"Aguardando confirma\u00e7\u00e3o"}</span>
+                          <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">{"Aguardando Aprova\u00e7\u00e3o"}</span>
                         )}
                         {reply.status === 'inactive' && (
                           <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-gray-200 text-gray-600">Inativo</span>
@@ -1492,7 +1500,7 @@ const ProfilePage = ({ userName, userEmail, posts, onLogout, onDeleteAccount, on
                   </span>
                   {post.status === 'pending' && (
                     <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-700">
-                      {"Aguardando confirma\u00e7\u00e3o"}
+                      {"Aguardando Aprova\u00e7\u00e3o"}
                     </span>
                   )}
                   {post.status === 'inactive' && (
@@ -2178,12 +2186,167 @@ const getSavedUser = () => {
   }
 };
 
+// ─── Admin Moderation Page ───
+const ADMIN_EMAIL = 'aldeia@demaesdadas.com.br';
+
+const AdminPage = ({ adminEmail, onBack }) => {
+  const [pending, setPending] = useState({ posts: [], comments: [] });
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null);
+
+  const fetchPending = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/moderate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'list_pending', adminEmail }),
+      });
+      const data = await res.json();
+      setPending({ posts: data.posts || [], comments: data.comments || [] });
+    } catch (e) {
+      console.error('Failed to fetch pending:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchPending(); }, []);
+
+  const handleAction = async (id, type, actionType) => {
+    setActionLoading(`${id}-${actionType}`);
+    try {
+      await fetch('/api/moderate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: actionType, id, type, adminEmail }),
+      });
+      // Remove from local list
+      if (type === 'post') {
+        setPending(prev => ({ ...prev, posts: prev.posts.filter(p => p.id !== id) }));
+      } else {
+        setPending(prev => ({ ...prev, comments: prev.comments.filter(c => c.id !== id) }));
+      }
+    } catch (e) {
+      console.error('Moderation action failed:', e);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const timeAgo = (dateStr) => {
+    if (!dateStr) return '';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'agora';
+    if (mins < 60) return `${mins}min`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h`;
+    return `${Math.floor(hrs / 24)}d`;
+  };
+
+  const total = pending.posts.length + pending.comments.length;
+
+  return (
+    <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
+      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-pink-100/50">
+        <div className="flex items-center gap-3">
+          <button onClick={onBack} className="text-gray-500 hover:text-gray-700">
+            <ArrowLeft size={20} />
+          </button>
+          <div>
+            <h1 className="text-lg font-bold text-gray-800">{"Guardi\u00e3 da Aldeia"}</h1>
+            <p className="text-xs text-gray-400">{total} {"pendente(s)"}</p>
+          </div>
+        </div>
+      </header>
+
+      {loading ? (
+        <div className="flex items-center justify-center pt-20">
+          <div className="w-8 h-8 border-3 border-[#FF66C4] border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : total === 0 ? (
+        <div className="flex flex-col items-center justify-center pt-20 px-6">
+          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-4">
+            <Check size={32} className="text-green-600" />
+          </div>
+          <h3 className="font-bold text-gray-700 mb-1">{"Tudo aprovado!"}</h3>
+          <p className="text-sm text-gray-400 text-center">{"Nenhum conteudo pendente de modera\u00e7\u00e3o."}</p>
+        </div>
+      ) : (
+        <div className="px-4 py-4 flex flex-col gap-3">
+          {/* Pending Posts */}
+          {pending.posts.map((item) => (
+            <div key={item.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700">Post</span>
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600">{item.category}</span>
+                <span className="text-xs text-gray-400 ml-auto">{timeAgo(item.createdAt)}</span>
+              </div>
+              <p className="text-xs text-gray-400 mb-1">{"Autora: "}{item.author}</p>
+              <p className="text-sm text-gray-700 leading-relaxed mb-3">{item.body}</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleAction(item.id, 'post', 'approve')}
+                  disabled={!!actionLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-green-500 text-white font-bold text-xs active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  {actionLoading === `${item.id}-approve` ? '...' : 'Aprovar'}
+                </button>
+                <button
+                  onClick={() => handleAction(item.id, 'post', 'reject')}
+                  disabled={!!actionLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-bold text-xs active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  {actionLoading === `${item.id}-reject` ? '...' : 'Rejeitar'}
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {/* Pending Comments */}
+          {pending.comments.map((item) => (
+            <div key={item.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700">{"Coment\u00e1rio"}</span>
+                <span className="text-xs text-gray-400 ml-auto">{timeAgo(item.createdAt)}</span>
+              </div>
+              <p className="text-xs text-gray-400 mb-1">{"Autora: "}{item.author}</p>
+              {item.postBody && (
+                <p className="text-xs text-gray-300 italic mb-1">{"Re: "}{item.postBody}{"..."}</p>
+              )}
+              <p className="text-sm text-gray-700 leading-relaxed mb-3">{item.body}</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleAction(item.id, 'comment', 'approve')}
+                  disabled={!!actionLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-green-500 text-white font-bold text-xs active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  {actionLoading === `${item.id}-approve` ? '...' : 'Aprovar'}
+                </button>
+                <button
+                  onClick={() => handleAction(item.id, 'comment', 'reject')}
+                  disabled={!!actionLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-bold text-xs active:scale-[0.98] transition-all disabled:opacity-50"
+                >
+                  {actionLoading === `${item.id}-reject` ? '...' : 'Rejeitar'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ─── Shared Bottom NavBar with Notifications Bell ───
-const NavBar = ({ currentPage, onNavigate, unreadCount = 0 }) => {
+const NavBar = ({ currentPage, onNavigate, unreadCount = 0, isAdmin = false }) => {
   const tabs = [
     { key: 'inicio', label: 'Inicio', icon: Heart, filled: currentPage === 'inicio' },
     { key: 'aldeia', label: 'Aldeia', isAldeia: true, filled: currentPage === 'aldeia' },
     { key: 'notificacoes', label: 'Alertas', icon: Bell, filled: currentPage === 'notificacoes', badge: unreadCount },
+    ...(isAdmin ? [{ key: 'admin', label: 'Guardia', icon: Shield, filled: currentPage === 'admin' }] : []),
     { key: 'perfil', label: 'Perfil', icon: User, filled: currentPage === 'perfil' },
   ];
 
@@ -3108,6 +3271,16 @@ const App = () => {
     );
   }
 
+  // Render Admin page (only for admin email)
+  if (currentPage === 'admin' && userEmail === ADMIN_EMAIL) {
+    return (
+      <>
+        <AdminPage adminEmail={userEmail} onBack={goBack} />
+        <NavBar currentPage="admin" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
+      </>
+    );
+  }
+
   // Render Notifications page
   if (currentPage === 'notificacoes') {
     return (
@@ -3123,7 +3296,7 @@ const App = () => {
             }
           }}
         />
-        <NavBar currentPage="notificacoes" onNavigate={handleNavTab} unreadCount={unreadCount} />
+        <NavBar currentPage="notificacoes" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
       </>
     );
   }
@@ -3158,7 +3331,7 @@ const App = () => {
             </button>
             </div>
           </div>
-        <NavBar currentPage="perfil" onNavigate={handleNavTab} unreadCount={unreadCount} />
+        <NavBar currentPage="perfil" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
       </>
     );
   }
@@ -3196,7 +3369,7 @@ const App = () => {
             setShowAccountDeleted(true);
           }}
         />
-        <NavBar currentPage="aldeia" onNavigate={handleNavTab} unreadCount={unreadCount} />
+        <NavBar currentPage="aldeia" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
       </>
     );
   }
@@ -3236,7 +3409,7 @@ const App = () => {
     return (
       <>
         <RodasDeConversa onBack={goBack} posts={rodasPosts} onOpenPost={handleOpenPost} onSendPost={handleSendPost} />
-        <NavBar currentPage="rodas" onNavigate={handleNavTab} unreadCount={unreadCount} />
+        <NavBar currentPage="rodas" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
       </>
     );
   }
@@ -3259,7 +3432,7 @@ const App = () => {
         {showComingSoon && (
           <ComingSoonPopup onClose={() => setShowComingSoon(null)} isLoggedIn={isLoggedIn} userEmail={userEmail} userId={savedUser?.id} feature={showComingSoon} />
         )}
-          <NavBar currentPage="perfil" onNavigate={handleNavTab} unreadCount={unreadCount} />
+          <NavBar currentPage="perfil" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
       </>
     );
   }
@@ -3383,7 +3556,7 @@ const App = () => {
         <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
       )}
 
-      <NavBar currentPage="inicio" onNavigate={handleNavTab} unreadCount={unreadCount} />
+      <NavBar currentPage="inicio" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
     </div>
   );
 };
