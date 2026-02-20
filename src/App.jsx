@@ -2198,9 +2198,19 @@ const App = () => {
   const isEmailConfirmed = !!savedUser?.emailConfirmed;
 
   // Helper to send confirmation email
-  const sendConfirmationEmail = (email, name, token) => {
+  const sendConfirmationEmail = async (email, name, token) => {
+    // Save token server-side so it works across devices
+    try {
+      await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'save_confirm_token', email, token }),
+      });
+    } catch (e) {
+      console.error('Failed to save confirm token:', e);
+    }
     const baseUrl = window.location.origin;
-    sendToBrevo('send_confirmation_email', {
+    await sendToBrevo('send_confirmation_email', {
       email,
       userName: name,
       confirmToken: token,
@@ -2208,10 +2218,14 @@ const App = () => {
     });
   };
 
-  // Helper to resend confirmation email from current user
-  const resendConfirmationEmail = () => {
-    if (savedUser && savedUser.confirmToken && !savedUser.emailConfirmed) {
-      sendConfirmationEmail(savedUser.email, savedUser.name, savedUser.confirmToken);
+  // Helper to resend confirmation email from current user (generates new token)
+  const resendConfirmationEmail = async () => {
+    if (savedUser && !savedUser.emailConfirmed) {
+      const newToken = crypto.randomUUID();
+      const updatedUser = { ...savedUser, confirmToken: newToken };
+      localStorage.setItem('dmd_user', JSON.stringify(updatedUser));
+      setSavedUser(updatedUser);
+      await sendConfirmationEmail(savedUser.email, savedUser.name, newToken);
     }
   };
 
