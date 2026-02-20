@@ -2503,7 +2503,7 @@ const App = () => {
       const res = await fetch('/api/posts', {
         method: 'POST',
         headers,
-        body: JSON.stringify({ action: 'list' }),
+        body: JSON.stringify({ action: 'list', userId: savedUser?.id || null }),
       });
       const data = await res.json();
       if (data.posts) {
@@ -2517,7 +2517,7 @@ const App = () => {
     } finally {
       setPostsLoading(false);
     }
-  }, [savedUser?.accessToken]);
+  }, [savedUser?.accessToken, savedUser?.id]);
 
   // ─── Fetch notifications ───
   const fetchNotifications = useCallback(async () => {
@@ -2667,15 +2667,19 @@ const App = () => {
         .then(res => res.json())
         .then(data => {
           if (data.success) {
-            // Update local state if user is on same device
+            // Always create/update full savedUser (works cross-device and same-device)
             const localUser = getSavedUser();
-            if (localUser && localUser.email === email) {
-              const updatedUser = { ...localUser, emailConfirmed: true };
-              localStorage.setItem('dmd_user', JSON.stringify(updatedUser));
-              setSavedUser(updatedUser);
-              setUserName(updatedUser.name);
-              setUserEmail(updatedUser.email);
-            }
+            const updatedUser = {
+              id: data.user?.id || localUser?.id,
+              name: data.user?.username || localUser?.name || email.split('@')[0],
+              email: data.user?.email || email,
+              emailConfirmed: true,
+              ...(localUser?.accessToken ? { accessToken: localUser.accessToken } : {}),
+            };
+            localStorage.setItem('dmd_user', JSON.stringify(updatedUser));
+            setSavedUser(updatedUser);
+            setUserName(updatedUser.name);
+            setUserEmail(updatedUser.email);
             setCurrentPage('emailConfirmed');
           } else {
             setCurrentPage('emailConfirmFailed');

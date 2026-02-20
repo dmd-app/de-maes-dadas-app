@@ -60,9 +60,9 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: error.message });
       }
 
-      // Get the current user id from the access token if available
-      let currentUserId = null;
-      if (accessToken) {
+      // Get the current user id from access token or request body
+      let currentUserId = req.body.userId || null;
+      if (accessToken && !currentUserId) {
         const { data: { user } } = await supabase.auth.getUser(accessToken);
         currentUserId = user?.id || null;
       }
