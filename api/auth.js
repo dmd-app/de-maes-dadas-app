@@ -43,6 +43,16 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: error.message });
       }
 
+      // The DB trigger handle_new_user auto-creates a profile row.
+      // Update it with the username the user chose.
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ username })
+        .eq('id', data.user.id);
+      if (profileError) {
+        console.error('[auth] Profile update error:', profileError);
+      }
+
       // Save confirmation token to dedicated table
       if (confirmToken) {
         const { error: tokenError } = await supabase
@@ -58,7 +68,7 @@ export default async function handler(req, res) {
         user: {
           id: data.user.id,
           email: data.user.email,
-          username: data.user.user_metadata?.username || username,
+          username,
         },
       });
 
@@ -82,12 +92,20 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: error.message });
       }
 
+      // Fetch profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('username, avatar_url')
+        .eq('id', data.user.id)
+        .single();
+
       return res.status(200).json({
         success: true,
         user: {
           id: data.user.id,
           email: data.user.email,
-          username: data.user.user_metadata?.username || data.user.email.split('@')[0],
+          username: profile?.username || data.user.user_metadata?.username || data.user.email.split('@')[0],
+          avatar_url: profile?.avatar_url || null,
           emailConfirmed: !!data.user.email_confirmed_at,
         },
         session: {

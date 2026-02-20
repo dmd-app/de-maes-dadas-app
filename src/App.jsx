@@ -2201,7 +2201,8 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState('inicio');
   const [pageHistory, setPageHistory] = useState([]);
   const [selectedPostIdx, setSelectedPostIdx] = useState(null);
-  const [rodasPosts, setRodasPosts] = useState(initialRodasPosts);
+  const [rodasPosts, setRodasPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(true);
   const [userName, setUserName] = useState(() => getSavedUser()?.name || '');
   const [userEmail, setUserEmail] = useState(() => getSavedUser()?.email || '');
   const [showComingSoon, setShowComingSoon] = useState(null); // null = hidden, string = feature name
@@ -2216,6 +2217,36 @@ const App = () => {
 
   const isLoggedIn = !!savedUser;
   const isEmailConfirmed = !!savedUser?.emailConfirmed;
+
+  // ─── Fetch posts from Supabase via API ───
+  const fetchPosts = async () => {
+    try {
+      setPostsLoading(true);
+      const headers = { 'Content-Type': 'application/json' };
+      if (savedUser?.accessToken) {
+        headers['Authorization'] = `Bearer ${savedUser.accessToken}`;
+      }
+      const res = await fetch('/api/posts', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ action: 'list' }),
+      });
+      const data = await res.json();
+      if (data.posts) {
+        setRodasPosts(data.posts);
+      }
+    } catch (e) {
+      console.error('Failed to fetch posts:', e);
+      // Fallback to seed data if API fails
+      setRodasPosts(initialRodasPosts);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   // Helper to send confirmation email
   const sendConfirmationEmail = async (email, name, token) => {
@@ -2348,28 +2379,37 @@ const App = () => {
     });
   };
 
-  const handleSendPost = (text, category, categoryColor) => {
+  const handleSendPost = async (text, category, categoryColor) => {
     if (isLoggedIn && !isEmailConfirmed) {
       setShowEmailConfirmRequired(true);
       return;
     }
-    const newPost = {
-      category: category || "Desabafo",
-      categoryColor: categoryColor || "bg-[#FF66C4] text-white",
-      author: "Eu",
-      time: "Agora",
-      title: text.length > 60 ? text.slice(0, 60) + "..." : text,
-      desc: text,
-      likes: 0,
-      comments: 0,
-      commentsList: [],
-      status: 'pending',
-    };
-    setRodasPosts([newPost, ...rodasPosts]);
-    setSelectedPostIdx(0);
-    setReviewPopupType('post');
-    navigateTo('postDetail');
-    setTimeout(() => window.scrollTo(0, 0), 50);
+
+    try {
+      const res = await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create',
+          body: text,
+          category: category || 'Desabafo',
+          categoryColor: categoryColor || '#FF66C4',
+          authorName: userName || 'Anonima',
+          userId: savedUser?.id || null,
+        }),
+      });
+      const data = await res.json();
+      if (data.post) {
+        setRodasPosts([data.post, ...rodasPosts]);
+        setSelectedPostIdx(0);
+        setReviewPopupType('post');
+        navigateTo('postDetail');
+        setTimeout(() => window.scrollTo(0, 0), 50);
+      }
+    } catch (e) {
+      console.error('Failed to create post:', e);
+    }
+
     if (userEmail) {
       sendToBrevo('send_event', { email: userEmail, attributes: { LAST_POST_DATE: new Date().toISOString().split('T')[0], HAS_POSTED: true } });
     }
@@ -2412,76 +2452,177 @@ const App = () => {
     handleLikePostByIdx(selectedPostIdx);
   };
 
-  const handleLikePostByIdx = (idx) => {
-    const updated = [...rodasPosts];
-    const post = { ...updated[idx] };
-    if (post.liked) {
-      post.likes = (post.likes || 1) - 1;
-      post.liked = false;
-    } else {
-      post.likes = (post.likes || 0) + 1;
-      post.liked = true;
+  const handleLikePostByIdx = async (idx) => {
+    const post = rodasPosts[idx];
+    if (!post?.id || !savedUser?.id) {
+      // Optimistic local toggle for non-DB posts
+      const updated = [...rodasPosts];
+      const p = { ...updated[idx] };
+      p.liked = !p.liked;
+      p.likes = p.liked ? (p.likes || 0) + 1 : Math.max((p.likes || 1) - 1, 0);
+      updated[idx] = p;
+      setRodasPosts(updated);
+      return;
     }
-    updated[idx] = post;
+
+    // Optimistic update
+    const updated = [...rodasPosts];
+    const p = { ...updated[idx] };
+    const wasLiked = p.liked;
+    p.liked = !wasLiked;
+    p.likes = wasLiked ? Math.max((p.likes || 1) - 1, 0) : (p.likes || 0) + 1;
+    updated[idx] = p;
     setRodasPosts(updated);
+
+    try {
+      await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'toggle_like', postId: post.id, userId: savedUser.id }),
+      });
+    } catch (e) {
+      // Revert on error
+      const reverted = [...rodasPosts];
+      reverted[idx] = { ...reverted[idx], liked: wasLiked, likes: wasLiked ? (p.likes || 0) + 1 : Math.max((p.likes || 1) - 1, 0) };
+      setRodasPosts(reverted);
+    }
   };
 
-  const handleAddComment = (text) => {
+  const handleAddComment = async (text) => {
     if (selectedPostIdx === null) return;
     if (isLoggedIn && !isEmailConfirmed) {
       setShowEmailConfirmRequired(true);
       return;
     }
+
+    const post = rodasPosts[selectedPostIdx];
+
+    // Optimistic update
+    const optimisticComment = { author: userName || 'Eu', time: 'agora', text, likes: 0, liked: false, replies: [], status: 'pending' };
     const updated = [...rodasPosts];
-    const newComment = { author: "Eu", time: "Agora", text, likes: 0, liked: false, replies: [], status: 'pending' };
     updated[selectedPostIdx] = {
       ...updated[selectedPostIdx],
-      commentsList: [...(updated[selectedPostIdx].commentsList || []), newComment],
+      commentsList: [...(updated[selectedPostIdx].commentsList || []), optimisticComment],
       comments: (updated[selectedPostIdx].comments || 0) + 1,
     };
     setRodasPosts(updated);
     setReviewPopupType('comment');
+
+    if (post?.id) {
+      try {
+        const res = await fetch('/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'add_comment',
+            postId: post.id,
+            body: text,
+            authorName: userName || 'Anonima',
+            userId: savedUser?.id || null,
+          }),
+        });
+        const data = await res.json();
+        if (data.comment) {
+          // Replace optimistic comment with real one (has DB id)
+          const refreshed = [...rodasPosts];
+          const currentPost = { ...refreshed[selectedPostIdx] };
+          const list = [...(currentPost.commentsList || [])];
+          list[list.length - 1] = data.comment;
+          currentPost.commentsList = list;
+          refreshed[selectedPostIdx] = currentPost;
+          setRodasPosts(refreshed);
+        }
+      } catch (e) {
+        console.error('Failed to add comment:', e);
+      }
+    }
   };
 
-  const handleLikeComment = (commentIdx) => {
+  const handleLikeComment = async (commentIdx) => {
     if (selectedPostIdx === null) return;
     const updated = [...rodasPosts];
     const post = { ...updated[selectedPostIdx] };
     const comments = [...(post.commentsList || [])];
     const comment = { ...comments[commentIdx] };
-    if (comment.liked) {
-      comment.likes = (comment.likes || 1) - 1;
-      comment.liked = false;
-    } else {
-      comment.likes = (comment.likes || 0) + 1;
-      comment.liked = true;
-    }
+    const wasLiked = comment.liked;
+    comment.liked = !wasLiked;
+    comment.likes = wasLiked ? Math.max((comment.likes || 1) - 1, 0) : (comment.likes || 0) + 1;
     comments[commentIdx] = comment;
     post.commentsList = comments;
     updated[selectedPostIdx] = post;
     setRodasPosts(updated);
+
+    if (comment.id && savedUser?.id) {
+      try {
+        await fetch('/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'toggle_comment_like', commentId: comment.id, userId: savedUser.id }),
+        });
+      } catch (e) {
+        console.error('Failed to like comment:', e);
+      }
+    }
   };
 
-  const handleReplyComment = (commentIdx, text) => {
+  const handleReplyComment = async (commentIdx, text) => {
     if (selectedPostIdx === null) return;
     if (isLoggedIn && !isEmailConfirmed) {
       setShowEmailConfirmRequired(true);
       return;
     }
+
+    const post = rodasPosts[selectedPostIdx];
+    const parentComment = post?.commentsList?.[commentIdx];
+
+    // Optimistic update
+    const optimisticReply = { author: userName || 'Eu', time: 'agora', text, likes: 0, liked: false, status: 'pending', replies: [] };
     const updated = [...rodasPosts];
-    const post = { ...updated[selectedPostIdx] };
-    const comments = [...(post.commentsList || [])];
+    const p = { ...updated[selectedPostIdx] };
+    const comments = [...(p.commentsList || [])];
     const comment = { ...comments[commentIdx] };
-    const newReply = { author: "Eu", time: "Agora", text, likes: 0, liked: false, status: 'pending' };
-    comment.replies = [...(comment.replies || []), newReply];
+    comment.replies = [...(comment.replies || []), optimisticReply];
     comments[commentIdx] = comment;
-    post.commentsList = comments;
-    updated[selectedPostIdx] = post;
+    p.commentsList = comments;
+    updated[selectedPostIdx] = p;
     setRodasPosts(updated);
     setReviewPopupType('reply');
+
+    if (post?.id && parentComment?.id) {
+      try {
+        const res = await fetch('/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'add_comment',
+            postId: post.id,
+            body: text,
+            authorName: userName || 'Anonima',
+            userId: savedUser?.id || null,
+            parentCommentId: parentComment.id,
+          }),
+        });
+        const data = await res.json();
+        if (data.comment) {
+          const refreshed = [...rodasPosts];
+          const rp = { ...refreshed[selectedPostIdx] };
+          const rComments = [...(rp.commentsList || [])];
+          const rComment = { ...rComments[commentIdx] };
+          const replies = [...(rComment.replies || [])];
+          replies[replies.length - 1] = data.comment;
+          rComment.replies = replies;
+          rComments[commentIdx] = rComment;
+          rp.commentsList = rComments;
+          refreshed[selectedPostIdx] = rp;
+          setRodasPosts(refreshed);
+        }
+      } catch (e) {
+        console.error('Failed to add reply:', e);
+      }
+    }
   };
 
-  const handleLikeReply = (commentIdx, replyIdx) => {
+  const handleLikeReply = async (commentIdx, replyIdx) => {
     if (selectedPostIdx === null) return;
     const updated = [...rodasPosts];
     const post = { ...updated[selectedPostIdx] };
@@ -2489,19 +2630,27 @@ const App = () => {
     const comment = { ...comments[commentIdx] };
     const replies = [...(comment.replies || [])];
     const reply = { ...replies[replyIdx] };
-    if (reply.liked) {
-      reply.likes = (reply.likes || 1) - 1;
-      reply.liked = false;
-    } else {
-      reply.likes = (reply.likes || 0) + 1;
-      reply.liked = true;
-    }
+    const wasLiked = reply.liked;
+    reply.liked = !wasLiked;
+    reply.likes = wasLiked ? Math.max((reply.likes || 1) - 1, 0) : (reply.likes || 0) + 1;
     replies[replyIdx] = reply;
     comment.replies = replies;
     comments[commentIdx] = comment;
     post.commentsList = comments;
     updated[selectedPostIdx] = post;
     setRodasPosts(updated);
+
+    if (reply.id && savedUser?.id) {
+      try {
+        await fetch('/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'toggle_comment_like', commentId: reply.id, userId: savedUser.id }),
+        });
+      } catch (e) {
+        console.error('Failed to like reply:', e);
+      }
+    }
   };
 
   const trilhas = [
