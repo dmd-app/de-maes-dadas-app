@@ -464,8 +464,12 @@ const ComingSoonPopup = ({ onClose, isLoggedIn, userEmail, userId, feature }) =>
         )}
 
         {submitted && (
-          <div className="mb-4 bg-green-50 rounded-xl p-3 border border-green-200">
-            <p className="text-xs font-semibold text-green-700">{"Pronto! Vamos te avisar quando estiver dispon\u00edvel."}</p>
+          <div className="mb-4 bg-green-50 rounded-2xl p-5 border border-green-200">
+            <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
+              <Check size={24} className="text-green-600" />
+            </div>
+            <p className="text-sm font-bold text-green-700 mb-1">{"E-mail enviado com sucesso!"}</p>
+            <p className="text-xs text-green-600">{"Vamos te avisar assim que estiver dispon\u00edvel. Fique de olho na sua caixa de entrada!"}</p>
           </div>
         )}
 
