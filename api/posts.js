@@ -29,6 +29,91 @@ const getServiceSupabase = () => {
 };
 
 export default async function handler(req, res) {
+  // ─── GET SINGLE POST BY ID (for shareable links) ────────
+  if (req.method === 'GET') {
+    const { id } = req.query;
+    if (!id) {
+      return res.status(400).json({ error: 'id query param required' });
+    }
+    const accessToken = req.headers.authorization?.replace('Bearer ', '') || null;
+    const supabase = getSupabase(accessToken);
+    const serviceSupabase = getServiceSupabase();
+    const sb = serviceSupabase || supabase;
+    if (!sb) {
+      return res.status(500).json({ error: 'Supabase not configured' });
+    }
+
+    try {
+      const { data: post, error } = await sb
+        .from('posts')
+        .select('*')
+        .eq('id', id)
+        .eq('status', 'approved')
+        .maybeSingle();
+
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+      if (!post) {
+        return res.status(404).json({ error: 'Post not found' });
+      }
+
+      // Fetch approved comments
+      const { data: allComments } = await sb
+        .from('comments')
+        .select('*')
+        .eq('post_id', post.id)
+        .eq('status', 'approved')
+        .order('created_at', { ascending: true });
+
+      const enrichedComments = (allComments || []).map(c => ({
+        id: c.id,
+        author: c.author_name,
+        text: c.body,
+        likes: c.likes_count,
+        liked: false,
+        time: formatTimeAgo(c.created_at),
+        parentCommentId: c.parent_comment_id,
+        userId: c.user_id,
+        status: c.status,
+        replies: [],
+      }));
+
+      // Build nested replies
+      const topLevel = [];
+      const byId = {};
+      enrichedComments.forEach(c => { byId[c.id] = c; });
+      enrichedComments.forEach(c => {
+        if (c.parentCommentId && byId[c.parentCommentId]) {
+          byId[c.parentCommentId].replies.push(c);
+        } else {
+          topLevel.push(c);
+        }
+      });
+
+      return res.status(200).json({
+        post: {
+          id: post.id,
+          userId: post.user_id,
+          category: post.category,
+          categoryColor: mapCategoryColor(post.category, post.category_color),
+          author: post.author_name,
+          time: formatTimeAgo(post.created_at),
+          title: post.title || '',
+          desc: post.body,
+          likes: post.likes_count,
+          comments: post.comments_count,
+          liked: false,
+          commentsList: topLevel,
+          status: post.status,
+        },
+      });
+    } catch (err) {
+      console.error('[posts] GET error:', err);
+      return res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
