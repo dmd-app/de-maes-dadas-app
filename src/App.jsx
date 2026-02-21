@@ -1480,8 +1480,8 @@ const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAcc
                   <Edit3 size={14} />
                 </button>
               </div>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <p className="text-sm text-gray-400">{userEmail}</p>
+<div className="flex items-center gap-1.5 mt-0.5 min-w-0 max-w-full">
+<p className="text-sm text-gray-400 truncate">{userEmail}</p>
                 {isEmailConfirmed ? (
                   <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0" title="Email confirmado">
                     <Check size={10} className="text-green-600" />
