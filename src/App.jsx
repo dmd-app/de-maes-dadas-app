@@ -901,11 +901,11 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
         ))}
       </div>
 
-      {/* Floating New Post Button */}
-      <div className="sticky bottom-28 z-30 flex justify-end px-6 -mt-16 pointer-events-none">
+      {/* Floating New Post Button - fixed above footer nav */}
+      <div className="fixed bottom-24 right-6 z-30">
         <button
           onClick={() => setIsNewPostOpen(true)}
-          className="w-14 h-14 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-all pointer-events-auto"
+          className="w-14 h-14 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-all"
         >
           <Plus size={28} />
         </button>
