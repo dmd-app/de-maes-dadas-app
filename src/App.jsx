@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, MailCheck, RefreshCw, AlertCircle } from 'lucide-react';
+import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ChevronDown, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, MailCheck, RefreshCw, AlertCircle } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import './index.css';
 
@@ -1399,9 +1399,42 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
 };
 
 // --- PROFILE PAGE ---
-const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAccount, onOpenPost, isEmailConfirmed, onResendConfirmation, notifPrefs, onToggleNotifPref }) => {
+const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAccount, onOpenPost, isEmailConfirmed, onResendConfirmation, notifPrefs, onToggleNotifPref, notifications = [] }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showNotifSettings, setShowNotifSettings] = useState(false);
+  const [showAlerts, setShowAlerts] = useState(false);
+
+  const timeAgo = (dateStr) => {
+    if (!dateStr) return '';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'agora';
+    if (mins < 60) return `${mins}min`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d`;
+  };
+
+  const getAlertIcon = (type) => {
+    switch (type) {
+      case 'comment': case 'comment_on_post': return MessageCircle;
+      case 'reply': case 'reply_to_comment': return ArrowRight;
+      case 'post_approved': case 'comment_approved': return Check;
+      case 'post_pending': return AlertCircle;
+      default: return Bell;
+    }
+  };
+
+  const getAlertColor = (type) => {
+    switch (type) {
+      case 'comment': case 'comment_on_post': return 'bg-blue-100 text-blue-600';
+      case 'reply': case 'reply_to_comment': return 'bg-purple-100 text-purple-600';
+      case 'post_approved': case 'comment_approved': return 'bg-green-100 text-green-600';
+      case 'post_pending': return 'bg-yellow-100 text-yellow-600';
+      default: return 'bg-gray-100 text-gray-600';
+    }
+  };
   const myPosts = posts
     .map((p, idx) => ({ ...p, originalIdx: idx }))
     .filter((p) => p.userId === userId || p.user_id === userId)
@@ -1593,6 +1626,50 @@ const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAcc
                 </button>
               </div>
             ))}
+
+            {/* Alerts Log Dropdown */}
+            <button
+              onClick={() => setShowAlerts(!showAlerts)}
+              className="w-full flex items-center justify-between px-5 py-3.5 border-t border-gray-100 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Bell size={16} className="text-gray-500" />
+                <p className="text-sm font-semibold text-gray-700">{"Hist\u00f3rico de Alertas"}</p>
+                {notifications.filter(n => !n.read).length > 0 && (
+                  <span className="w-5 h-5 rounded-full bg-[#FF66C4] text-white text-[10px] font-bold flex items-center justify-center">
+                    {notifications.filter(n => !n.read).length}
+                  </span>
+                )}
+              </div>
+              <ChevronDown size={16} className={`text-gray-400 transition-transform ${showAlerts ? 'rotate-180' : ''}`} />
+            </button>
+
+            {showAlerts && (
+              <div className="border-t border-gray-100 max-h-64 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <div className="flex flex-col items-center py-6 px-4">
+                    <Bell size={24} className="text-gray-300 mb-2" />
+                    <p className="text-xs text-gray-400 text-center">{"Nenhum alerta ainda."}</p>
+                  </div>
+                ) : (
+                  notifications.slice(0, 20).map((n, i) => {
+                    const Icon = getAlertIcon(n.type);
+                    return (
+                      <div key={n.id || i} className={`flex items-start gap-3 px-5 py-3 border-b border-gray-50 last:border-0 ${!n.read ? 'bg-blue-50/40' : ''}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${getAlertColor(n.type)}`}>
+                          <Icon size={14} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-700 leading-snug">{n.message}</p>
+                          <p className="text-[11px] text-gray-400 mt-0.5">{timeAgo(n.created_at)}</p>
+                        </div>
+                        {!n.read && <span className="w-2 h-2 rounded-full bg-[#FF66C4] flex-shrink-0 mt-1.5" />}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -3411,6 +3488,7 @@ const App = () => {
           onResendConfirmation={resendConfirmationEmail}
           notifPrefs={notifPrefs}
           onToggleNotifPref={(key) => setNotifPrefs(prev => ({ ...prev, [key]: !prev[key] }))}
+          notifications={notifications}
           onLogout={() => {
             setUserName('');
             setUserEmail('');
