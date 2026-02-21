@@ -2480,6 +2480,26 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState('inicio');
   const [pageHistory, setPageHistory] = useState([]);
   const [selectedPostIdx, setSelectedPostIdx] = useState(null);
+  const [selectedPostId, setSelectedPostId] = useState(null);
+
+  // Helper: get selected post by ID (resilient to array reordering)
+  const getSelectedPost = () => {
+    if (selectedPostId) {
+      return rodasPosts.find(p => p.id === selectedPostId) || null;
+    }
+    if (selectedPostIdx !== null) {
+      return rodasPosts[selectedPostIdx] || null;
+    }
+    return null;
+  };
+  // Helper: get selected post index by ID
+  const getSelectedPostIdx = () => {
+    if (selectedPostId) {
+      const idx = rodasPosts.findIndex(p => p.id === selectedPostId);
+      return idx !== -1 ? idx : null;
+    }
+    return selectedPostIdx;
+  };
   const [rodasPosts, setRodasPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(true);
   const [userName, setUserName] = useState(() => getSavedUser()?.name || '');
@@ -2746,6 +2766,7 @@ const App = () => {
   const handleNavTab = (tab) => {
     setPageHistory([]);
     setSelectedPostIdx(null);
+    setSelectedPostId(null);
     setCurrentPage(tab);
     window.scrollTo(0, 0);
     try { window.history.replaceState({ page: tab }, '', '/'); } catch (e) { /* ignore */ }
@@ -2766,6 +2787,7 @@ const App = () => {
       const destination = previousPage || 'inicio';
       setCurrentPage(destination);
       setSelectedPostIdx(null);
+      setSelectedPostId(null);
       // Don't scroll to top if returning to inicio with draft open - ActionGrid will scroll to the panel
       if (!(destination === 'inicio' && isPanicOpen && draftMessage)) {
         window.scrollTo(0, 0);
@@ -2824,17 +2846,15 @@ const App = () => {
 
   const handleOpenPost = (postId) => {
     if (!postId) return;
-    const foundIdx = rodasPosts.findIndex(p => p.id === postId);
-    if (foundIdx !== -1) {
-      setSelectedPostIdx(foundIdx);
-      navigateTo('postDetail');
-    }
+    setSelectedPostId(postId);
+    navigateTo('postDetail');
   };
 
   const handleEditPost = ({ title, desc, category, categoryColor }) => {
-    if (selectedPostIdx === null) return;
+    const idx = getSelectedPostIdx();
+    if (idx === null) return;
     const updated = [...rodasPosts];
-    const post = { ...updated[selectedPostIdx] };
+    const post = { ...updated[idx] };
 
     // Save current version to history before overwriting
     const previousVersion = {
@@ -2853,14 +2873,15 @@ const App = () => {
     post.categoryColor = categoryColor;
     post.status = 'pending';
 
-    updated[selectedPostIdx] = post;
+    updated[idx] = post;
     setRodasPosts(updated);
     setReviewPopupType('post');
   };
 
   const handleLikePost = () => {
-    if (selectedPostIdx === null) return;
-    handleLikePostByIdx(selectedPostIdx);
+    const idx = getSelectedPostIdx();
+    if (idx === null) return;
+    handleLikePostByIdx(idx);
   };
 
   const handleLikePostByIdx = async (idx) => {
@@ -2900,21 +2921,22 @@ const App = () => {
   };
 
   const handleAddComment = async (text) => {
-    if (selectedPostIdx === null) return;
+    const idx = getSelectedPostIdx();
+    if (idx === null) return;
     if (isLoggedIn && !isEmailConfirmed) {
       setShowEmailConfirmRequired(true);
       return;
     }
 
-    const post = rodasPosts[selectedPostIdx];
+    const post = rodasPosts[idx];
 
     // Optimistic update
     const optimisticComment = { author: userName || 'Eu', time: 'agora', text, likes: 0, liked: false, replies: [], status: 'pending' };
     const updated = [...rodasPosts];
-    updated[selectedPostIdx] = {
-      ...updated[selectedPostIdx],
-      commentsList: [...(updated[selectedPostIdx].commentsList || []), optimisticComment],
-      comments: (updated[selectedPostIdx].comments || 0) + 1,
+    updated[idx] = {
+      ...updated[idx],
+      commentsList: [...(updated[idx].commentsList || []), optimisticComment],
+      comments: (updated[idx].comments || 0) + 1,
     };
     setRodasPosts(updated);
     setReviewPopupType('comment');
@@ -2936,12 +2958,15 @@ const App = () => {
         if (data.comment) {
           // Replace optimistic comment with real one (has DB id)
           const refreshed = [...rodasPosts];
-          const currentPost = { ...refreshed[selectedPostIdx] };
-          const list = [...(currentPost.commentsList || [])];
-          list[list.length - 1] = data.comment;
-          currentPost.commentsList = list;
-          refreshed[selectedPostIdx] = currentPost;
-          setRodasPosts(refreshed);
+          const freshIdx = refreshed.findIndex(p => p.id === post.id);
+          if (freshIdx !== -1) {
+            const currentPost = { ...refreshed[freshIdx] };
+            const list = [...(currentPost.commentsList || [])];
+            list[list.length - 1] = data.comment;
+            currentPost.commentsList = list;
+            refreshed[freshIdx] = currentPost;
+            setRodasPosts(refreshed);
+          }
         }
       } catch (e) {
         console.error('Failed to add comment:', e);
@@ -2950,9 +2975,10 @@ const App = () => {
   };
 
   const handleLikeComment = async (commentIdx) => {
-    if (selectedPostIdx === null) return;
+    const idx = getSelectedPostIdx();
+    if (idx === null) return;
     const updated = [...rodasPosts];
-    const post = { ...updated[selectedPostIdx] };
+    const post = { ...updated[idx] };
     const comments = [...(post.commentsList || [])];
     const comment = { ...comments[commentIdx] };
     const wasLiked = comment.liked;
@@ -2960,7 +2986,7 @@ const App = () => {
     comment.likes = wasLiked ? Math.max((comment.likes || 1) - 1, 0) : (comment.likes || 0) + 1;
     comments[commentIdx] = comment;
     post.commentsList = comments;
-    updated[selectedPostIdx] = post;
+    updated[idx] = post;
     setRodasPosts(updated);
 
     if (comment.id && savedUser?.id) {
@@ -2977,25 +3003,26 @@ const App = () => {
   };
 
   const handleReplyComment = async (commentIdx, text) => {
-    if (selectedPostIdx === null) return;
+    const idx = getSelectedPostIdx();
+    if (idx === null) return;
     if (isLoggedIn && !isEmailConfirmed) {
       setShowEmailConfirmRequired(true);
       return;
     }
 
-    const post = rodasPosts[selectedPostIdx];
+    const post = rodasPosts[idx];
     const parentComment = post?.commentsList?.[commentIdx];
 
     // Optimistic update
     const optimisticReply = { author: userName || 'Eu', time: 'agora', text, likes: 0, liked: false, status: 'pending', replies: [] };
     const updated = [...rodasPosts];
-    const p = { ...updated[selectedPostIdx] };
+    const p = { ...updated[idx] };
     const comments = [...(p.commentsList || [])];
     const comment = { ...comments[commentIdx] };
     comment.replies = [...(comment.replies || []), optimisticReply];
     comments[commentIdx] = comment;
     p.commentsList = comments;
-    updated[selectedPostIdx] = p;
+    updated[idx] = p;
     setRodasPosts(updated);
     setReviewPopupType('reply');
 
@@ -3016,16 +3043,19 @@ const App = () => {
         const data = await res.json();
         if (data.comment) {
           const refreshed = [...rodasPosts];
-          const rp = { ...refreshed[selectedPostIdx] };
-          const rComments = [...(rp.commentsList || [])];
-          const rComment = { ...rComments[commentIdx] };
-          const replies = [...(rComment.replies || [])];
-          replies[replies.length - 1] = data.comment;
-          rComment.replies = replies;
-          rComments[commentIdx] = rComment;
-          rp.commentsList = rComments;
-          refreshed[selectedPostIdx] = rp;
-          setRodasPosts(refreshed);
+          const freshIdx = refreshed.findIndex(p => p.id === post.id);
+          if (freshIdx !== -1) {
+            const rp = { ...refreshed[freshIdx] };
+            const rComments = [...(rp.commentsList || [])];
+            const rComment = { ...rComments[commentIdx] };
+            const replies = [...(rComment.replies || [])];
+            replies[replies.length - 1] = data.comment;
+            rComment.replies = replies;
+            rComments[commentIdx] = rComment;
+            rp.commentsList = rComments;
+            refreshed[freshIdx] = rp;
+            setRodasPosts(refreshed);
+          }
         }
       } catch (e) {
         console.error('Failed to add reply:', e);
@@ -3034,9 +3064,10 @@ const App = () => {
   };
 
   const handleLikeReply = async (commentIdx, replyIdx) => {
-    if (selectedPostIdx === null) return;
+    const idx = getSelectedPostIdx();
+    if (idx === null) return;
     const updated = [...rodasPosts];
-    const post = { ...updated[selectedPostIdx] };
+    const post = { ...updated[idx] };
     const comments = [...(post.commentsList || [])];
     const comment = { ...comments[commentIdx] };
     const replies = [...(comment.replies || [])];
@@ -3048,7 +3079,7 @@ const App = () => {
     comment.replies = replies;
     comments[commentIdx] = comment;
     post.commentsList = comments;
-    updated[selectedPostIdx] = post;
+    updated[idx] = post;
     setRodasPosts(updated);
 
     if (reply.id && savedUser?.id) {
@@ -3410,7 +3441,7 @@ const App = () => {
 
   // Render Post Detail page
   if (currentPage === 'postDetail') {
-    const post = selectedPostIdx !== null ? rodasPosts[selectedPostIdx] : null;
+    const post = getSelectedPost();
     return (
       <>
         {post ? (
