@@ -2574,9 +2574,9 @@ const NotificationsPage = ({ notifications, onMarkAllRead, onBack, onNavigateToP
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm leading-snug ${n.read ? 'text-gray-500' : 'text-gray-800 font-medium'}`}>
-                    {n.title}
+                    {n.message || ''}
                   </p>
-                  {n.body && <p className="text-xs text-gray-400 mt-0.5 truncate">{n.body}</p>}
+                  {n.actor_name && <p className="text-xs text-gray-400 mt-0.5">{n.actor_name}</p>}
                   <p className="text-[11px] text-gray-300 mt-1">{timeAgo(n.created_at)}</p>
                 </div>
                 {!n.read && <div className="w-2.5 h-2.5 rounded-full bg-[#FF66C4] flex-shrink-0 mt-1.5" />}
