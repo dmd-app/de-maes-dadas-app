@@ -1445,7 +1445,7 @@ const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAcc
     .filter((p) => p.userId === userId || p.user_id === userId)
     .filter((p) => !p.isWelcome);
   const totalLikes = myPosts.reduce((sum, p) => sum + (p.likes || 0), 0);
-  const totalComments = myPosts.reduce((sum, p) => sum + (p.commentsList?.length || 0), 0);
+  const totalComments = myPosts.reduce((sum, p) => sum + (p.comments || p.commentsList?.length || 0), 0);
 
   const menuItems = [
     { icon: Bell, label: "Notifica\u00e7\u00f5es", desc: "Gerencie seus alertas", action: () => setShowNotifSettings(!showNotifSettings) },
@@ -1515,11 +1515,11 @@ const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAcc
             <p className="text-[11px] text-gray-400 mt-0.5">Conversas</p>
           </div>
           <div className="text-center border-x border-gray-100">
-            <p className="text-xl font-bold text-[#FF66C4]">{totalLikes}</p>
+            <p className="text-xl font-bold text-gray-800">{totalLikes}</p>
             <p className="text-[11px] text-gray-400 mt-0.5">Curtidas</p>
           </div>
           <div className="text-center">
-            <p className="text-xl font-bold text-soft-blue">{totalComments}</p>
+            <p className="text-xl font-bold text-gray-800">{totalComments}</p>
             <p className="text-[11px] text-gray-400 mt-0.5">{"Coment\u00e1rios"}</p>
           </div>
         </div>
