@@ -884,11 +884,11 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
             {/* Actions - Static display */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <span className="flex items-center gap-1.5 text-gray-400">
+                <span className="flex items-center gap-1.5 text-gray-900">
                   <Heart size={18} />
                   <span className="text-sm font-medium">{post.likes}</span>
                 </span>
-                <span className="flex items-center gap-1.5 text-gray-400">
+                <span className="flex items-center gap-1.5 text-gray-900">
                   <MessageCircle size={18} />
                   <span className="text-sm font-medium">{post.commentsList?.length || 0}</span>
                 </span>
@@ -1034,10 +1034,10 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogi
               </div>
               <p className="text-sm text-gray-600 mb-1 line-clamp-2">{post.desc || post.title || ''}</p>
               <div className="flex items-center gap-3 mt-2">
-                <span className="flex items-center gap-1 text-xs text-gray-400">
+                <span className="flex items-center gap-1 text-xs text-gray-900">
                   <Heart size={14} /> {post.likes}
                 </span>
-                <span className="flex items-center gap-1 text-xs text-gray-400">
+                <span className="flex items-center gap-1 text-xs text-gray-900">
                   <MessageCircle size={14} /> {post.commentsList?.length || 0}
                 </span>
               </div>
@@ -1165,11 +1165,11 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
 
           <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
             <div className="flex items-center gap-4">
-              <button onClick={onLikePost} className={`flex items-center gap-1.5 transition-colors ${post.liked ? 'text-[#FF66C4]' : 'text-gray-400 hover:text-[#FF66C4]'}`}>
+              <button onClick={onLikePost} className={`flex items-center gap-1.5 transition-colors ${post.liked ? 'text-[#FF66C4]' : 'text-gray-900 hover:text-[#FF66C4]'}`}>
                 <Heart size={18} fill={post.liked ? '#FF66C4' : 'none'} />
                 <span className="text-sm font-medium">{post.likes}</span>
               </button>
-              <span className="flex items-center gap-1.5 text-gray-400">
+              <span className="flex items-center gap-1.5 text-gray-900">
                 <MessageCircle size={18} />
                 <span className="text-sm font-medium">{post.commentsList?.length || 0}</span>
               </span>
@@ -1319,14 +1319,14 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
               <div className="flex items-center gap-4 pl-9 mt-2">
                 <button
                   onClick={() => onLikeComment(comment.originalIdx)}
-                  className={`flex items-center gap-1 text-xs transition-colors ${comment.liked ? 'text-[#FF66C4]' : 'text-gray-400 hover:text-[#FF66C4]'}`}
+                  className={`flex items-center gap-1 text-xs transition-colors ${comment.liked ? 'text-[#FF66C4]' : 'text-gray-900 hover:text-[#FF66C4]'}`}
                 >
                   <Heart size={14} fill={comment.liked ? '#FF66C4' : 'none'} />
                   <span>{comment.likes || 0}</span>
                 </button>
                 <button
                   onClick={() => { setReplyingTo(replyingTo === comment.originalIdx ? null : comment.originalIdx); setReplyText(''); }}
-                  className="flex items-center gap-1 text-xs text-gray-400 hover:text-soft-blue transition-colors"
+                  className="flex items-center gap-1 text-xs text-gray-900 hover:text-soft-blue transition-colors"
                 >
                   <MessageCircle size={14} />
                   <span>Responder</span>
@@ -1380,7 +1380,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
                       <div className="pl-7 mt-1.5">
                         <button
                           onClick={() => onLikeReply(comment.originalIdx, rIdx)}
-                          className={`flex items-center gap-1 text-[11px] transition-colors ${reply.liked ? 'text-[#FF66C4]' : 'text-gray-400 hover:text-[#FF66C4]'}`}
+                          className={`flex items-center gap-1 text-[11px] transition-colors ${reply.liked ? 'text-[#FF66C4]' : 'text-gray-900 hover:text-[#FF66C4]'}`}
                         >
                           <Heart size={12} fill={reply.liked ? '#FF66C4' : 'none'} />
                           <span>{reply.likes || 0}</span>
@@ -1532,11 +1532,11 @@ const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAcc
                 </div>
                 <p className="text-sm text-gray-600 line-clamp-2">{post.desc || post.body || ''}</p>
                 <div className="flex items-center gap-4 mt-2">
-                  <span className="flex items-center gap-1 text-xs text-gray-400">
+                  <span className="flex items-center gap-1 text-xs text-gray-900">
                     <Heart size={14} />
                     <span>{post.likes || 0}</span>
                   </span>
-                  <span className="flex items-center gap-1 text-xs text-gray-400">
+                  <span className="flex items-center gap-1 text-xs text-gray-900">
                     <MessageCircle size={14} />
                     <span>{post.commentsList?.length || 0}</span>
                   </span>
