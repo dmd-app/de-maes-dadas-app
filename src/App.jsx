@@ -879,8 +879,7 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
             </div>
 
             {/* Content */}
-            <h3 className="font-bold text-gray-800 mb-1 leading-snug">{post.title}</h3>
-            <p className="text-sm text-gray-500 leading-relaxed mb-4">{post.desc}</p>
+            <p className="text-sm text-gray-500 leading-relaxed mb-4">{post.desc || ''}</p>
 
             {/* Actions - Static display */}
             <div className="flex items-center justify-between">
@@ -1033,7 +1032,7 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogi
                 </span>
                 <span className="text-xs text-gray-400">{post.author}{'  \u2022  '}{post.time}</span>
               </div>
-              <h4 className="font-bold text-gray-800 text-sm mb-1">{post.title}</h4>
+              <p className="text-sm text-gray-600 mb-1 line-clamp-2">{post.desc || post.title || ''}</p>
               <div className="flex items-center gap-3 mt-2">
                 <span className="flex items-center gap-1 text-xs text-gray-400">
                   <Heart size={14} /> {post.likes}
@@ -1162,8 +1161,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
             )}
           </div>
 
-          <h2 className="font-bold text-gray-800 text-lg mb-2 leading-snug">{post.title}</h2>
-          <p className="text-sm text-gray-600 leading-relaxed">{post.desc}</p>
+                <p className="text-sm text-gray-600 leading-relaxed">{post.desc || ''}</p>
 
           <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
             <div className="flex items-center gap-4">
@@ -1532,7 +1530,7 @@ const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAcc
                   )}
                   <span className="text-xs text-gray-400">{post.time}</span>
                 </div>
-                <p className="text-sm text-gray-600 line-clamp-2">{post.body || post.title || ''}</p>
+                <p className="text-sm text-gray-600 line-clamp-2">{post.desc || post.body || ''}</p>
                 <div className="flex items-center gap-4 mt-2">
                   <span className="flex items-center gap-1 text-xs text-gray-400">
                     <Heart size={14} />
