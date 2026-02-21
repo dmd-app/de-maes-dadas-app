@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, MailCheck, RefreshCw, AlertCircle } from 'lucide-react';
+import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ChevronDown, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, MailCheck, RefreshCw, AlertCircle } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import './index.css';
 
@@ -884,11 +884,11 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
             {/* Actions - Static display */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <span className="flex items-center gap-1.5 text-gray-400">
+                <span className="flex items-center gap-1.5 text-gray-900">
                   <Heart size={18} />
                   <span className="text-sm font-medium">{post.likes}</span>
                 </span>
-                <span className="flex items-center gap-1.5 text-gray-400">
+                <span className="flex items-center gap-1.5 text-gray-900">
                   <MessageCircle size={18} />
                   <span className="text-sm font-medium">{post.commentsList?.length || 0}</span>
                 </span>
@@ -901,11 +901,11 @@ const RodasDeConversa = ({ onBack, posts, onOpenPost, onSendPost }) => {
         ))}
       </div>
 
-      {/* Floating New Post Button */}
-      <div className="sticky bottom-28 z-30 flex justify-end px-6 -mt-16 pointer-events-none">
+      {/* Floating New Post Button - fixed above footer nav */}
+      <div className="fixed bottom-24 right-6 z-30">
         <button
           onClick={() => setIsNewPostOpen(true)}
-          className="w-14 h-14 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-all pointer-events-auto"
+          className="w-14 h-14 bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-all"
         >
           <Plus size={28} />
         </button>
@@ -1034,10 +1034,10 @@ const AldeiaPage = ({ onNavigate, posts, onComingSoon, isLoggedIn, onRequireLogi
               </div>
               <p className="text-sm text-gray-600 mb-1 line-clamp-2">{post.desc || post.title || ''}</p>
               <div className="flex items-center gap-3 mt-2">
-                <span className="flex items-center gap-1 text-xs text-gray-400">
+                <span className="flex items-center gap-1 text-xs text-gray-900">
                   <Heart size={14} /> {post.likes}
                 </span>
-                <span className="flex items-center gap-1 text-xs text-gray-400">
+                <span className="flex items-center gap-1 text-xs text-gray-900">
                   <MessageCircle size={14} /> {post.commentsList?.length || 0}
                 </span>
               </div>
@@ -1165,11 +1165,11 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
 
           <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
             <div className="flex items-center gap-4">
-              <button onClick={onLikePost} className={`flex items-center gap-1.5 transition-colors ${post.liked ? 'text-[#FF66C4]' : 'text-gray-400 hover:text-[#FF66C4]'}`}>
+              <button onClick={onLikePost} className={`flex items-center gap-1.5 transition-colors ${post.liked ? 'text-[#FF66C4]' : 'text-gray-900 hover:text-[#FF66C4]'}`}>
                 <Heart size={18} fill={post.liked ? '#FF66C4' : 'none'} />
                 <span className="text-sm font-medium">{post.likes}</span>
               </button>
-              <span className="flex items-center gap-1.5 text-gray-400">
+              <span className="flex items-center gap-1.5 text-gray-900">
                 <MessageCircle size={18} />
                 <span className="text-sm font-medium">{post.commentsList?.length || 0}</span>
               </span>
@@ -1319,14 +1319,14 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
               <div className="flex items-center gap-4 pl-9 mt-2">
                 <button
                   onClick={() => onLikeComment(comment.originalIdx)}
-                  className={`flex items-center gap-1 text-xs transition-colors ${comment.liked ? 'text-[#FF66C4]' : 'text-gray-400 hover:text-[#FF66C4]'}`}
+                  className={`flex items-center gap-1 text-xs transition-colors ${comment.liked ? 'text-[#FF66C4]' : 'text-gray-900 hover:text-[#FF66C4]'}`}
                 >
                   <Heart size={14} fill={comment.liked ? '#FF66C4' : 'none'} />
                   <span>{comment.likes || 0}</span>
                 </button>
                 <button
                   onClick={() => { setReplyingTo(replyingTo === comment.originalIdx ? null : comment.originalIdx); setReplyText(''); }}
-                  className="flex items-center gap-1 text-xs text-gray-400 hover:text-soft-blue transition-colors"
+                  className="flex items-center gap-1 text-xs text-gray-900 hover:text-soft-blue transition-colors"
                 >
                   <MessageCircle size={14} />
                   <span>Responder</span>
@@ -1380,7 +1380,7 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
                       <div className="pl-7 mt-1.5">
                         <button
                           onClick={() => onLikeReply(comment.originalIdx, rIdx)}
-                          className={`flex items-center gap-1 text-[11px] transition-colors ${reply.liked ? 'text-[#FF66C4]' : 'text-gray-400 hover:text-[#FF66C4]'}`}
+                          className={`flex items-center gap-1 text-[11px] transition-colors ${reply.liked ? 'text-[#FF66C4]' : 'text-gray-900 hover:text-[#FF66C4]'}`}
                         >
                           <Heart size={12} fill={reply.liked ? '#FF66C4' : 'none'} />
                           <span>{reply.likes || 0}</span>
@@ -1399,9 +1399,42 @@ const PostDetail = ({ post, onBack, onAddComment, onLikePost, onLikeComment, onR
 };
 
 // --- PROFILE PAGE ---
-const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAccount, onOpenPost, isEmailConfirmed, onResendConfirmation, notifPrefs, onToggleNotifPref }) => {
+const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAccount, onOpenPost, isEmailConfirmed, onResendConfirmation, notifPrefs, onToggleNotifPref, notifications = [] }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showNotifSettings, setShowNotifSettings] = useState(false);
+  const [showAlerts, setShowAlerts] = useState(false);
+
+  const timeAgo = (dateStr) => {
+    if (!dateStr) return '';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'agora';
+    if (mins < 60) return `${mins}min`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d`;
+  };
+
+  const getAlertIcon = (type) => {
+    switch (type) {
+      case 'comment': case 'comment_on_post': return MessageCircle;
+      case 'reply': case 'reply_to_comment': return ArrowRight;
+      case 'post_approved': case 'comment_approved': return Check;
+      case 'post_pending': return AlertCircle;
+      default: return Bell;
+    }
+  };
+
+  const getAlertColor = (type) => {
+    switch (type) {
+      case 'comment': case 'comment_on_post': return 'bg-blue-100 text-blue-600';
+      case 'reply': case 'reply_to_comment': return 'bg-purple-100 text-purple-600';
+      case 'post_approved': case 'comment_approved': return 'bg-green-100 text-green-600';
+      case 'post_pending': return 'bg-yellow-100 text-yellow-600';
+      default: return 'bg-gray-100 text-gray-600';
+    }
+  };
   const myPosts = posts
     .map((p, idx) => ({ ...p, originalIdx: idx }))
     .filter((p) => p.userId === userId || p.user_id === userId)
@@ -1447,8 +1480,8 @@ const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAcc
                   <Edit3 size={14} />
                 </button>
               </div>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <p className="text-sm text-gray-400">{userEmail}</p>
+<div className="flex items-center gap-1.5 mt-0.5 min-w-0 max-w-full">
+<p className="text-sm text-gray-400 truncate">{userEmail}</p>
                 {isEmailConfirmed ? (
                   <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0" title="Email confirmado">
                     <Check size={10} className="text-green-600" />
@@ -1532,11 +1565,11 @@ const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAcc
                 </div>
                 <p className="text-sm text-gray-600 line-clamp-2">{post.desc || post.body || ''}</p>
                 <div className="flex items-center gap-4 mt-2">
-                  <span className="flex items-center gap-1 text-xs text-gray-400">
+                  <span className="flex items-center gap-1 text-xs text-gray-900">
                     <Heart size={14} />
                     <span>{post.likes || 0}</span>
                   </span>
-                  <span className="flex items-center gap-1 text-xs text-gray-400">
+                  <span className="flex items-center gap-1 text-xs text-gray-900">
                     <MessageCircle size={14} />
                     <span>{post.commentsList?.length || 0}</span>
                   </span>
@@ -1593,6 +1626,50 @@ const ProfilePage = ({ userName, userEmail, userId, posts, onLogout, onDeleteAcc
                 </button>
               </div>
             ))}
+
+            {/* Alerts Log Dropdown */}
+            <button
+              onClick={() => setShowAlerts(!showAlerts)}
+              className="w-full flex items-center justify-between px-5 py-3.5 border-t border-gray-100 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Bell size={16} className="text-gray-500" />
+                <p className="text-sm font-semibold text-gray-700">{"Hist\u00f3rico de Alertas"}</p>
+                {notifications.filter(n => !n.read).length > 0 && (
+                  <span className="w-5 h-5 rounded-full bg-[#FF66C4] text-white text-[10px] font-bold flex items-center justify-center">
+                    {notifications.filter(n => !n.read).length}
+                  </span>
+                )}
+              </div>
+              <ChevronDown size={16} className={`text-gray-400 transition-transform ${showAlerts ? 'rotate-180' : ''}`} />
+            </button>
+
+            {showAlerts && (
+              <div className="border-t border-gray-100 max-h-64 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <div className="flex flex-col items-center py-6 px-4">
+                    <Bell size={24} className="text-gray-300 mb-2" />
+                    <p className="text-xs text-gray-400 text-center">{"Nenhum alerta ainda."}</p>
+                  </div>
+                ) : (
+                  notifications.slice(0, 20).map((n, i) => {
+                    const Icon = getAlertIcon(n.type);
+                    return (
+                      <div key={n.id || i} className={`flex items-start gap-3 px-5 py-3 border-b border-gray-50 last:border-0 ${!n.read ? 'bg-blue-50/40' : ''}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${getAlertColor(n.type)}`}>
+                          <Icon size={14} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-700 leading-snug">{n.message}</p>
+                          <p className="text-[11px] text-gray-400 mt-0.5">{timeAgo(n.created_at)}</p>
+                        </div>
+                        {!n.read && <span className="w-2 h-2 rounded-full bg-[#FF66C4] flex-shrink-0 mt-1.5" />}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -2480,6 +2557,26 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState('inicio');
   const [pageHistory, setPageHistory] = useState([]);
   const [selectedPostIdx, setSelectedPostIdx] = useState(null);
+  const [selectedPostId, setSelectedPostId] = useState(null);
+
+  // Helper: get selected post by ID (resilient to array reordering)
+  const getSelectedPost = () => {
+    if (selectedPostId) {
+      return rodasPosts.find(p => p.id === selectedPostId) || null;
+    }
+    if (selectedPostIdx !== null) {
+      return rodasPosts[selectedPostIdx] || null;
+    }
+    return null;
+  };
+  // Helper: get selected post index by ID
+  const getSelectedPostIdx = () => {
+    if (selectedPostId) {
+      const idx = rodasPosts.findIndex(p => p.id === selectedPostId);
+      return idx !== -1 ? idx : null;
+    }
+    return selectedPostIdx;
+  };
   const [rodasPosts, setRodasPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(true);
   const [userName, setUserName] = useState(() => getSavedUser()?.name || '');
@@ -2746,6 +2843,7 @@ const App = () => {
   const handleNavTab = (tab) => {
     setPageHistory([]);
     setSelectedPostIdx(null);
+    setSelectedPostId(null);
     setCurrentPage(tab);
     window.scrollTo(0, 0);
     try { window.history.replaceState({ page: tab }, '', '/'); } catch (e) { /* ignore */ }
@@ -2766,6 +2864,7 @@ const App = () => {
       const destination = previousPage || 'inicio';
       setCurrentPage(destination);
       setSelectedPostIdx(null);
+      setSelectedPostId(null);
       // Don't scroll to top if returning to inicio with draft open - ActionGrid will scroll to the panel
       if (!(destination === 'inicio' && isPanicOpen && draftMessage)) {
         window.scrollTo(0, 0);
@@ -2824,17 +2923,15 @@ const App = () => {
 
   const handleOpenPost = (postId) => {
     if (!postId) return;
-    const foundIdx = rodasPosts.findIndex(p => p.id === postId);
-    if (foundIdx !== -1) {
-      setSelectedPostIdx(foundIdx);
-      navigateTo('postDetail');
-    }
+    setSelectedPostId(postId);
+    navigateTo('postDetail');
   };
 
   const handleEditPost = ({ title, desc, category, categoryColor }) => {
-    if (selectedPostIdx === null) return;
+    const idx = getSelectedPostIdx();
+    if (idx === null) return;
     const updated = [...rodasPosts];
-    const post = { ...updated[selectedPostIdx] };
+    const post = { ...updated[idx] };
 
     // Save current version to history before overwriting
     const previousVersion = {
@@ -2853,14 +2950,15 @@ const App = () => {
     post.categoryColor = categoryColor;
     post.status = 'pending';
 
-    updated[selectedPostIdx] = post;
+    updated[idx] = post;
     setRodasPosts(updated);
     setReviewPopupType('post');
   };
 
   const handleLikePost = () => {
-    if (selectedPostIdx === null) return;
-    handleLikePostByIdx(selectedPostIdx);
+    const idx = getSelectedPostIdx();
+    if (idx === null) return;
+    handleLikePostByIdx(idx);
   };
 
   const handleLikePostByIdx = async (idx) => {
@@ -2900,21 +2998,22 @@ const App = () => {
   };
 
   const handleAddComment = async (text) => {
-    if (selectedPostIdx === null) return;
+    const idx = getSelectedPostIdx();
+    if (idx === null) return;
     if (isLoggedIn && !isEmailConfirmed) {
       setShowEmailConfirmRequired(true);
       return;
     }
 
-    const post = rodasPosts[selectedPostIdx];
+    const post = rodasPosts[idx];
 
     // Optimistic update
     const optimisticComment = { author: userName || 'Eu', time: 'agora', text, likes: 0, liked: false, replies: [], status: 'pending' };
     const updated = [...rodasPosts];
-    updated[selectedPostIdx] = {
-      ...updated[selectedPostIdx],
-      commentsList: [...(updated[selectedPostIdx].commentsList || []), optimisticComment],
-      comments: (updated[selectedPostIdx].comments || 0) + 1,
+    updated[idx] = {
+      ...updated[idx],
+      commentsList: [...(updated[idx].commentsList || []), optimisticComment],
+      comments: (updated[idx].comments || 0) + 1,
     };
     setRodasPosts(updated);
     setReviewPopupType('comment');
@@ -2936,12 +3035,15 @@ const App = () => {
         if (data.comment) {
           // Replace optimistic comment with real one (has DB id)
           const refreshed = [...rodasPosts];
-          const currentPost = { ...refreshed[selectedPostIdx] };
-          const list = [...(currentPost.commentsList || [])];
-          list[list.length - 1] = data.comment;
-          currentPost.commentsList = list;
-          refreshed[selectedPostIdx] = currentPost;
-          setRodasPosts(refreshed);
+          const freshIdx = refreshed.findIndex(p => p.id === post.id);
+          if (freshIdx !== -1) {
+            const currentPost = { ...refreshed[freshIdx] };
+            const list = [...(currentPost.commentsList || [])];
+            list[list.length - 1] = data.comment;
+            currentPost.commentsList = list;
+            refreshed[freshIdx] = currentPost;
+            setRodasPosts(refreshed);
+          }
         }
       } catch (e) {
         console.error('Failed to add comment:', e);
@@ -2950,9 +3052,10 @@ const App = () => {
   };
 
   const handleLikeComment = async (commentIdx) => {
-    if (selectedPostIdx === null) return;
+    const idx = getSelectedPostIdx();
+    if (idx === null) return;
     const updated = [...rodasPosts];
-    const post = { ...updated[selectedPostIdx] };
+    const post = { ...updated[idx] };
     const comments = [...(post.commentsList || [])];
     const comment = { ...comments[commentIdx] };
     const wasLiked = comment.liked;
@@ -2960,7 +3063,7 @@ const App = () => {
     comment.likes = wasLiked ? Math.max((comment.likes || 1) - 1, 0) : (comment.likes || 0) + 1;
     comments[commentIdx] = comment;
     post.commentsList = comments;
-    updated[selectedPostIdx] = post;
+    updated[idx] = post;
     setRodasPosts(updated);
 
     if (comment.id && savedUser?.id) {
@@ -2977,25 +3080,26 @@ const App = () => {
   };
 
   const handleReplyComment = async (commentIdx, text) => {
-    if (selectedPostIdx === null) return;
+    const idx = getSelectedPostIdx();
+    if (idx === null) return;
     if (isLoggedIn && !isEmailConfirmed) {
       setShowEmailConfirmRequired(true);
       return;
     }
 
-    const post = rodasPosts[selectedPostIdx];
+    const post = rodasPosts[idx];
     const parentComment = post?.commentsList?.[commentIdx];
 
     // Optimistic update
     const optimisticReply = { author: userName || 'Eu', time: 'agora', text, likes: 0, liked: false, status: 'pending', replies: [] };
     const updated = [...rodasPosts];
-    const p = { ...updated[selectedPostIdx] };
+    const p = { ...updated[idx] };
     const comments = [...(p.commentsList || [])];
     const comment = { ...comments[commentIdx] };
     comment.replies = [...(comment.replies || []), optimisticReply];
     comments[commentIdx] = comment;
     p.commentsList = comments;
-    updated[selectedPostIdx] = p;
+    updated[idx] = p;
     setRodasPosts(updated);
     setReviewPopupType('reply');
 
@@ -3016,16 +3120,19 @@ const App = () => {
         const data = await res.json();
         if (data.comment) {
           const refreshed = [...rodasPosts];
-          const rp = { ...refreshed[selectedPostIdx] };
-          const rComments = [...(rp.commentsList || [])];
-          const rComment = { ...rComments[commentIdx] };
-          const replies = [...(rComment.replies || [])];
-          replies[replies.length - 1] = data.comment;
-          rComment.replies = replies;
-          rComments[commentIdx] = rComment;
-          rp.commentsList = rComments;
-          refreshed[selectedPostIdx] = rp;
-          setRodasPosts(refreshed);
+          const freshIdx = refreshed.findIndex(p => p.id === post.id);
+          if (freshIdx !== -1) {
+            const rp = { ...refreshed[freshIdx] };
+            const rComments = [...(rp.commentsList || [])];
+            const rComment = { ...rComments[commentIdx] };
+            const replies = [...(rComment.replies || [])];
+            replies[replies.length - 1] = data.comment;
+            rComment.replies = replies;
+            rComments[commentIdx] = rComment;
+            rp.commentsList = rComments;
+            refreshed[freshIdx] = rp;
+            setRodasPosts(refreshed);
+          }
         }
       } catch (e) {
         console.error('Failed to add reply:', e);
@@ -3034,9 +3141,10 @@ const App = () => {
   };
 
   const handleLikeReply = async (commentIdx, replyIdx) => {
-    if (selectedPostIdx === null) return;
+    const idx = getSelectedPostIdx();
+    if (idx === null) return;
     const updated = [...rodasPosts];
-    const post = { ...updated[selectedPostIdx] };
+    const post = { ...updated[idx] };
     const comments = [...(post.commentsList || [])];
     const comment = { ...comments[commentIdx] };
     const replies = [...(comment.replies || [])];
@@ -3048,7 +3156,7 @@ const App = () => {
     comment.replies = replies;
     comments[commentIdx] = comment;
     post.commentsList = comments;
-    updated[selectedPostIdx] = post;
+    updated[idx] = post;
     setRodasPosts(updated);
 
     if (reply.id && savedUser?.id) {
@@ -3380,6 +3488,7 @@ const App = () => {
           onResendConfirmation={resendConfirmationEmail}
           notifPrefs={notifPrefs}
           onToggleNotifPref={(key) => setNotifPrefs(prev => ({ ...prev, [key]: !prev[key] }))}
+          notifications={notifications}
           onLogout={() => {
             setUserName('');
             setUserEmail('');
@@ -3410,7 +3519,7 @@ const App = () => {
 
   // Render Post Detail page
   if (currentPage === 'postDetail') {
-    const post = selectedPostIdx !== null ? rodasPosts[selectedPostIdx] : null;
+    const post = getSelectedPost();
     return (
       <>
         {post ? (
