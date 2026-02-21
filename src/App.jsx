@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { Routes, Route, useNavigate, useLocation, useParams, Navigate } from 'react-router-dom';
 import { Flag, Heart, Users, BookOpen, MessageCircle, User, X, ArrowLeft, Share2, Send, Mail, Lock, Eye, EyeOff, Check, ChevronRight, ChevronLeft, ChevronDown, ArrowRight, Settings, LogOut, Bell, Shield, HelpCircle, Edit3, Plus, MailCheck, RefreshCw, AlertCircle } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import './index.css';
@@ -2431,14 +2432,46 @@ const AdminPage = ({ adminEmail, onBack }) => {
   );
 };
 
+// ─── Route mapping helpers ───
+const ROUTE_MAP = {
+  inicio: '/',
+  aldeia: '/aldeia',
+  rodas: '/feed',
+  perfil: '/perfil',
+  notificacoes: '/alertas',
+  admin: '/admin',
+  login: '/login',
+  signup: '/signup',
+  emailPending: '/email-pendente',
+  emailConfirmed: '/email-confirmado',
+  emailConfirmFailed: '/email-falhou',
+  forgotPassword: '/esqueci-senha',
+  resetPassword: '/resetar-senha',
+  passwordResetSuccess: '/senha-resetada',
+  onboarding: '/onboarding',
+};
+
+const getActiveTab = (pathname) => {
+  if (pathname === '/') return 'inicio';
+  if (pathname === '/aldeia' || pathname === '/feed' || pathname.startsWith('/post/')) return 'aldeia';
+  if (pathname === '/alertas') return 'notificacoes';
+  if (pathname === '/admin') return 'admin';
+  if (pathname === '/perfil') return 'perfil';
+  return 'inicio';
+};
+
 // ─── Shared Bottom NavBar with Notifications Bell ───
-const NavBar = ({ currentPage, onNavigate, unreadCount = 0, isAdmin = false }) => {
+const NavBar = ({ unreadCount = 0, isAdmin = false }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const activeTab = getActiveTab(location.pathname);
+
   const tabs = [
-    { key: 'inicio', label: 'Inicio', icon: Heart, filled: currentPage === 'inicio' },
-    { key: 'aldeia', label: 'Aldeia', isAldeia: true, filled: ['aldeia', 'rodas', 'postDetail'].includes(currentPage) },
-    { key: 'notificacoes', label: 'Alertas', icon: Bell, filled: currentPage === 'notificacoes', badge: unreadCount },
-    ...(isAdmin ? [{ key: 'admin', label: 'Guardia', icon: Shield, filled: currentPage === 'admin' }] : []),
-    { key: 'perfil', label: 'Perfil', icon: User, filled: currentPage === 'perfil' },
+    { key: 'inicio', route: '/', label: 'Inicio', icon: Heart, filled: activeTab === 'inicio' },
+    { key: 'aldeia', route: '/aldeia', label: 'Aldeia', isAldeia: true, filled: activeTab === 'aldeia' },
+    { key: 'notificacoes', route: '/alertas', label: 'Alertas', icon: Bell, filled: activeTab === 'notificacoes', badge: unreadCount },
+    ...(isAdmin ? [{ key: 'admin', route: '/admin', label: 'Guardia', icon: Shield, filled: activeTab === 'admin' }] : []),
+    { key: 'perfil', route: '/perfil', label: 'Perfil', icon: User, filled: activeTab === 'perfil' },
   ];
 
   return (
@@ -2446,7 +2479,7 @@ const NavBar = ({ currentPage, onNavigate, unreadCount = 0, isAdmin = false }) =
       {tabs.map((tab) => (
         <button
           key={tab.key}
-          onClick={() => onNavigate(tab.key)}
+          onClick={() => { navigate(tab.route, { replace: true }); window.scrollTo(0, 0); }}
           className={`flex flex-col items-center gap-1 transition-colors relative ${tab.filled ? 'text-gray-800' : 'hover:text-gray-800'}`}
         >
           {tab.isAldeia ? (
@@ -2558,28 +2591,17 @@ const NotificationsPage = ({ notifications, onMarkAllRead, onBack, onNavigateToP
 
 const App = () => {
   const [savedUser, setSavedUser] = useState(getSavedUser);
-  const [currentPage, setCurrentPage] = useState('inicio');
-  const [pageHistory, setPageHistory] = useState([]);
-  const [selectedPostIdx, setSelectedPostIdx] = useState(null);
-  const [selectedPostId, setSelectedPostId] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Helper: get selected post by ID (resilient to array reordering)
-  const getSelectedPost = () => {
-    if (selectedPostId) {
-      return rodasPosts.find(p => p.id === selectedPostId) || null;
-    }
-    if (selectedPostIdx !== null) {
-      return rodasPosts[selectedPostIdx] || null;
-    }
-    return null;
+  // Helper: get selected post by ID from URL or state
+  const getPostById = (postId) => {
+    return rodasPosts.find(p => p.id === postId) || null;
   };
   // Helper: get selected post index by ID
-  const getSelectedPostIdx = () => {
-    if (selectedPostId) {
-      const idx = rodasPosts.findIndex(p => p.id === selectedPostId);
-      return idx !== -1 ? idx : null;
-    }
-    return selectedPostIdx;
+  const getPostIdxById = (postId) => {
+    const idx = rodasPosts.findIndex(p => p.id === postId);
+    return idx !== -1 ? idx : null;
   };
   const [rodasPosts, setRodasPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(true);
@@ -2791,13 +2813,13 @@ const App = () => {
             setSavedUser(updatedUser);
             setUserName(updatedUser.name);
             setUserEmail(updatedUser.email);
-            setCurrentPage('emailConfirmed');
+            navigate('/email-confirmado');
           } else {
-            setCurrentPage('emailConfirmFailed');
+            navigate('/email-falhou');
           }
         })
         .catch(() => {
-          setCurrentPage('emailConfirmFailed');
+          navigate('/email-falhou');
         });
     }
   }, []);
@@ -2811,7 +2833,7 @@ const App = () => {
     if (onboardingSeen) {
       resolvePendingAction();
     } else {
-      setCurrentPage('onboarding');
+      navigate('/onboarding');
     }
   };
 
@@ -2825,71 +2847,27 @@ const App = () => {
         setIsPanicOpen(false);
       } else if (pendingAction.type === 'rodas') {
         setPendingAction(null);
-        setCurrentPage('rodas');
+        navigate('/feed');
         window.scrollTo(0, 0);
       } else {
         setPendingAction(null);
-        goBack();
+        navigate(-1);
       }
     } else {
-      goBack();
+      navigate(-1);
     }
   };
 
+  // Navigation helpers using React Router
   const navigateTo = (page) => {
-    setPageHistory((prev) => [...prev, currentPage]);
-    setCurrentPage(page);
+    const route = ROUTE_MAP[page] || '/';
+    navigate(route);
     window.scrollTo(0, 0);
-    try { window.history.pushState({ page }, '', '/'); } catch (e) { /* ignore */ }
   };
 
-  // NavBar tab handler (resets history for main tabs)
-  const handleNavTab = (tab) => {
-    setPageHistory([]);
-    setSelectedPostIdx(null);
-    setSelectedPostId(null);
-    setCurrentPage(tab);
-    window.scrollTo(0, 0);
-    try { window.history.replaceState({ page: tab }, '', '/'); } catch (e) { /* ignore */ }
-    if (tab === 'notificacoes' && savedUser?.id) {
-      fetchNotifications();
-    }
-  };
-
-  // Internal goBack logic (used by both in-app back buttons and browser popstate)
-  const goBackInternal = () => {
-    setPageHistory((prev) => {
-      const newHistory = [...prev];
-      let previousPage = newHistory.pop();
-      // Skip auth/onboarding/email pages in history
-      while (previousPage && ['onboarding', 'signup', 'login', 'emailPending', 'emailConfirmed', 'emailConfirmFailed', 'forgotPassword', 'resetPassword', 'passwordResetSuccess'].includes(previousPage)) {
-        previousPage = newHistory.pop();
-      }
-      const destination = previousPage || 'inicio';
-      setCurrentPage(destination);
-      setSelectedPostIdx(null);
-      setSelectedPostId(null);
-      // Don't scroll to top if returning to inicio with draft open - ActionGrid will scroll to the panel
-      if (!(destination === 'inicio' && isPanicOpen && draftMessage)) {
-        window.scrollTo(0, 0);
-      }
-      return newHistory;
-    });
-  };
-
-  // In-app back button: trigger browser history.back() which fires popstate
   const goBack = () => {
-    try { window.history.back(); } catch (e) { goBackInternal(); }
+    navigate(-1);
   };
-
-  // Listen for browser back/forward button
-  useEffect(() => {
-    const handlePopState = () => {
-      goBackInternal();
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
 
   const handleSendPost = async (text, category, categoryColor) => {
     if (isLoggedIn && !isEmailConfirmed) {
@@ -2927,12 +2905,12 @@ const App = () => {
 
   const handleOpenPost = (postId) => {
     if (!postId) return;
-    setSelectedPostId(postId);
-    navigateTo('postDetail');
+    navigate(`/post/${postId}`);
+    window.scrollTo(0, 0);
   };
 
-  const handleEditPost = ({ title, desc, category, categoryColor }) => {
-    const idx = getSelectedPostIdx();
+  const handleEditPost = ({ title, desc, category, categoryColor, postId }) => {
+    const idx = postId ? getPostIdxById(postId) : null;
     if (idx === null) return;
     const updated = [...rodasPosts];
     const post = { ...updated[idx] };
@@ -2959,8 +2937,8 @@ const App = () => {
     setReviewPopupType('post');
   };
 
-  const handleLikePost = () => {
-    const idx = getSelectedPostIdx();
+  const handleLikePost = (postId) => {
+    const idx = postId ? getPostIdxById(postId) : null;
     if (idx === null) return;
     handleLikePostByIdx(idx);
   };
@@ -3001,8 +2979,8 @@ const App = () => {
     }
   };
 
-  const handleAddComment = async (text) => {
-    const idx = getSelectedPostIdx();
+  const handleAddComment = async (text, postId) => {
+    const idx = postId ? getPostIdxById(postId) : null;
     if (idx === null) return;
     if (isLoggedIn && !isEmailConfirmed) {
       setShowEmailConfirmRequired(true);
@@ -3055,8 +3033,8 @@ const App = () => {
     }
   };
 
-  const handleLikeComment = async (commentIdx) => {
-    const idx = getSelectedPostIdx();
+  const handleLikeComment = async (commentIdx, postId) => {
+    const idx = postId ? getPostIdxById(postId) : null;
     if (idx === null) return;
     const updated = [...rodasPosts];
     const post = { ...updated[idx] };
@@ -3083,8 +3061,8 @@ const App = () => {
     }
   };
 
-  const handleReplyComment = async (commentIdx, text) => {
-    const idx = getSelectedPostIdx();
+  const handleReplyComment = async (commentIdx, text, postId) => {
+    const idx = postId ? getPostIdxById(postId) : null;
     if (idx === null) return;
     if (isLoggedIn && !isEmailConfirmed) {
       setShowEmailConfirmRequired(true);
@@ -3144,8 +3122,8 @@ const App = () => {
     }
   };
 
-  const handleLikeReply = async (commentIdx, replyIdx) => {
-    const idx = getSelectedPostIdx();
+  const handleLikeReply = async (commentIdx, replyIdx, postId) => {
+    const idx = postId ? getPostIdxById(postId) : null;
     if (idx === null) return;
     const updated = [...rodasPosts];
     const post = { ...updated[idx] };
@@ -3248,490 +3226,474 @@ const App = () => {
     }
   ];
 
-  // Render Login page (Entrar)
-  if (currentPage === 'login') {
-    return (
-      <LoginPage
-        onBack={pageHistory.length > 0 ? goBack : null}
-        onLogin={async ({ email, password }) => {
-          const res = await fetch('/api/auth', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'login', email, password }),
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'Erro ao entrar');
+  // ─── Auth handler functions (extracted for Routes) ───
+  const handleLogin = async ({ email, password }) => {
+    const res = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'login', email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erro ao entrar');
 
-          const username = data.user.username || email.split('@')[0];
-          setUserName(username);
-          setUserEmail(email);
-          const userData = { id: data.user.id, name: username, email, emailConfirmed: !!data.user.emailConfirmed };
-          if (data.session) {
-            userData.accessToken = data.session.access_token;
-          }
-          localStorage.setItem('dmd_user', JSON.stringify(userData));
-          setSavedUser(userData);
-          sendToBrevo('create_contact', { email, name: username, attributes: { LAST_LOGIN: new Date().toISOString().split('T')[0] } });
-          if (pendingAction && pendingAction.type === 'post') {
-            resolvePendingAction();
-          } else {
-            setPendingAction(null);
-            goBack();
-          }
-        }}
-        onGoToSignup={() => setCurrentPage('signup')}
-        onForgotPassword={() => setCurrentPage('forgotPassword')}
-      />
-    );
-  }
+    const username = data.user.username || email.split('@')[0];
+    setUserName(username);
+    setUserEmail(email);
+    const userData = { id: data.user.id, name: username, email, emailConfirmed: !!data.user.emailConfirmed };
+    if (data.session) {
+      userData.accessToken = data.session.access_token;
+    }
+    localStorage.setItem('dmd_user', JSON.stringify(userData));
+    setSavedUser(userData);
+    sendToBrevo('create_contact', { email, name: username, attributes: { LAST_LOGIN: new Date().toISOString().split('T')[0] } });
+    if (pendingAction && pendingAction.type === 'post') {
+      resolvePendingAction();
+    } else {
+      setPendingAction(null);
+      navigate(-1);
+    }
+  };
 
-  // Render Signup page (Criar Conta)
-  if (currentPage === 'signup') {
-    return (
-      <SignupPage
-        onBack={pageHistory.length > 0 ? goBack : null}
-        onSignup={async ({ email, username, password }) => {
-          const confirmToken = crypto.randomUUID();
-          const res = await fetch('/api/auth', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'signup', email, password, username, confirmToken }),
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
+  const handleSignup = async ({ email, username, password }) => {
+    const confirmToken = crypto.randomUUID();
+    const res = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'signup', email, password, username, confirmToken }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
 
-          setUserName(username);
-          setUserEmail(email);
-          const userData = { id: data.user.id, name: username, email, emailConfirmed: false, confirmToken };
-          localStorage.setItem('dmd_user', JSON.stringify(userData));
-          setSavedUser(userData);
+    setUserName(username);
+    setUserEmail(email);
+    const userData = { id: data.user.id, name: username, email, emailConfirmed: false, confirmToken };
+    localStorage.setItem('dmd_user', JSON.stringify(userData));
+    setSavedUser(userData);
 
-          // Send to Brevo CRM + confirmation email
-          await sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
-          await sendToBrevo('send_confirmation_email', { email, userName: username, confirmToken, baseUrl: window.location.origin });
+    await sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
+    await sendToBrevo('send_confirmation_email', { email, userName: username, confirmToken, baseUrl: window.location.origin });
 
-          setCurrentPage('emailPending');
-        }}
-        onGoToLogin={() => setCurrentPage('login')}
-      />
-    );
-  }
+    navigate('/email-pendente');
+  };
 
-  // Render Email Pending page (after signup)
-  if (currentPage === 'emailPending') {
-    return (
-      <EmailPendingPage
-        email={userEmail}
-        userName={userName}
-        confirmToken={savedUser?.confirmToken}
-        onContinue={goAfterAuth}
-        onResend={resendConfirmationEmail}
-        onConfirmed={() => {
-          // Email was confirmed on another device - update local state
-          if (savedUser) {
-            const updatedUser = { ...savedUser, emailConfirmed: true };
-            localStorage.setItem('dmd_user', JSON.stringify(updatedUser));
-            setSavedUser(updatedUser);
-          }
-          setCurrentPage('emailConfirmed');
-        }}
-      />
-    );
-  }
+  const handleSignupForRodas = async ({ email, username, password }) => {
+    const confirmToken = crypto.randomUUID();
+    const res = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'signup', email, password, username, confirmToken }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
 
-  // Render Email Confirmed success page
-  if (currentPage === 'emailConfirmed') {
-    return (
-      <EmailConfirmPage
-        success={true}
-        onContinue={() => {
-          setCurrentPage('inicio');
-          setPageHistory([]);
-          window.scrollTo(0, 0);
-        }}
-      />
-    );
-  }
+    setUserName(username);
+    setUserEmail(email);
+    const userData = { id: data.user.id, name: username, email, emailConfirmed: false, confirmToken };
+    localStorage.setItem('dmd_user', JSON.stringify(userData));
+    setSavedUser(userData);
 
-  // Render Email Confirm Failed page
-  if (currentPage === 'emailConfirmFailed') {
-    return (
-      <EmailConfirmPage
-        success={false}
-        onContinue={() => {
-          setCurrentPage('inicio');
-          setPageHistory([]);
-          window.scrollTo(0, 0);
-        }}
-      />
-    );
-  }
+    await sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
+    await sendToBrevo('send_confirmation_email', { email, userName: username, confirmToken, baseUrl: window.location.origin });
 
-  // Render Forgot Password page
-  if (currentPage === 'forgotPassword') {
-    return (
-      <ForgotPasswordPage
-        onBack={() => setCurrentPage('login')}
-        onCodeSent={(email) => {
-          setResetEmail(email);
-          setCurrentPage('resetPassword');
-        }}
-      />
-    );
-  }
+    setPendingAction({ type: 'rodas' });
+    navigate('/email-pendente');
+  };
 
-  // Render Reset Password page (enter code + new password)
-  if (currentPage === 'resetPassword') {
-    return (
-      <ResetPasswordPage
-        email={resetEmail}
-        onBack={() => setCurrentPage('forgotPassword')}
-        onSuccess={() => setCurrentPage('passwordResetSuccess')}
-      />
-    );
-  }
+  const handleLogout = () => {
+    setUserName('');
+    setUserEmail('');
+    setSavedUser(null);
+    setOnboardingSeen(false);
+    localStorage.removeItem('dmd_user');
+    localStorage.removeItem('dmd_onboarding_seen');
+    navigate('/');
+    window.scrollTo(0, 0);
+  };
 
-  // Render Password Reset Success page
-  if (currentPage === 'passwordResetSuccess') {
-    return (
-      <PasswordResetSuccessPage
-        onGoToLogin={() => {
-          setCurrentPage('login');
-          setResetEmail('');
-        }}
-      />
-    );
-  }
+  const handleDeleteAccount = () => {
+    setUserName('');
+    setUserEmail('');
+    setSavedUser(null);
+    setOnboardingSeen(false);
+    localStorage.removeItem('dmd_user');
+    localStorage.removeItem('dmd_onboarding_seen');
+    navigate('/');
+    window.scrollTo(0, 0);
+    setShowAccountDeleted(true);
+  };
 
-  // Render Onboarding (only shown once)
-  if (currentPage === 'onboarding') {
-    return (
-      <OnboardingPage
-        userName={userName}
-        onComplete={() => {
-          completeOnboarding();
-          resolvePendingAction();
-        }}
-      />
-    );
-  }
+  // ─── PostDetail Wrapper (reads :id from URL) ───
+  const PostDetailWrapper = () => {
+    const { id: postId } = useParams();
+    const [fetchedPost, setFetchedPost] = useState(null);
+    const [fetchLoading, setFetchLoading] = useState(false);
+    const [fetchError, setFetchError] = useState(false);
 
-  // Render Admin page (only for admin email)
-  if (currentPage === 'admin' && userEmail === ADMIN_EMAIL) {
-    return (
-      <>
-        <AdminPage adminEmail={userEmail} onBack={goBack} />
-        <NavBar currentPage="admin" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
-      </>
-    );
-  }
+    const post = getPostById(postId) || fetchedPost;
 
-  // Render Notifications page
-  if (currentPage === 'notificacoes') {
-    return (
-      <>
-        <NotificationsPage
-          notifications={notifications}
-          onMarkAllRead={markAllNotificationsRead}
-          onBack={goBack}
-          onNavigateToPost={(postId) => {
-            const idx = rodasPosts.findIndex(p => p.id === postId);
-            if (idx >= 0) {
-              handleOpenPost(idx);
+    useEffect(() => {
+      if (!post && postId && !fetchLoading && !fetchError) {
+        setFetchLoading(true);
+        fetch(`/api/posts?id=${postId}`)
+          .then(r => r.json())
+          .then(data => {
+            if (data.post) {
+              setFetchedPost(data.post);
+            } else {
+              setFetchError(true);
             }
-          }}
-        />
-        <NavBar currentPage="notificacoes" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
-      </>
-    );
-  }
+          })
+          .catch(() => setFetchError(true))
+          .finally(() => setFetchLoading(false));
+      }
+    }, [postId, post, fetchLoading, fetchError]);
 
-  // Render Profile page
-  if (currentPage === 'perfil') {
-    if (!isLoggedIn) {
+    if (fetchLoading) {
       return (
-        <>
-          <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
-            <header className="p-6 pb-2 bg-soft-bg">
-              <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
-              <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
-            </header>
-            <div className="flex flex-col items-center justify-center flex-1 px-8">
-            <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mb-6">
-              <User size={36} className="text-gray-400" />
-            </div>
-            <h2 className="text-xl font-bold text-gray-800 mb-2 text-center">{"Voc\u00ea ainda n\u00e3o est\u00e1 conectada"}</h2>
-            <p className="text-sm text-gray-400 text-center mb-8 leading-relaxed">{"Crie sua conta ou fa\u00e7a login para acessar seu perfil e todas as funcionalidades."}</p>
-            <button
-              onClick={() => navigateTo('signup')}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all mb-3"
-            >
-              Criar Conta
-            </button>
-            <button
-              onClick={() => navigateTo('login')}
-              className="w-full py-3.5 rounded-xl border-2 border-[#FF66C4] text-[#FF66C4] font-bold text-sm active:scale-[0.98] transition-all"
-            >
-              {"J\u00e1 tenho conta"}
-            </button>
-            </div>
-          </div>
-        <NavBar currentPage="perfil" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
-      </>
-    );
-  }
-    return (
-      <>
-        <ProfilePage
-          userName={userName}
-          userEmail={userEmail}
-          userId={savedUser?.id}
-          posts={rodasPosts}
-          onOpenPost={handleOpenPost}
-          isEmailConfirmed={isEmailConfirmed}
-          onResendConfirmation={resendConfirmationEmail}
-          notifPrefs={notifPrefs}
-          onToggleNotifPref={(key) => setNotifPrefs(prev => ({ ...prev, [key]: !prev[key] }))}
-          notifications={notifications}
-          onLogout={() => {
-            setUserName('');
-            setUserEmail('');
-            setSavedUser(null);
-            setOnboardingSeen(false);
-            localStorage.removeItem('dmd_user');
-            localStorage.removeItem('dmd_onboarding_seen');
-            setCurrentPage('inicio');
-            window.scrollTo(0, 0);
-          }}
-          onDeleteAccount={() => {
-            setUserName('');
-            setUserEmail('');
-            setSavedUser(null);
-            setOnboardingSeen(false);
-            localStorage.removeItem('dmd_user');
-            localStorage.removeItem('dmd_onboarding_seen');
-            setCurrentPage('inicio');
-            setPageHistory([]);
-            window.scrollTo(0, 0);
-            setShowAccountDeleted(true);
-          }}
-        />
-        <NavBar currentPage="aldeia" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
-      </>
-    );
-  }
-
-  // Render Post Detail page
-  if (currentPage === 'postDetail') {
-    const post = getSelectedPost();
-    return (
-      <>
-        {post ? (
-          <PostDetail
-            post={post}
-            onBack={goBack}
-            onAddComment={handleAddComment}
-            onLikePost={handleLikePostDetail}
-            onLikeComment={handleLikeComment}
-            onReplyComment={handleReplyComment}
-            onLikeReply={handleLikeReply}
-            onEditPost={handleEditPost}
-          />
-        ) : (
-          <div className="min-h-screen bg-soft-bg flex flex-col items-center justify-center px-6">
-            <p className="text-gray-500 text-sm mb-4">Conversa nao encontrada.</p>
-            <button onClick={goBack} className="text-soft-pink font-semibold text-sm">Voltar</button>
-          </div>
-        )}
-        <NavBar currentPage="postDetail" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
-      </>
-    );
-  }
-
-  // Render Rodas de Conversa page (requires login)
-  if (currentPage === 'rodas') {
-    if (!isLoggedIn) {
-      return (
-        <SignupPage
-        onSignup={async ({ email, username, password }) => {
-          const confirmToken = crypto.randomUUID();
-          const res = await fetch('/api/auth', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'signup', email, password, username, confirmToken }),
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
-
-          setUserName(username);
-          setUserEmail(email);
-          const userData = { id: data.user.id, name: username, email, emailConfirmed: false, confirmToken };
-          localStorage.setItem('dmd_user', JSON.stringify(userData));
-          setSavedUser(userData);
-
-          // Send to Brevo CRM + confirmation email
-          await sendToBrevo('create_contact', { email, name: username, attributes: { SIGNUP_DATE: new Date().toISOString().split('T')[0] } });
-          await sendToBrevo('send_confirmation_email', { email, userName: username, confirmToken, baseUrl: window.location.origin });
-
-          setPendingAction({ type: 'rodas' });
-          setCurrentPage('emailPending');
-        }}
-          onGoToLogin={() => setCurrentPage('login')}
-        />
+        <div className="min-h-screen bg-soft-bg flex items-center justify-center">
+          <div className="w-8 h-8 border-3 border-[#FF66C4] border-t-transparent rounded-full animate-spin" />
+        </div>
       );
     }
-    return (
-      <>
-        <RodasDeConversa onBack={goBack} posts={rodasPosts} onOpenPost={handleOpenPost} onSendPost={handleSendPost} />
-        <NavBar currentPage="rodas" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
-      </>
-    );
-  }
 
-  // Render Aldeia page
-  if (currentPage === 'aldeia') {
-    return (
-      <>
-      <AldeiaPage
-      onNavigate={(page) => navigateTo(page)}
-      posts={rodasPosts}
-      onComingSoon={(feat) => setShowComingSoon(feat || 'general')}
-      isLoggedIn={isLoggedIn}
-          onRequireLogin={(action) => {
-            setPendingAction(action);
-            navigateTo('signup');
-          }}
-          onOpenPost={handleOpenPost}
-        />
-        {showComingSoon && (
-          <ComingSoonPopup onClose={() => setShowComingSoon(null)} isLoggedIn={isLoggedIn} userEmail={userEmail} userId={savedUser?.id} feature={showComingSoon} />
-        )}
-          <NavBar currentPage="aldeia" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
-      </>
-    );
-  }
+    if (!post || fetchError) {
+      return (
+        <div className="min-h-screen bg-soft-bg flex flex-col items-center justify-center px-6">
+          <p className="text-gray-500 text-sm mb-4">Conversa nao encontrada.</p>
+          <button onClick={() => navigate(-1)} className="text-soft-pink font-semibold text-sm">Voltar</button>
+        </div>
+      );
+    }
 
-  // Render Inicio (default)
+    return (
+      <PostDetail
+        post={post}
+        onBack={() => navigate(-1)}
+        onAddComment={(text) => handleAddComment(text, postId)}
+        onLikePost={() => handleLikePost(postId)}
+        onLikeComment={(commentIdx) => handleLikeComment(commentIdx, postId)}
+        onReplyComment={(commentIdx, text) => handleReplyComment(commentIdx, text, postId)}
+        onLikeReply={(commentIdx, replyIdx) => handleLikeReply(commentIdx, replyIdx, postId)}
+        onEditPost={(data) => handleEditPost({ ...data, postId })}
+      />
+    );
+  };
+
+  // ─── Determine which pages show the NavBar ───
+  const showNavBar = ['/', '/aldeia', '/feed', '/perfil', '/alertas', '/admin'].includes(location.pathname) || location.pathname.startsWith('/post/');
+
+  // ─── Fetch notifications when going to /alertas ───
+  useEffect(() => {
+    if (location.pathname === '/alertas' && savedUser?.id) {
+      fetchNotifications();
+    }
+  }, [location.pathname]);
+
+  // ─── RENDER ───
   return (
-    <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
+    <>
+      <Routes>
+        {/* Auth pages (no NavBar) */}
+        <Route path="/login" element={
+          <LoginPage
+            onBack={goBack}
+            onLogin={handleLogin}
+            onGoToSignup={() => navigate('/signup')}
+            onForgotPassword={() => navigate('/esqueci-senha')}
+          />
+        } />
+        <Route path="/signup" element={
+          <SignupPage
+            onBack={goBack}
+            onSignup={handleSignup}
+            onGoToLogin={() => navigate('/login')}
+          />
+        } />
+        <Route path="/email-pendente" element={
+          <EmailPendingPage
+            email={userEmail}
+            userName={userName}
+            confirmToken={savedUser?.confirmToken}
+            onContinue={goAfterAuth}
+            onResend={resendConfirmationEmail}
+            onConfirmed={() => {
+              if (savedUser) {
+                const updatedUser = { ...savedUser, emailConfirmed: true };
+                localStorage.setItem('dmd_user', JSON.stringify(updatedUser));
+                setSavedUser(updatedUser);
+              }
+              navigate('/email-confirmado');
+            }}
+          />
+        } />
+        <Route path="/email-confirmado" element={
+          <EmailConfirmPage
+            success={true}
+            onContinue={() => { navigate('/'); window.scrollTo(0, 0); }}
+          />
+        } />
+        <Route path="/email-falhou" element={
+          <EmailConfirmPage
+            success={false}
+            onContinue={() => { navigate('/'); window.scrollTo(0, 0); }}
+          />
+        } />
+        <Route path="/esqueci-senha" element={
+          <ForgotPasswordPage
+            onBack={() => navigate('/login')}
+            onCodeSent={(email) => {
+              setResetEmail(email);
+              navigate('/resetar-senha');
+            }}
+          />
+        } />
+        <Route path="/resetar-senha" element={
+          <ResetPasswordPage
+            email={resetEmail}
+            onBack={() => navigate('/esqueci-senha')}
+            onSuccess={() => navigate('/senha-resetada')}
+          />
+        } />
+        <Route path="/senha-resetada" element={
+          <PasswordResetSuccessPage
+            onGoToLogin={() => {
+              navigate('/login');
+              setResetEmail('');
+            }}
+          />
+        } />
+        <Route path="/onboarding" element={
+          <OnboardingPage
+            userName={userName}
+            onComplete={() => {
+              completeOnboarding();
+              resolvePendingAction();
+            }}
+          />
+        } />
 
-      {/* Header */}
-      <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-blue-100/50">
-        <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-7" />
-        <p className="text-xs text-soft-pink font-sans font-medium">Aldeia Digital</p>
-      </header>
-      <div className="px-6 pt-5 pb-3">
-        <h2 className="text-xl font-bold text-gray-800">{"Bem-vinda, "}<span className="text-soft-pink">{userName || "Mam\u00e3e"}</span>{" \ud83d\udc97"}</h2>
-        <p className="text-sm text-gray-400 mt-1">{"Sua aldeia digital de apoio"}</p>
-      </div>
+        {/* Main pages (with NavBar) */}
+        <Route path="/admin" element={
+          userEmail === ADMIN_EMAIL
+            ? <AdminPage adminEmail={userEmail} onBack={goBack} />
+            : <Navigate to="/" replace />
+        } />
+        <Route path="/alertas" element={
+          <NotificationsPage
+            notifications={notifications}
+            onMarkAllRead={markAllNotificationsRead}
+            onBack={goBack}
+            onNavigateToPost={(postId) => {
+              if (postId) handleOpenPost(postId);
+            }}
+          />
+        } />
+        <Route path="/perfil" element={
+          !isLoggedIn ? (
+            <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800 flex flex-col">
+              <header className="p-6 pb-2 bg-soft-bg">
+                <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-8" />
+                <p className="text-sm text-soft-pink font-sans font-medium">Aldeia Digital</p>
+              </header>
+              <div className="flex flex-col items-center justify-center flex-1 px-8">
+                <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mb-6">
+                  <User size={36} className="text-gray-400" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-800 mb-2 text-center">{"Voc\u00ea ainda n\u00e3o est\u00e1 conectada"}</h2>
+                <p className="text-sm text-gray-400 text-center mb-8 leading-relaxed">{"Crie sua conta ou fa\u00e7a login para acessar seu perfil e todas as funcionalidades."}</p>
+                <button
+                  onClick={() => navigate('/signup')}
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all mb-3"
+                >
+                  Criar Conta
+                </button>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="w-full py-3.5 rounded-xl border-2 border-[#FF66C4] text-[#FF66C4] font-bold text-sm active:scale-[0.98] transition-all"
+                >
+                  {"J\u00e1 tenho conta"}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <ProfilePage
+              userName={userName}
+              userEmail={userEmail}
+              userId={savedUser?.id}
+              posts={rodasPosts}
+              onOpenPost={handleOpenPost}
+              isEmailConfirmed={isEmailConfirmed}
+              onResendConfirmation={resendConfirmationEmail}
+              notifPrefs={notifPrefs}
+              onToggleNotifPref={(key) => setNotifPrefs(prev => ({ ...prev, [key]: !prev[key] }))}
+              notifications={notifications}
+              onLogout={handleLogout}
+              onDeleteAccount={handleDeleteAccount}
+            />
+          )
+        } />
+        <Route path="/post/:id" element={<PostDetailWrapper />} />
+        <Route path="/feed" element={
+          !isLoggedIn ? (
+            <SignupPage
+              onSignup={handleSignupForRodas}
+              onGoToLogin={() => navigate('/login')}
+            />
+          ) : (
+            <RodasDeConversa onBack={goBack} posts={rodasPosts} onOpenPost={handleOpenPost} onSendPost={handleSendPost} />
+          )
+        } />
+        <Route path="/aldeia" element={
+          <>
+            <AldeiaPage
+              onNavigate={(page) => navigateTo(page)}
+              posts={rodasPosts}
+              onComingSoon={(feat) => setShowComingSoon(feat || 'general')}
+              isLoggedIn={isLoggedIn}
+              onRequireLogin={(action) => {
+                setPendingAction(action);
+                navigate('/signup');
+              }}
+              onOpenPost={handleOpenPost}
+            />
+            {showComingSoon && (
+              <ComingSoonPopup onClose={() => setShowComingSoon(null)} isLoggedIn={isLoggedIn} userEmail={userEmail} userId={savedUser?.id} feature={showComingSoon} />
+            )}
+          </>
+        } />
 
-      {/* Email Confirm Banner */}
-      {isLoggedIn && !isEmailConfirmed && (
-        <EmailConfirmBanner onResend={resendConfirmationEmail} />
+        {/* Home / Inicio (default) */}
+        <Route path="/" element={
+          <div className="min-h-screen bg-soft-bg pb-24 max-w-md mx-auto shadow-2xl font-sans text-gray-800">
+            <header className="sticky top-0 z-30 bg-soft-bg/95 backdrop-blur-sm px-6 py-3 border-b border-blue-100/50">
+              <img src="/images/logo-horizontal-azul.png" alt="DeMãesDadas" className="h-7" />
+              <p className="text-xs text-soft-pink font-sans font-medium">Aldeia Digital</p>
+            </header>
+            <div className="px-6 pt-5 pb-3">
+              <h2 className="text-xl font-bold text-gray-800">{"Bem-vinda, "}<span className="text-soft-pink">{userName || "Mam\u00e3e"}</span>{" \ud83d\udc97"}</h2>
+              <p className="text-sm text-gray-400 mt-1">{"Sua aldeia digital de apoio"}</p>
+            </div>
+
+            {isLoggedIn && !isEmailConfirmed && (
+              <EmailConfirmBanner onResend={resendConfirmationEmail} />
+            )}
+
+            {showEmailConfirmRequired && (
+              <EmailConfirmRequiredPopup
+                onClose={() => setShowEmailConfirmRequired(false)}
+                onResend={resendConfirmationEmail}
+              />
+            )}
+
+            {showAccountDeleted && (
+              <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-6">
+                <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl">
+                  <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                    <Check size={28} className="text-green-600" />
+                  </div>
+                  <h3 className="font-bold text-gray-800 text-lg mb-2">{"Conta exclu\u00edda"}</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed mb-5">
+                    {"Sua conta foi exclu\u00edda com sucesso. Sentiremos sua falta na Aldeia."}
+                  </p>
+                  <button
+                    onClick={() => setShowAccountDeleted(false)}
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
+                  >
+                    Entendi
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {reviewPopupType && (
+              <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
+            )}
+
+            <MoodCup />
+
+            <ActionGrid
+              onNavigate={(page) => navigateTo(page)}
+              onSendPost={handleSendPost}
+              onComingSoon={(feat) => setShowComingSoon(feat || 'general')}
+              isLoggedIn={isLoggedIn}
+              isEmailConfirmed={isEmailConfirmed}
+              onRequireLogin={(action) => {
+                setPendingAction(action);
+                navigate('/signup');
+              }}
+              onRequireEmailConfirm={() => setShowEmailConfirmRequired(true)}
+              draftMessage={draftMessage}
+              setDraftMessage={setDraftMessage}
+              isPanicOpen={isPanicOpen}
+              setIsPanicOpen={setIsPanicOpen}
+            />
+            <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" feature="Jornadas" onComingSoon={(feat) => setShowComingSoon(feat)} />
+
+            <div className="mx-6 h-px bg-white" />
+
+            <section className="py-4 bg-soft-bg">
+              <div className="px-6 mb-2">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-sans font-bold text-gray-800">Os Guardi&#245;es do Cuidado</h3>
+                  <button onClick={() => setShowComingSoon('Guardioes')} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
+                </div>
+                <p className="text-xs text-gray-400 leading-relaxed mt-1">
+                  Encontros com saberes que sustentam a vida. N&#227;o s&#227;o gurus. S&#227;o pessoas que caminham com o corpo, a escuta e a experi&#234;ncia.
+                </p>
+              </div>
+              <div className="flex overflow-x-auto px-6 gap-4 pb-8 pt-2 snap-x hide-scrollbar">
+                {guardioes.map((item, idx) => (
+                  <div key={idx} onClick={() => setShowComingSoon('Guardioes')} style={{ minWidth: "180px", maxWidth: "180px" }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col cursor-pointer">
+                    <div className={`h-32 relative ${item.bgClass} flex items-center justify-center overflow-hidden`}>
+                      <span className="absolute top-4 left-4 text-[10px] font-bold px-3 py-1 rounded-full bg-white/90 text-emerald-700 z-10">
+                        {item.tag}
+                      </span>
+                      <div className="w-24 h-24 rounded-full bg-white/20 blur-2xl absolute -top-4 -right-4"></div>
+                      <div className="w-32 h-32 rounded-full bg-black/5 blur-3xl absolute -bottom-10 -left-10"></div>
+                    </div>
+                    <div className="p-5">
+                      <h4 className="font-sans font-bold text-gray-800 mb-2">{item.title}</h4>
+                      <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <div className="mx-6 h-px bg-white" />
+
+            <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" cardWidth="280px" feature="Tribos" onComingSoon={(feat) => setShowComingSoon(feat)} />
+
+            {showComingSoon && (
+              <ComingSoonPopup onClose={() => setShowComingSoon(null)} isLoggedIn={isLoggedIn} userEmail={userEmail} userId={savedUser?.id} feature={showComingSoon} />
+            )}
+
+            {reviewPopupType && (
+              <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
+            )}
+          </div>
+        } />
+
+        {/* Catch-all: redirect to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+
+      {/* Global NavBar */}
+      {showNavBar && (
+        <NavBar unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
       )}
 
-      {/* Email Confirm Required Popup */}
-      {showEmailConfirmRequired && (
+      {/* Global popups that can appear on any page */}
+      {showEmailConfirmRequired && location.pathname !== '/' && (
         <EmailConfirmRequiredPopup
           onClose={() => setShowEmailConfirmRequired(false)}
           onResend={resendConfirmationEmail}
         />
       )}
-
-      {/* Account Deleted Popup */}
-      {showAccountDeleted && (
-        <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center px-6">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl">
-            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-              <Check size={28} className="text-green-600" />
-            </div>
-            <h3 className="font-bold text-gray-800 text-lg mb-2">{"Conta exclu\u00edda"}</h3>
-            <p className="text-sm text-gray-500 leading-relaxed mb-5">
-              {"Sua conta foi exclu\u00edda com sucesso. Sentiremos sua falta na Aldeia."}
-            </p>
-            <button
-              onClick={() => setShowAccountDeleted(false)}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF66C4] to-[#B946FF] text-white font-bold text-sm active:scale-[0.98] transition-all"
-            >
-              Entendi
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Review Pending Popup */}
-      {reviewPopupType && (
+      {reviewPopupType && location.pathname !== '/' && (
         <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
       )}
-
-      <MoodCup />
-
-      <ActionGrid
-        onNavigate={(page) => navigateTo(page)}
-        onSendPost={handleSendPost}
-        onComingSoon={(feat) => setShowComingSoon(feat || 'general')}
-        isLoggedIn={isLoggedIn}
-        isEmailConfirmed={isEmailConfirmed}
-        onRequireLogin={(action) => {
-          setPendingAction(action);
-          navigateTo('signup');
-        }}
-        onRequireEmailConfirm={() => setShowEmailConfirmRequired(true)}
-        draftMessage={draftMessage}
-        setDraftMessage={setDraftMessage}
-        isPanicOpen={isPanicOpen}
-        setIsPanicOpen={setIsPanicOpen}
-      />
-      <ContentSection title="Jornadas da Cura" items={trilhas} badgeColor="bg-[#FF66C4] text-white" feature="Jornadas" onComingSoon={(feat) => setShowComingSoon(feat)} />
-
-      <div className="mx-6 h-px bg-white" />
-
-      {/* Os Guardioes do Cuidado */}
-      <section className="py-4 bg-soft-bg">
-        <div className="px-6 mb-2">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-sans font-bold text-gray-800">Os Guardi&#245;es do Cuidado</h3>
-            <button onClick={() => setShowComingSoon('Guardioes')} className="text-xs font-bold text-[#FF66C4] uppercase tracking-wider">Ver tudo</button>
-          </div>
-          <p className="text-xs text-gray-400 leading-relaxed mt-1">
-            Encontros com saberes que sustentam a vida. N&#227;o s&#227;o gurus. S&#227;o pessoas que caminham com o corpo, a escuta e a experi&#234;ncia.
-          </p>
-        </div>
-        <div className="flex overflow-x-auto px-6 gap-4 pb-8 pt-2 snap-x hide-scrollbar">
-          {guardioes.map((item, idx) => (
-            <div key={idx} onClick={() => setShowComingSoon('Guardioes')} style={{ minWidth: "180px", maxWidth: "180px" }} className="snap-center bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 hover:shadow-md transition-all flex flex-col cursor-pointer">
-              <div className={`h-32 relative ${item.bgClass} flex items-center justify-center overflow-hidden`}>
-                <span className="absolute top-4 left-4 text-[10px] font-bold px-3 py-1 rounded-full bg-white/90 text-emerald-700 z-10">
-                  {item.tag}
-                </span>
-                <div className="w-24 h-24 rounded-full bg-white/20 blur-2xl absolute -top-4 -right-4"></div>
-                <div className="w-32 h-32 rounded-full bg-black/5 blur-3xl absolute -bottom-10 -left-10"></div>
-              </div>
-              <div className="p-5">
-                <h4 className="font-sans font-bold text-gray-800 mb-2">{item.title}</h4>
-                <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="mx-6 h-px bg-white" />
-
-      <ContentSection title="Encontre Sua Tribo" items={tribos} badgeColor="bg-white text-[#8b5cf6]" cardWidth="280px" feature="Tribos" onComingSoon={(feat) => setShowComingSoon(feat)} />
-      
-      {/* Coming Soon Popup */}
-      {showComingSoon && (
-        <ComingSoonPopup onClose={() => setShowComingSoon(null)} isLoggedIn={isLoggedIn} userEmail={userEmail} userId={savedUser?.id} feature={showComingSoon} />
-      )}
-
-      {/* Review Pending Popup */}
-      {reviewPopupType && (
-        <ReviewPendingPopup type={reviewPopupType} onClose={() => { setReviewPopupType(null); window.scrollTo(0, 0); }} />
-      )}
-
-      <NavBar currentPage="inicio" onNavigate={handleNavTab} unreadCount={unreadCount} isAdmin={userEmail === ADMIN_EMAIL} />
-    </div>
+    </>
   );
 };
 
